@@ -1,0 +1,292 @@
+﻿@model CCMS_Analysis_Quote.Models.QuoteModel
+
+@{
+    ViewData["Title"] = "New Form";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breakout Table Form</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .add-btn, .remove-btn {
+            cursor: pointer;
+        }
+     
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>SMG FACILITIES PROPOSAL FORM</h2>
+
+        <form asp-action="SubmitForm" method="post" enctype="multipart/form-data">
+            <!-- Updated enctype -->
+            <!-- General Fields Section -->
+            <div class="form-group">
+                <label asp-for="SMG_Vendor_PO">SMG Vendor PO#</label>
+                <input asp-for="SMG_Vendor_PO" class="form-control required" placeholder="###### or ######-##" />
+                <span asp-validation-for="SMG_Vendor_PO" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Date">Date</label>
+                <input asp-for="Date" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="SMG_CLIENT">SMG CLIENT</label>
+                <input asp-for="SMG_CLIENT" class="form-control required" placeholder="Enter SMG CLIENT" />
+                <span asp-validation-for="SMG_CLIENT" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="StoreNumber">Store Number</label>
+                <input asp-for="StoreNumber" class="form-control" placeholder="Enter Store Number" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Location">LOCATION</label>
+                <input asp-for="Location" class="form-control required" placeholder="Enter Location" />
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CityState">City/State</label>
+                <input asp-for="CityState" class="form-control required" placeholder="Enter City/State" />
+                <span asp-validation-for="CityState" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Vendor">Vendor</label>
+                <input asp-for="Vendor" class="form-control required" placeholder="Enter Vendor" />
+                <span asp-validation-for="Vendor" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email">Email</label>
+                <input asp-for="Email" class="form-control required" placeholder="Enter Email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ServiceRepName">Service Rep Name</label>
+                <input asp-for="ServiceRepName" class="form-control" placeholder="Enter Service Rep Name" />
+            </div>
+
+            <div class="form-group">
+                <label>Incurred Cost?</label><br />
+                <label>
+                    <input type="radio" name="IsIncurredCost" value="true"> Yes
+                </label>
+                <label>
+                    <input type="radio" name="IsIncurredCost" value="false" checked> No
+                </label>
+            </div>
+
+            <!-- Dynamic Incurred Breakout Table -->
+            <h4 id="incurredSection" style="display: none;">Incurred Breakout Table</h4>
+            <table class="table table-bordered" id="incurredBreakoutTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Cost Type</th>
+                        <th>Description</th>
+                        <th>Rate</th>
+                        <th>Quantity</th>
+                        <th>#Techs</th>
+                        <th>Initial Call Sub Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select class="form-control" name="IncurredBreakouts[0].CostType">
+                                <option value="Labor">Labor</option>
+                                <option value="Materials">Materials</option>
+                                <option value="Travel">Travel</option>
+                                <option value="Equipment">Equipment</option>
+                                <option value="Disposal">Disposal</option>
+                                <option value="Fees">Fees</option>
+                                <option value="Permitting">Permitting</option>
+                                <option value="Miscellaneous">Miscellaneous</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="IncurredBreakouts[0].Description" placeholder="Description">
+                        </td>
+                        <td>
+                            <input type="number" class="form-control" name="IncurredBreakouts[0].Rate" placeholder="Rate" min="0">
+                        </td>
+                        <td>
+                            <input type="number" class="form-control" name="IncurredBreakouts[0].Quantity" placeholder="Quantity" min="0">
+                        </td>
+                        <td>
+                            <input type="number" class="form-control" name="IncurredBreakouts[0].Techs" placeholder="Techs">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="IncurredBreakouts[0].InitialCallSubTotal" readonly />
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-success add-btn">+</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Dynamic Proposed Breakout Table -->
+            <h4>Proposed Breakout Table</h4>
+            <table class="table table-bordered" id="proposedBreakoutTable">
+                <thead>
+                    <tr>
+                        <th>Cost Type</th>
+                        <th>Description</th>
+                        <th>Rate</th>
+                        <th>Quantity</th>
+                        <th>#Techs</th>
+                        <th>Initial Call Sub Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select class="form-control" name="ProposedBreakouts[0].CostType">
+                                <option value="Labor">Labor</option>
+                                <option value="Materials">Materials</option>
+                                <option value="Travel">Travel</option>
+                                <option value="Equipment">Equipment</option>
+                                <option value="Disposal">Disposal</option>
+                                <option value="Fees">Fees</option>
+                                <option value="Permitting">Permitting</option>
+                                <option value="Miscellaneous">Miscellaneous</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="ProposedBreakouts[0].Description" placeholder="Description">
+                        </td>
+                        <td>
+                            <input type="number" class="form-control" name="ProposedBreakouts[0].Rate" placeholder="Rate" min="0">
+                        </td>
+                        <td>
+                            <input type="number" class="form-control" name="ProposedBreakouts[0].Quantity" placeholder="Quantity" min="0">
+                        </td>
+                        <td>
+                            <input type="number" class="form-control" name="ProposedBreakouts[0].Techs" placeholder="Techs">
+                        </td>
+                        <td>
+                            <input type="text" class="form-control" name="ProposedBreakouts[0].InitialCallSubTotal" readonly />
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-success add-btn">+</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="form-group">
+                <label asp-for="SignatureFile">Upload Signature: </label>
+                <input asp-for="SignatureFile" type="file" accept=".pdf,.png,.jpg,.jpeg" class="form-control d-none" id="fileInput" />
+                <div id="fileDisplay" style="display: none;">
+                    <span id="fileName"></span>
+                    <button type="button" id="removeFileButton" class="btn btn-link text-danger p-0">X</button>
+                </div>
+                <button type="button" id="uploadButton" class="btn btn-primary mt-2">Upload Signature</button>
+                <span asp-validation-for="SignatureFile" class="text-danger"></span>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Toggle visibility of sections based on IsIncurredCost
+            $('input[name="IsIncurredCost"]').change(function () {
+                if ($(this).val() === 'true') {
+                    $('#incurredSection').show();
+                    $('#incurredBreakoutTable').show();
+                } else {
+                    $('#incurredSection').hide();
+                    $('#incurredBreakoutTable').hide();
+
+                    // Clear all data in Incurred Breakout fields when 'No' is selected
+                    $('#incurredBreakoutTable').find('input, select').val('');
+                }
+            });
+
+            // Autofill Initial Call Sub Total on Rate and Quantity change
+            $('#proposedBreakoutTable, #incurredBreakoutTable').on('input', 'input[name$=".Rate"], input[name$=".Quantity"]', function () {
+                if (parseFloat($(this).val()) < 0) {
+                    $(this).val(0);
+                } 
+                const row = $(this).closest('tr');
+                const rate = parseFloat(row.find('input[name$=".Rate"]').val()) || 0;
+                const quantity = parseInt(row.find('input[name$=".Quantity"]').val()) || 0;
+                const subtotal = rate * quantity;
+                row.find('input[name$=".InitialCallSubTotal"]').val(subtotal.toFixed(2));
+            });
+
+            function addNewRow(tableSelector, type) {
+                const lastIndex = $(tableSelector + ' tbody tr').length;
+                const newRow = $(tableSelector + ' tbody tr:first').clone(true);
+                newRow.find('input').val('');
+                newRow.find('select').val('');
+                newRow.find('.add-btn').removeClass('btn-success add-btn').addClass('btn-danger remove-btn').text('X');
+
+                // Update names with new index
+                newRow.find('select').attr('name', `${type}[${lastIndex}].CostType`);
+                newRow.find('input[name$=".Description"]').attr('name', `${type}[${lastIndex}].Description`);
+                newRow.find('input[name$=".Rate"]').attr('name', `${type}[${lastIndex}].Rate`);
+                newRow.find('input[name$=".Quantity"]').attr('name', `${type}[${lastIndex}].Quantity`);
+                newRow.find('input[name$=".Techs"]').attr('name', `${type}[${lastIndex}].Techs`);
+                newRow.find('input[name$=".InitialCallSubTotal"]').attr('name', `${type}[${lastIndex}].InitialCallSubTotal`);
+
+                $(tableSelector + ' tbody').append(newRow);
+            }
+
+            // Add event listeners for add and remove buttons
+            $('#proposedBreakoutTable').on('click', '.add-btn', function () {
+                addNewRow('#proposedBreakoutTable', 'ProposedBreakouts');
+            });
+            $('#incurredBreakoutTable').on('click', '.add-btn', function () {
+                addNewRow('#incurredBreakoutTable', 'IncurredBreakouts');
+            });
+
+            // Remove row functionality
+            $('#proposedBreakoutTable, #incurredBreakoutTable').on('click', '.remove-btn', function () {
+                $(this).closest('tr').remove();
+            });
+
+            $('#uploadButton').on('click', function () {
+                $('#fileInput').click();
+            });
+
+            // Display file name and remove button when a file is selected
+            $('#fileInput').on('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    $('#fileName').text(file.name);
+                    $('#fileDisplay').show();
+                    $('#uploadButton').hide(); // Hide the upload button once a file is selected
+                }
+            });
+
+            // Clear the file input and reset display when "X" is clicked
+            $('#removeFileButton').on('click', function () {
+                $('#fileInput').val(''); // Clear the input
+                $('#fileDisplay').hide(); // Hide the file display area
+                $('#uploadButton').show(); // Show the upload button again
+            });
+        });
+    </script>
+</body>
+</html>

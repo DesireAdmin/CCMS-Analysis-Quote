@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/CCMS-Analysis_Quote/bin/Debug/net8.0
+/CCMS-Analysis_Quote/.vs/CCMS-Analysis_Quote/FileContentIndex
+/CCMS-Analysis_Quote/obj
