@@ -1,0 +1,27 @@
+ <tr>
+                                <td>
+                                    <select class="small-font form-control">
+                                        <option selected>{{CostType}}</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" class="small-font form-control"
+                                        placeholder="Description" value="{{Description}}" readonly>
+                                </td>
+                                <td>
+                                    <input type="text" class="small-font form-control"
+                                        placeholder="Description" value="{{Rate}}" readonly>
+                                </td>
+                                <td>
+                                    <input type="number" class="small-font form-control" placeholder="Rate"
+                                        value="{{Quantity}}" readonly>
+                                </td>
+                                <td>
+                                    <input type="number" class="small-font form-control" placeholder="#Techs"
+                                        value="{{Techs}}" readonly>
+                                </td>
+                                <td>
+                                    <input type="text" class="small-font form-control"
+                                        placeholder="Initial Call Sub Total" value="{{InitialCallSubTotal}}" readonly>
+                                </td>
+                            </tr>

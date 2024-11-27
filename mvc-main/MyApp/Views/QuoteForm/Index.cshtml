@@ -1,0 +1,601 @@
+﻿@model IEnumerable<MyApp.ServiceModel.DatabaseModel.QuoteModel>
+
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="contain-dashboard">
+    <div class="container">
+        <div>
+            <div class="dashboard-header">
+                
+            </div>
+            <div class="dashboard-body table-box">
+                <div>
+                    <h3>Dashboard</h3>
+                </div>
+                <div>
+                    <div>
+                        <div>
+                            <div id="new-search-box-location"></div>
+
+                        </div>
+                        <div></div>
+                    </div>
+                    <table class="answers-table table table-hover" id="answers-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                @* <th>SMG Vendor PO #</th>
+                                <th>SMG Client</th>
+                                <th>Store</th>
+                                <th>Email</th>
+                                <th>Date</th>
+                                <th>Action</th> *@
+                                <th>
+                                    @Html.DisplayNameFor(model => model.SMG_Vendor_PO)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.SMG_CLIENT)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.StoreNumber)
+                                </th>
+                                @* <th>
+                                @Html.DisplayNameFor(model => model.    )
+                                </th>
+                                <th>
+                                @Html.DisplayNameFor(model => model.Vendor)
+                                </th> *@
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Email)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Date)
+                                </th>
+                                @* <th>
+                                @Html.DisplayNameFor(model => model.ServiceRepName)
+                                </th>
+                                <th>
+                                @Html.DisplayNameFor(model => model.IsIncurredCost)
+                                </th>
+                                <th>
+                                @Html.DisplayNameFor(model => model.SignatureUrl)
+                                </th> *@
+                                <th>View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int index = 1;
+                            }
+                            @foreach (var item in Model)
+                            {
+                                
+                                <tr>
+                                    <td class="text-center">@index</td>
+                                    <td class="text-center">@Html.DisplayFor(modelItem => item.SMG_Vendor_PO)</td>
+                                    <td class="mt-2">@Html.DisplayFor(modelItem => item.SMG_CLIENT)</td>
+                                    <td class="text-center">@Html.DisplayFor(modelItem => item.StoreNumber)</td>
+                                    <td class="mt-2">@Html.DisplayFor(modelItem => item.Email)</td>
+                                    <td class="text-center">@Html.DisplayFor(modelItem => item.Date)</td>
+                                    <td style="justify-items: center;">
+                                        <svg onclick="openModal('@item.Id')" xmlns="http://www.w3.org/2000/svg" height="22px"
+                                             viewBox="0 0 576 512">
+                                            <path fill="#0181eb"
+                                                  d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z" />
+                                        </svg>
+                                    </td>
+                                    @* <td>
+                                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                                </td> *@
+                                </tr>
+                                index++;
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+                
+            </div>
+            <div class="dashboard-footer">
+                
+            </div>
+        </div> 
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="extraLargeModal" tabindex="-1" aria-labelledby="extraLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl container">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <div class="">
+                    <h3 class="modal-title" id="extraLargeModalLabel">SMG Facilities Proposal Form Summary</h3>
+                </div>
+                <div class="">
+                    <button type="button" class=" modal-title-close position-absolute end-0 me-3" data-bs-dismiss="modal" onclick="closeModal()" aria-label="Close">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="red" x="0px" y="0px" width="30" height="30" viewBox="0 0 128 128">
+    <path d="M 64 6 C 48.5 6 33.9 12 23 23 C 12 33.9 6 48.5 6 64 C 6 79.5 12 94.1 23 105 C 34 116 48.5 122 64 122 C 79.5 122 94.1 116 105 105 C 116 94 122 79.5 122 64 C 122 48.5 116 33.9 105 23 C 94.1 12 79.5 6 64 6 z M 64 12 C 77.9 12 90.900781 17.399219 100.80078 27.199219 C 110.70078 36.999219 116 50.1 116 64 C 116 77.9 110.60078 90.900781 100.80078 100.80078 C 90.900781 110.60078 77.9 116 64 116 C 50.1 116 37.099219 110.60078 27.199219 100.80078 C 17.299219 91.000781 12 77.9 12 64 C 12 50.1 17.399219 37.099219 27.199219 27.199219 C 36.999219 17.299219 50.1 12 64 12 z M 50.5625 47.5 C 49.8 47.5 49.05 47.800391 48.5 48.400391 C 47.3 49.600391 47.3 51.499609 48.5 52.599609 L 59.800781 64 L 48.400391 75.300781 C 47.200391 76.500781 47.200391 78.4 48.400391 79.5 C 49.000391 80.1 49.8 80.400391 50.5 80.400391 C 51.2 80.400391 51.999609 80.1 52.599609 79.5 L 64 68.199219 L 75.300781 79.5 C 75.900781 80.1 76.700391 80.400391 77.400391 80.400391 C 78.100391 80.400391 78.9 80.1 79.5 79.5 C 80.7 78.3 80.7 76.400781 79.5 75.300781 L 68.199219 64 L 79.5 52.699219 C 80.7 51.499219 80.699609 49.600391 79.599609 48.400391 C 78.399609 47.200391 76.500391 47.200391 75.400391 48.400391 L 64 59.800781 L 52.699219 48.400391 C 52.099219 47.800391 51.325 47.5 50.5625 47.5 z"></path>
+</svg>
+                    </button>
+                </div>
+                
+                
+            </div>
+            <div class="modal-body">
+                <div class="view-content">
+                    <div class="modal-smg-facilities-proposal-form-details">
+                        <!--SMG FACILITIES PROPOSAL FORM Details-->
+                        <div>
+                            <div class="header-form-title">
+                                <h2>SMG FACILITIES PROPOSAL FORM</h2>
+                            </div>
+                        </div>
+                        <div class="row pr-2 pl-2 mt-2">
+                            <div class="form-group  col-md-6">
+                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">SMG Vendor PO #:</h4></div>
+                                <div>
+                                    <span id="modal-SMGVendorPO"></span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Date:</h4></div>
+                                <div>
+                                    <span id="modal-Date"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row pl-2 pr-2 mt-2">
+                            <div class="form-group col-md-6">
+                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">SMG Client:</h4></div>
+                                <div>
+                                    <span id="modal-SMGClient"></span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Store #:</h4></div>
+                                <div>
+                                    <span id="modal-StoreNumber"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row pr-2 pl-2 mt-2">
+                            <div class="form-group col-md-6">
+                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Location:</h4></div>
+                                <div>
+                                    <span id="modal-Location"></span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Vendor:</h4></div>
+                                <div>
+                                    <span id="modal-Vendor"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row pl-2 pr-2 pb-3 mt-2">
+                            <div class="form-group col-md-6">
+                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Email:</h4></div>
+                                <div>
+                                    <span id="modal-Email"></span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Service Rep Name:</h4></div>
+                                <div><span id="modal-ServiceRepName"></span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <div class="modal-smg-facilities-proposal-form-details">
+                            <div class="summary-section header-form-title">
+                                <h4>SUMMARY OF INITIAL CALL</h4>
+                            </div>
+                            <div class="modal-service-date">
+                                <span class="service-date-label">Service Date: 2024-10-29</span>
+                            </div>
+                            <div class="initial-call-breakout p-2 mb-2">
+                                <div>
+                                    <h4 id="incurredSection" style="text-align: center;">Initial call breakout</h4>
+                                </div>
+                                <div class="p-2">
+                                    <div><label class="text-base font-medium text-gray-700 dark:text-gray-300">Issue(s) discovered while on-site & Description of Work Performed*</label></div>
+                                    <div class="mt-2"><span id="incurredIssueDescription"></span></div>
+                                </div>
+                                <div class=" p-2">
+                                    <table class="initial-call-table table">
+                                    <thead>
+                                        <tr>
+                                            <th>Cost Type</th>
+                                            <th>Description</th>
+                                            <th>Rate</th>
+                                            <th>Quantity</th>
+                                            <th>#Techs</th>
+                                            <th>Initial Call Sub Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="incurredBreakouts">
+                                        @* Dynamically load the data *@
+                                    </tbody>
+                                    
+                                </table>
+                                    <div>
+                                        <div class="tfoot">
+                                            <div class="row justify-content-end ">
+                                                <div class="col-md-2"><b>Sub Total</b></div>
+                                                <div class="col-md-2" colspan="5">
+                                                    <div><span class="initial-subtotal-final" id="initial-subtotal"></span></div>
+                                                </div>
+                                            </div>
+                                            <div class="row justify-content-end">
+                                                <div class="col-md-2"><b>Tax</b></div>
+                                                <div class="col-md-2" colspan="5">
+                                                    <div><span class="initial-tax-input" id="initial-tax"></span></div>
+                                                </div>
+                                            </div>
+                                            <div class="row justify-content-end">
+                                                <div class="col-md-2"><b>INITIAL CALL TOTAL</b></div>
+                                                <div class="col-md-2" colspan="5">
+                                                    <div><span class="initial-total-input" id="initial-total"></span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <h4 id="ProposedBreakoutTableText">Summary of proposed quoted work</h4>
+                            <div class="proposed-quote-summary table-responsive">
+                            <div class="p-2">
+                                    <div><label class="text-base font-medium text-gray-700 dark:text-gray-300">Detailed description of proposed work to address unresolved issues</label></div>
+                                    <div class="mt-2"><span id="proposedIssueDescription"></span></div>
+                            </div>
+                            <div class="p-2">
+                                <table class="table proposed-quote-table">
+                                <thead>
+                                    <tr>
+                                        <th>Cost Type</th>
+                                        <th>Description</th>
+                                        <th>Cost</th>
+                                        <th>Quantity</th>
+                                        <th>#Techs</th>
+                                        <th>Quote Sub Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="proposedBreakouts">
+                                    @* Dynamically load the data *@
+                                </tbody>
+                           
+                            </table>
+                                <div class="quote-summary p-2">
+                            <div class="quote-summary-row row">
+                                        <div class="quote-label col-md-2"><b>Sub Total</b></div>
+                                <div class="quote-value col-md-2" colspan="5">
+                                    <div><span class="quote-subtotal-final" id="quote-subtotal"></span></div>
+                                </div>
+                            </div>
+                            <div class="quote-summary-row row">
+                                        <div class="quote-label col-md-2"><b>Tax</b></div>
+                                <div class="quote-value col-md-2" colspan="5">
+                                    <div><span class="quote-tax-input" id="quote-tax"></span></div>
+                                </div>
+                            </div>
+                            <div class="quote-summary-row row">
+                                        <div class="quote-label col-md-2"><b>PROPOSED QUOTE </b></div>
+                                        <div class="quote-value col-md-2" colspan="5">
+                                    <div><span class="quote-total-input" id="quote-total"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                             </div>
+                    
+                    </div>
+                    
+                        </div>
+                    </div>
+
+                    <div class="ServiceProposal-container">
+                        <div class="header-form-title">
+                            <h3>Service Proposal</h3>
+                        </div>
+                        <div class="ServiceProposal-from-contain">
+                            <div class="mddl additional-details">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div>
+                                            <label for="message" class="message-label text-base font-medium text-gray-700 dark:text-gray-300">Message</label>
+
+                                        </div>
+                                        <div>
+                                            <div><span class="message-input" id="message"></span></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div>
+                                            <label for="disclaimer" class="disclaimer-label text-base font-medium text-gray-700 dark:text-gray-300">Disclaimer</label>
+                                        </div>
+                                        <div>
+                                            <div><span id="disclaimer" class="disclaimer-input"></span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 mt-3">
+                                        <div>
+                                            <label for="services" class="services-label text-base font-medium text-gray-700 dark:text-gray-300">Description of Services</label>
+                                        </div>
+                                        <div>
+                                            <div><span id="services" class="services-input"></span></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="DocAttachAndPartLeadTime d-none" id="modalPartsLeadSection" >
+                        <div class="header-form-title">
+                            <h3>Parts Lead Time</h3>
+                        </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div><label><b>Time Option</b></label></div>
+                                    <div><span id="Modal-Time-Option"></span></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div id="time" style="display:none">
+                                        <div><label><b>Time Number</b></label></div>
+                                        <div><span id="Modal-Time-Number"></span></div>
+                                    </div>
+                                    <div>
+                                        <div class="row" style="display:none" id="modalPartsRange">
+                                            <div class="col-md-6">
+                                                <div><label><b>Time Range From</b></label></div>
+                                                <div><span id="Modal-Time-Range-From"></span></div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div><label><b>Time Range To</b></label></div>
+                                                <div><span id="Modal-Time-Range-To"></span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div><label>Time Unit</label></div>
+                                    <div><span id="Modal-Time-Unit"></span></div>
+                                </div>
+                            </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+
+</div>
+
+@section Scripts{
+    <script src="~/lib/jquery/jquery-3.7.1.min.js"></script>
+    <script src="~/lib/jquery/datatables/datatables.min.js"></script>
+    
+    <script>
+        function openModal(id) {
+            //console.log("Modal opened with ID:", id);  // Check if this logs in the console
+            $.ajax({
+                url: '@Url.Action("GetQuoteDetails", "QuoteForm")',
+                type: 'GET',
+                data: { id: id },
+                success: function (response) {
+                    console.log(response);
+                    if (response.success) {
+                        console.log(response);
+                        $('#modal-SMGVendorPO').text(response.data.smG_Vendor_PO);
+                        $('#modal-Date').text(response.data.date);
+                        $('#modal-SMGClient').text(response.data.smG_CLIENT);
+                        $('#modal-StoreNumber').text(response.data.storeNumber);
+                        $('#modal-Email').text(response.data.email);
+                        $('#modal-Vendor').text(response.data.vendor);
+                        $('#modal-Location').text(response.data.location);
+                        $('#modal-ServiceRepName').text(response.data.serviceRepName);
+                        $('#initial-subtotal').text(response.data.incurredTotals.incurredSubTotal);
+                        $('#initial-tax').text(response.data.incurredTotals.incurredTax);
+                        $('#initial-total').text(response.data.incurredTotals.incurredInitialCallTotal);
+                        $('#quote-subtotal').text(response.data.proposedTotals.proposedSubTotal);
+                        $('#quote-tax').text(response.data.proposedTotals.proposedTax);
+                        $('#quote-total').text(response.data.proposedTotals.proposedInitialCallTotal);
+                        $('#message').text(response.data.message);
+                        $('#disclaimer').text(response.data.disclaimer);
+                        $('#services').text(response.data.descriptionOfServices);
+                        $('#incurredIssueDescription').text(response.data.incurredIssueDescription);
+                        $('#proposedIssueDescription').text(response.data.proposedIssueDescription);
+
+                        if(response.data.timeOption == 'Range' && response.data.timeRangeFrom != ''){
+                            $('#time').css('display', 'none');
+                            $('#modalPartsRange').css('display', 'inline');
+
+                            $('#Modal-Time-Unit').text(response.data.timeUnit);
+                            $('#Modal-Time-Option').text(response.data.timeOption); 
+                            $('#Modal-Time-Range-From').text(response.data.timeRangeFrom);
+                            $('#Modal-Time-Range-To').text(response.data.timeRangeTo);
+                            
+                            $('#modalPartsLeadSection').removeClass('d-none');
+                        }else if(response.data.timeOption == 'Number' && response.data.timeUnit != 0){
+                            $('#time').css('display', 'inline');
+                            $('#modalPartsRange').css('display', 'none');
+                            
+                            $('#Modal-Time-Number').text(response.data.timeNumber);
+                            $('#Modal-Time-Unit').text(response.data.timeUnit);
+                            $('#Modal-Time-Option').text(response.data.timeOption); 
+
+                            $('#modalPartsLeadSection').show(); 
+                        }
+
+
+
+                        // Assuming response.data.proposedBreakouts is the array of proposed breakouts
+                        var proposedBreakouts = response.data.proposedBreakouts;
+                        if (proposedBreakouts != null) {
+                            proposedBreakoutsRows(proposedBreakouts)
+                        }
+
+                        var incurredBreakouts = response.data.incurredBreakouts;
+                        debugger
+                        if (incurredBreakouts != null && incurredBreakouts.length > 0) {
+                            incurredBreakoutsRows(incurredBreakouts)
+                        } else {
+                            $(".initial-call-breakout").css({ "display":"none"});
+                        }
+                            
+                        
+                        var myModal = new bootstrap.Modal(document.getElementById('extraLargeModal'));
+                        // Show the modal
+                        myModal.show();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    debugger
+                    alert("Error retrieving data.");
+                }
+            });
+        }
+
+        function proposedBreakoutsRows(proposedBreakouts) {
+            // Clear the existing table rows
+            $('#proposedBreakouts').empty();
+
+            // Loop through each proposedBreakout and create new rows
+            $.each(proposedBreakouts, function (index, item) {
+                // Create a new row
+                var row = $('<tr></tr>');
+
+                // Cost Type cell (select dropdown with selected value)
+                var costTypeCell = $('<td></td>').append(
+                    $('<p></p>').addClass('quote-cost-type-select').text(item.costType)
+                );
+
+                // Description cell (readonly input)
+                var descriptionCell = $('<td></td>').append(
+                    $('<p></p>')
+                        .addClass('quote-description-input')
+                        .text(item.description)
+                );
+
+                // Cost cell (readonly p tag)
+                var costCell = $('<td></td>').append(
+                    $('<p></p>')
+                        .addClass('quote-cost-input')
+                        .text(item.rate)
+                );
+
+                // Quantity cell (readonly p tag)
+                var quantityCell = $('<td></td>').append(
+                    $('<p></p>')
+                        .addClass('quote-quantity-input')
+                        .text(item.quantity)
+                );
+
+                // Techs cell (readonly p tag)
+                var techsCell = $('<td></td>').append(
+                    $('<p></p>')
+                        .addClass('quote-techs-input')
+                        .text(item.techs)
+                );
+
+                // Quote Sub Total cell (readonly p tag)
+                var subtotalCell = $('<td></td>').append(
+                    $('<p></p>')
+                        .addClass('quote-subtotal-input')
+                        .text(item.initialCallSubTotal)
+                );
+
+                // Append all cells to the row
+                row.append(costTypeCell, descriptionCell, costCell, quantityCell, techsCell, subtotalCell);
+
+                // Append the row to the table body
+                $('#proposedBreakouts').append(row);
+            });
+
+
+        }
+
+        function incurredBreakoutsRows(incurredBreakouts) {
+            // Clear the existing table rows
+            $('#incurredBreakouts').empty();
+
+            // Loop through each proposedBreakout and create new rows
+            $.each(incurredBreakouts, function (index, item) {
+                // Create a new row
+                var row = $('<tr></tr>');
+
+                        // Cost Type cell (using <p>)
+                        var costTypeCell = $('<td></td>').append(
+                            $('<p></p>').addClass('quote-cost-type').text(item.costType)
+                        );
+
+                        // Description cell (using <p>)
+                        var descriptionCell = $('<td></td>').append(
+                            $('<p></p>')
+                                .addClass('quote-description')
+                                .text(item.description)
+                        );
+
+                        // Cost cell (using <p>)
+                        var costCell = $('<td></td>').append(
+                            $('<p></p>')
+                                .addClass('quote-cost')
+                                .text(item.rate)
+                        );
+
+                        // Quantity cell (using <p>)
+                        var quantityCell = $('<td></td>').append(
+                            $('<p></p>')
+                                .addClass('quote-quantity')
+                                .text(item.quantity)
+                        );
+
+                        // Techs cell (using <p>)
+                        var techsCell = $('<td></td>').append(
+                            $('<p></p>')
+                                .addClass('quote-techs')
+                                .text(item.techs)
+                        );
+
+                        // Quote Sub Total cell (using <p>)
+                        var subtotalCell = $('<td></td>').append(
+                            $('<p></p>')
+                                .addClass('quote-subtotal')
+                                .text(item.initialCallSubTotal)
+                        );
+
+               
+                // Append all cells to the row
+                row.append(costTypeCell, descriptionCell, costCell, quantityCell, techsCell, subtotalCell);
+
+                // Append the row to the table body
+                $('#incurredBreakouts').append(row);
+
+                $(".initial-call-breakout").css("display","block");
+            });
+        }
+
+        $(document).ready(function () {
+
+           
+            let table = new DataTable('#answers-table');
+            $('#new-search-box-location').detach().prependTo('#new-search-box-location');
+             $("#dt-search-0").attr("placeholder", "Search"); 
+        });
+
+    </script>
+        
+}

@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+@{
+    var dev = HostContext.AppHost.IsDevelopmentEnvironment();
+}
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] - Quote Form</title>
+     <link rel="icon" href="/logo.ico" type="image/x-icon">
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/css/font-awesome/css/all.css"/>
+        <link rel="stylesheet" href="~/lib/Bootstrap/bootstrap-5.0.2-dist/css/bootstrap.min.css"/>
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"
+              asp-fallback-href="~/lib/css/font-awesome/css/all.min.css"
+              crossorigin="anonymous">
+    </environment>
+
+    <link rel="stylesheet" href="/css/app.css"/>
+    <link rel="stylesheet" href="/css/typography.css"/>
+    <link rel="stylesheet" href="/css/site.css"/>
+    <link href="~/lib/toastr/toastr.min.css" rel="stylesheet" />
+
+    @Html.ImportMap(new()
+    {
+        ["vue"]                  = ("/lib/mjs/vue.mjs",                 "/lib/mjs/vue.min.mjs"),
+        ["@servicestack/client"] = ("/lib/mjs/servicestack-client.mjs", "/lib/mjs/servicestack-client.min.mjs"),
+        ["@servicestack/vue"]    = ("/lib/mjs/servicestack-vue.mjs",    "/lib/mjs/servicestack-vue.min.mjs"),
+        ["app.mjs"]              = ("/mjs/app.mjs",                     "/mjs/app.mjs"),
+        ["dtos.mjs"]             = ("/mjs/dtos.mjs",                    "/mjs/dtos.mjs"),
+    })
+    @await RenderSectionAsync("head", required: false)
+    
+    @if (dev) {
+        <script>window.Server = @await Html.ApiAsJsonAsync(new MetadataApp())</script>
+    }
+    <script type="module">
+    import { useAuth, useMetadata } from "@@servicestack/vue"
+    const { signIn } = useAuth()
+    signIn(@await Html.ApiAsJsonAsync(new Authenticate()))
+    
+    const { loadMetadata } = useMetadata()
+    loadMetadata({
+        olderThan: window.Server ? null : location.search.includes('clear=metadata') ? 0 : 60 * 60 * 1000 //1hr 
+    })
+    </script>
+</head>
+<body class="">
+<header class="border-b container border-gray-200 dark:border-gray-600 pr-3">
+    <div class="header-contain items-center">
+        <div class="">
+            <div class="cursor-pointer">
+                    <a class="navbar-brand navbar-brand-items  flex items-center" href="/">
+                    <img class="sm:ml-2 w-20 h-20" src="/img/logo.svg" alt="MyApp logo">
+                    <span class="">Quote Form</span>
+                </a>
+            </div>
+        </div>
+            <div class="flex flex-grow flex-shrink flex-nowrap header-nav-items items-center">
+            <nav hx-boost="true" class="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
+                <ul class="flex flex-wrap navbarcustom items-center justify-end w-full">
+                    @{
+                        var isAuthenticated = await Html.IsAuthenticatedAsync();
+                        var isAdmin = await Html.HasRoleAsync("Admin");
+
+                        async Task RenderNavLink(string controller, string action, string childContent, string? cls=null)
+                        {
+                            <li class="@Html.ClassNames("relative flex flex-wrap just-fu-start m-0",cls)">
+                                <a asp-controller="@controller" asp-action="@action"
+                                   class="@Html.ClassNames("p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400", Html.MatchesPath(controller) ? "text-blue-700 dark:text-blue-300" : "")">
+                                    @Html.Raw(childContent)
+                                </a>
+                            </li>
+                        }
+
+                        async Task RenderLinkButton(string controller, string action, string childContent, string? cls = null)
+                        {
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a asp-controller="@controller" asp-action="@action" class="@(cls ?? Css.SecondaryButton)">
+                                    @Html.Raw(childContent)
+                                </a>
+                            </li>
+                        }
+
+                       
+                        if (isAdmin)
+                        {
+                            <li class="relative flex flex-wrap just-fu-start m-0">
+                                <a href="/admin-ui" class="p-4 flex items-center justify-start mw-full hover:text-sky-500 dark:hover:text-sky-400">
+                                    Admin UI
+                                </a>
+                            </li>
+                        }
+
+
+                        <div class="onQouteform" style="margin: 10px;">
+                            @{
+                                await RenderLinkButton("QuoteForm", "CreateQuoteForm", "Create Quote Form");
+                            }
+                        </div>
+                        
+                        if (!isAuthenticated)
+                        {
+                            <div class="signInBtn-contain">
+                            @{
+                                await RenderLinkButton("Account", "Login", "Dashboard");
+                            }
+                            </div>
+                            
+                        }
+                        else
+                        {
+
+                                <li>
+                                    <div class="mx-3 relative">
+                                        <!-- Profile Menu Button -->
+                                        <div>
+                                            <button id="user-menu-button"
+                                                    class="max-w-xs bg-white dark:bg-black rounded-full flex items-center text-sm "
+                                                    aria-expanded="false" aria-haspopup="true" onclick="toggleDropdown()">
+                                                <img class="h-8 w-8 rounded-full" src="@User.GetPicture()" alt="">
+                                            </button>
+                                        </div>
+
+                                        <!-- Dropdown Menu -->
+                                        <div id="profile-dropdown"
+                                             class="hidden absolute mt-2 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 ring-1 ring-black ring-opacity-5 max-w-md whitespace-nowrap"
+                                             style="right: 0; transform: translateX(10%);">
+                                            <div class="profile-email">
+                                                <div>
+                                                    <span class="ml-3 text-sm font-medium lg:block">
+                                                        <span class="sr-only">Open user menu for </span>
+                                                        @User.GetDisplayName()
+                                                    </span>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <span class="ml-3 text-sm font-medium lg:block" style="color:#000000a8;">
+                                                        <span class="sr-only">Open user menu for </span>
+                                                        (@User.GetEmail())
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="profile-signout mt-4">
+                                                <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+                                                    <button type="submit" class="@Css.SecondaryButton singOutbtn">Sign Out</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                        }
+                          
+                    }
+                   
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<div class="min-h-screen">
+    <partial name="_CookieConsentPartial"/>
+    <main role="main" class="pb-3 pl-2 sm:pl-0">
+        @RenderBody()
+    </main>
+</div>
+
+@*
+<footer class="bg-accent-1 dark:bg-black border-t border-accent-2 dark:border-gray-600">
+    <div class="container mx-auto px-5">
+        <div class="py-28 flex flex-col lg:flex-row items-center">
+            <h3 class="text-4xl lg:text-6xl font-bold tracking-tighter leading-tight text-center lg:text-left mb-10 lg:mb-0 lg:pr-4 lg:w-1/2">A ServiceStack Project</h3>
+            <div class="flex flex-col lg:flex-row justify-center items-center lg:pl-4 lg:w-1/2">
+                <a href="https://docs.servicestack.net" class="mx-3 bg-black dark:bg-gray-700 hover:bg-white dark:hover:bg-gray-200 hover:text-black border border-black text-white font-bold py-3 px-12 lg:px-8 duration-200 transition-colors mb-6 lg:mb-0">Read Documentation</a>
+                <a href="https://github.com/NetCoreTemplates/mvc" class="mx-3 font-bold hover:underline">View on GitHub</a>
+            </div>
+        </div>
+    </div>
+</footer>
+*@
+<environment include="Development">
+    <script src="~/lib/js/jquery.js"></script>
+    <script src="~/lib/Bootstrap/bootstrap-5.0.2-dist/js/bootstrap.min.js"></script>
+</environment>
+<environment exclude="Development">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+            asp-fallback-src="~/lib/js/jquery.min.js"
+            asp-fallback-test="window.jQuery"
+            crossorigin="anonymous">
+    </script>
+</environment>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/toastr/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@3.2.13/dist/jquery.validate.unobtrusive.min.js"></script>
+
+
+@await RenderSectionAsync("Scripts", required: false)
+
+<script type="module">
+import { init } from "app.mjs"
+init()
+</script>
+
+    <script>
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": true,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+    </script>
+</body>
+</html>
