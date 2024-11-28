@@ -7,7 +7,7 @@ namespace MyApp
 
     public interface IBradEmailSender
     {
-        Task SendEmailAsync(string email, string subject, string message, byte[] pdfAttachment, IFormFile file);
+        Task SendEmailAsync(string email, string subject, string message, MemoryStream pdfAttachment, IFormFile file);
         string returnHtmlBody();
     }
 
@@ -21,7 +21,7 @@ namespace MyApp
             _config = configurationManager;
         }
 
-        public async Task SendEmailAsync(string email, string subject, string message, byte[] pdfAttachment, IFormFile file)
+        public async Task SendEmailAsync(string email, string subject, string message, MemoryStream pdfAttachment, IFormFile file)
         {
             using (MailMessage mail = new MailMessage())
             {
@@ -30,17 +30,17 @@ namespace MyApp
                 mail.Subject = subject;
                 mail.Body = message;
                 mail.IsBodyHtml = true;
-                var attachment = new Attachment(new MemoryStream(pdfAttachment), "GeneratedDocument.pdf", "application/pdf");
+                var attachment = new Attachment(pdfAttachment, "GeneratedDocument.pdf", "application/pdf");
                 mail.Attachments.Add(attachment);
-                
-                    var memoryStream = new MemoryStream();
-               
-                    await file.CopyToAsync(memoryStream);
-                    memoryStream.Position = 0;
-                    var attachmentClient = new Attachment(memoryStream, file.FileName, file.ContentType);
-                    mail.Attachments.Add(attachmentClient);
 
-                
+                var memoryStream = new MemoryStream();
+
+                await file.CopyToAsync(memoryStream);
+                memoryStream.Position = 0;
+                var attachmentClient = new Attachment(memoryStream, file.FileName, file.ContentType);
+                mail.Attachments.Add(attachmentClient);
+
+
 
 
                 //mail.Attachments.Add(new Attachment("D:\\TestFile.txt"));//--Uncomment this to send any attachment  

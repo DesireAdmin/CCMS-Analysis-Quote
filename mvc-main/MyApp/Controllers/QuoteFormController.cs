@@ -35,7 +35,8 @@ namespace MyApp.Controllers
         }
 
 
-        public IActionResult CreateQuoteForm() {
+        public IActionResult CreateQuoteForm()
+        {
 
 
             return View();
@@ -76,7 +77,7 @@ namespace MyApp.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateQuoteForm(QuoteModel model)
         {
-            if(model.IsChecked == false)
+            if (model.IsChecked == false)
             {
                 ModelState.AddModelError("IsChecked", "Please confirm that the provided information is accurate by checking the confirmation box before submitting the form.");
                 return View("CreateQuoteForm", model);
@@ -92,8 +93,8 @@ namespace MyApp.Controllers
                 string signatureUrl = await UploadSignatureAsync(model.AttachmentFile, model.Id);
                 if (string.IsNullOrEmpty(signatureUrl))
                 {
-                        ModelState.AddModelError("AttachmentFile", "Failed to upload signature file.");
-                        return View(model);                    
+                    ModelState.AddModelError("AttachmentFile", "Failed to upload signature file.");
+                    return View(model);
                 }
                 else
                 {
@@ -149,7 +150,7 @@ namespace MyApp.Controllers
             _context.QuoteModels.Add(model);
             await _context.SaveChangesAsync();
 
-            var pdfdata = await new MyApp.ServiceModel.Helper.JsonToPdfGenerator(_configuration).GeneratePdfAsync(model);
+            var pdfdata = await new MyApp.ServiceModel.Helper.PdfGenerator(_configuration).GeneratePdf(model);
 
             var emailbody = _bradEmail.returnHtmlBody();
 

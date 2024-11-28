@@ -149,9 +149,9 @@ namespace MyApp.ServiceModel.Helper
         </div>
     </div>";
 
-            var partsLeadNumberTemplate = @"<div class=""DocAttachAndPartLeadTime"" style=""{{PartsLead-Style}} text-align: center ;"" id=""modalPartsLeadSection"" >
+            var partsLeadNumberTemplate = @"<div class=""DocAttachAndPartLeadTime"" style=""{{PartsLead-Style}} "" id=""modalPartsLeadSection"" >
                         <div class=""header-form-title"">
-                            <h3>Parts Lead Time</h3>
+                            <h3 style=""text-align: center"" >Parts Lead Time</h3>
                         </div>
 
                             <div class=""row"">

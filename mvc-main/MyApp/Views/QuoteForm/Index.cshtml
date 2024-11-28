@@ -69,17 +69,19 @@
                         <tbody>
                             @{
                                 int index = 1;
+                                string FormattedDate;
                             }
                             @foreach (var item in Model)
                             {
-                                
+                                FormattedDate = item.Date.ToString("dd-MM-yyyy");
+
                                 <tr>
                                     <td class="text-center">@index</td>
                                     <td class="text-center">@Html.DisplayFor(modelItem => item.SMG_Vendor_PO)</td>
                                     <td class="mt-2">@Html.DisplayFor(modelItem => item.SMG_CLIENT)</td>
                                     <td class="text-center">@Html.DisplayFor(modelItem => item.StoreNumber)</td>
                                     <td class="mt-2">@Html.DisplayFor(modelItem => item.Email)</td>
-                                    <td class="text-center">@Html.DisplayFor(modelItem => item.Date)</td>
+                                    <td class="text-center">@Html.DisplayFor(modelItem => FormattedDate)</td>
                                     <td style="justify-items: center;">
                                         <svg onclick="openModal('@item.Id')" xmlns="http://www.w3.org/2000/svg" height="22px"
                                              viewBox="0 0 576 512">
