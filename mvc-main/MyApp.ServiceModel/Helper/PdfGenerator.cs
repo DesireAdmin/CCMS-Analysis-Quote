@@ -11,6 +11,8 @@ using Azure.Storage.Blobs;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 using MyApp.ServiceModel.DatabaseModel;
 using System.IO;
+using System.Diagnostics.Metrics;
+using Azure.Storage.Blobs.Models;
 
 namespace MyApp.ServiceModel.Helper
 {
@@ -32,145 +34,167 @@ namespace MyApp.ServiceModel.Helper
         {
             try
             {
-                using (MemoryStream memoryStream = new MemoryStream())
+                MemoryStream memoryStream = new MemoryStream(); // Do not use `using` here
+
+                // Create a PdfWriter
+                PdfWriter writer = new PdfWriter(memoryStream, new WriterProperties().SetCompressionLevel(CompressionConstants.BEST_COMPRESSION)); // Prevent automatic stream closure
+                PdfDocument pdf = new PdfDocument(writer);
+                Document document = new Document(pdf);
+
+                #region Title
+                // Add a table with 2 columns to hold the logo and the title
+                float[] columnWidths = { 1, 5 }; // Adjust column widths as needed
+                Table logoAndTitleTable = new Table(columnWidths).UseAllAvailableWidth();
+                logoAndTitleTable.SetBorder(Border.NO_BORDER); // Remove table borders
+
+                var folderName = Path.Combine("wwwroot", "img");
+                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+                var fileName = "SMGFacilitiesLogo.jpg";
+
+                string logoPath = Path.Combine(folderPath, fileName);
+                //D:\DesireInfoweb\Bradly\Master\mvc - main\MyApp\wwwroot\img\SMGFacilitiesLogo.jpg
+
+                // Add the logo to the first cell
+                ImageData logoData = ImageDataFactory.Create(logoPath);
+                Image logo = new Image(logoData).ScaleToFit(50, 50);
+                logoAndTitleTable.AddCell(new Cell()
+                    .Add(logo)
+                    .SetBorder(Border.NO_BORDER)
+                    .SetVerticalAlignment(VerticalAlignment.MIDDLE)); // Align logo vertically
+
+                // Add the title to the second cell
+                Paragraph heading = new Paragraph("SMG Facilities Proposal Form Summary")
+                    .SetTextAlignment(TextAlignment.LEFT) // Align to the left of the cell
+                    .SetFontSize(24)
+                    .SimulateBold(); // Make it bold
+                logoAndTitleTable.AddCell(new Cell()
+                    .Add(heading)
+                    .SetBorder(Border.NO_BORDER)
+                    .SetVerticalAlignment(VerticalAlignment.MIDDLE)); // Align title vertically
+
+                // Add the table to the document
+                document.Add(logoAndTitleTable);
+
+                // Add some spacing below
+                document.Add(new Paragraph("\n"));
+
+                #endregion
+
+                // Adding key-value pairs as Paragraphs
+                AddKeyValueParagraph("SMG Vendor PO # :", quoteModel.SMG_Vendor_PO, document);
+                AddKeyValueParagraph("Date :", quoteModel.Date.ToString("dd-MM-yyyy"), document);
+                AddKeyValueParagraph("SMG Client :", quoteModel.SMG_CLIENT, document);
+                AddKeyValueParagraph("Store # :", quoteModel.StoreNumber, document);
+                AddKeyValueParagraph("Location :", quoteModel.Location, document);
+                AddKeyValueParagraph("Vendor :", quoteModel.Vendor, document);
+                AddKeyValueParagraph("Email :", quoteModel.Email, document);
+                AddKeyValueParagraph("Service Rep Name :", quoteModel.ServiceRepName, document);
+
+                // Add some spacing
+                document.Add(new Paragraph("\n"));
+                document.Add(PrintIsIncurredCost(quoteModel));
+
+                #region Breakout Tables
+                // Add the Initial Breakout table to the document
+                Table initialCallTable = FillInitialCallTable(quoteModel);
+                if (initialCallTable != null)
                 {
-                    // Create a PdfWriter
-                    using (PdfWriter writer = new PdfWriter(memoryStream))
-                    {
-                        // Create a PdfDocument
-                        using (PdfDocument pdf = new PdfDocument(writer))
-                        {
-                            // Create a Document to add content
-                            Document document = new Document(pdf);
+                    // Add "INITIAL CALL BREAKOUT" section
+                    Paragraph initialCallHeading = new Paragraph("INITIAL CALL BREAKOUT")
+                        .SetTextAlignment(TextAlignment.CENTER)
+                        .SetFontSize(14)
+                        .SimulateBold()
+                        .SetFontColor(ColorConstants.DARK_GRAY);
+                    Paragraph incurredIssueDescriptionHeading = new Paragraph("Issue(s) discovered while on-site & Description of Work Performed :")
+                        .SetTextAlignment(TextAlignment.LEFT)
+                        .SetFontSize(12)
+                        .SimulateBold()
+                        .SetFontColor(ColorConstants.DARK_GRAY)
+                        .SetPaddingTop(5);
+                    Paragraph incurredIssueDescription = new Paragraph(quoteModel.IncurredIssueDescription)
+                        .SetTextAlignment(TextAlignment.LEFT)
+                        .SetFontSize(12)
+                        .SetFontColor(ColorConstants.DARK_GRAY)
+                        .SetPaddingBottom(5);
 
-                            #region Title
-                            // Add a table with 2 columns to hold the logo and the title
-                            float[] columnWidths = { 1, 5 }; // Adjust column widths as needed
-                            Table logoAndTitleTable = new Table(columnWidths).UseAllAvailableWidth();
-                            logoAndTitleTable.SetBorder(Border.NO_BORDER); // Remove table borders
+                    document.Add(initialCallHeading);
+                    document.Add(incurredIssueDescriptionHeading);
+                    document.Add(incurredIssueDescription);
 
-
-                            //string binPath = AppDomain.CurrentDomain.BaseDirectory;
-                            //var folderName = Path.Combine("wwwroot", "img");
-                            //var Path = Path.Combine(folderName,"logo.svg");
-
-                            // Add the logo to the first cell
-                            ImageData logoData = ImageDataFactory.Create("D:\\DesireInfoweb\\Bradly\\Master\\mvc-main\\MyApp\\wwwroot\\img\\SMGFacilitiesLogo.jpg"); // Replace with your logo file path
-                            Image logo = new Image(logoData).ScaleToFit(50, 50); // Scale the logo to fit
-                            logoAndTitleTable.AddCell(new Cell()
-                                .Add(logo)
-                                .SetBorder(Border.NO_BORDER)
-                                .SetVerticalAlignment(VerticalAlignment.MIDDLE)); // Align logo vertically
-
-                            // Add the title to the second cell
-                            Paragraph heading = new Paragraph("SMG Facilities Proposal Form Summary")
-                                .SetTextAlignment(TextAlignment.LEFT) // Align to the left of the cell
-                                .SetFontSize(24)
-                                .SimulateBold(); // Make it bold
-                            logoAndTitleTable.AddCell(new Cell()
-                                .Add(heading)
-                                .SetBorder(Border.NO_BORDER)
-                                .SetVerticalAlignment(VerticalAlignment.MIDDLE)); // Align title vertically
-
-                            // Add the table to the document
-                            document.Add(logoAndTitleTable);
-
-                            // Add some spacing below
-                            document.Add(new Paragraph("\n"));
-
-                            #endregion
-
-                            // Add some spacing
-                            document.Add(new Paragraph("\n"));
-
-                            // Add the personal details table to the document
-                            Table personalDetailsTable = FillPersonalDetailsTable(quoteModel);
-                            if (personalDetailsTable != null)
-                            {
-                                document.Add(personalDetailsTable);
-                            }
-
-                            #region Breakout Tables
-                            // Add some spacing
-                            document.Add(new Paragraph("\n"));
-
-                            // Add "INITIAL CALL BREAKOUT" section
-                            Paragraph initialCallHeading = new Paragraph("INITIAL CALL BREAKOUT")
-                                .SetTextAlignment(TextAlignment.LEFT)
-                                .SetFontSize(18)
-                                .SimulateBold()
-                                .SetFontColor(ColorConstants.DARK_GRAY); // Subtle color for heading
-                            document.Add(initialCallHeading);
-
-                            // Add the Initial Breakout table to the document
-                            Table initialCallTable = FillInitialCallTable(quoteModel);
-                            if (initialCallTable != null)
-                            {
-                                document.Add(initialCallTable);
-                            }
-
-                            // Add some spacing
-                            document.Add(new Paragraph("\n"));
-
-                            // Add "INITIAL CALL BREAKOUT" section
-                            Paragraph proposedCallHeading = new Paragraph("SUMMARY OF PROPOSED QUOTED WORK")
-                                .SetTextAlignment(TextAlignment.LEFT)
-                                .SetFontSize(18)
-                                .SimulateBold()
-                                .SetFontColor(ColorConstants.DARK_GRAY); // Subtle color for heading
-                            document.Add(proposedCallHeading);
-
-                            // Add the proposed call breakout table to the document
-                            Table proposedCallTable = FillProposedCallTable(quoteModel);
-                            if (proposedCallTable != null)
-                            {
-                                document.Add(proposedCallTable);
-                            }
-                            #endregion
-
-                            #region Description of Services
-                            // Add some spacing
-                            document.Add(new Paragraph("\n"));
-
-                            // Add the personal details table to the document
-                            Table descriptionofServicesTable = FillDescriptionofServicesTable(quoteModel);
-                            if (descriptionofServicesTable != null)
-                            {
-                                document.Add(descriptionofServicesTable);
-                            }
-                            #endregion
-
-                            #region Parts Lead
-                            // Add some spacing
-                            document.Add(new Paragraph("\n"));
-
-                            // Add "Parts Lead Time" section
-                            Paragraph partsLeadTimeHeading = new Paragraph("Parts Lead Time")
-                                .SetTextAlignment(TextAlignment.LEFT)
-                                .SetFontSize(18)
-                                .SimulateBold()
-                                .SetFontColor(ColorConstants.DARK_GRAY); // Subtle color for heading
-                            document.Add(partsLeadTimeHeading);
-
-                            Table partsLeadTimeTable = FillPartsLeadTime(quoteModel);
-                            if (partsLeadTimeTable != null)
-                            {
-                                document.Add(partsLeadTimeTable);
-                            }
-                            #endregion
-
-                            // Finalize the document
-                            document.Close();
-                        }
-                    }
-
-                    // Reset the memory stream position to the beginning
-                    memoryStream.Position = 0;
-
-                    // Upload the PDF to Azure Blob Storage
-                    await UploadPdfToAzureBlobAsync(memoryStream.ToArray(), quoteModel.Id, blobName);
-                    return memoryStream;
+                    document.Add(initialCallTable);
+                    // Add some spacing
+                    document.Add(new Paragraph("\n"));
                 }
+
+                // Add the proposed call breakout table to the document
+                Table proposedCallTable = FillProposedCallTable(quoteModel);
+                if (proposedCallTable != null)
+                {
+                    // Add "INITIAL CALL BREAKOUT" section
+                    Paragraph proposedCallHeading = new Paragraph("SUMMARY OF PROPOSED QUOTED WORK")
+                        .SetTextAlignment(TextAlignment.CENTER)
+                        .SetFontSize(14)
+                        .SimulateBold()
+                        .SetFontColor(ColorConstants.DARK_GRAY); // Subtle color for heading
+
+                    Paragraph proposedIssueDescriptionHeading = new Paragraph("Detailed description of proposed work to address unresolved issues. :")
+                        .SetTextAlignment(TextAlignment.LEFT)
+                        .SetFontSize(12)
+                        .SimulateBold()
+                        .SetFontColor(ColorConstants.DARK_GRAY)
+                        .SetPaddingTop(5);
+                    Paragraph proposedIssueDescription = new Paragraph(quoteModel.ProposedIssueDescription)
+                        .SetTextAlignment(TextAlignment.LEFT)
+                        .SetFontSize(12)
+                        .SetFontColor(ColorConstants.DARK_GRAY)
+                        .SetPaddingBottom(5);
+
+                    document.Add(proposedCallHeading);
+                    document.Add(proposedIssueDescriptionHeading);
+                    document.Add(proposedIssueDescription);
+
+                    document.Add(proposedCallTable);
+                }
+                #endregion
+
+                // Add some spacing
+                document.Add(new Paragraph("\n"));
+
+                // Add the personal details table to the document
+                Table descriptionofServicesTable = FillDescriptionofServicesTable(quoteModel);
+                if (descriptionofServicesTable != null)
+                {
+                    document.Add(descriptionofServicesTable);
+                }
+
+                Table partsLeadTimeTable = FillPartsLeadTime(quoteModel);
+                if (partsLeadTimeTable != null)
+                {
+                    // Add some spacing
+                    document.Add(new Paragraph("\n"));
+
+                    // Add "Parts Lead Time" section
+                    Paragraph partsLeadTimeHeading = new Paragraph("Parts Lead Time")
+                        .SetTextAlignment(TextAlignment.CENTER)
+                        .SetFontSize(18)
+                        .SimulateBold()
+                        .SetFontColor(ColorConstants.DARK_GRAY); // Subtle color for heading
+                    document.Add(partsLeadTimeHeading);
+
+                    document.Add(partsLeadTimeTable);
+                }
+
+                // Finalize the document
+                document.Close();
+
+                // Upload the PDF to Azure Blob Storage
+                await UploadPdfToAzureBlobAsync(memoryStream.ToArray(), quoteModel.Id, blobName);
+
+                //// Reset the memory stream position to the beginning
+                //memoryStream.Position = 0;
+
+                MemoryStream readMemoryStream = await ReadPdfFromAzureBlobAsync(quoteModel.Id, blobName);
+                return readMemoryStream;
             }
             catch (Exception ex)
             {
@@ -181,66 +205,139 @@ namespace MyApp.ServiceModel.Helper
 
         private Table FillPartsLeadTime(QuoteModel quoteModel)
         {
-            // Create a table with 2 columns for Parts Lead Time
-            float[] partsLeadTimeTableColumnWidths = { 2, 8 };
-            Table partsLeadTimeTable = new Table(partsLeadTimeTableColumnWidths).UseAllAvailableWidth(); // Make table full width
-
-            // Define key-value pairs for Parts Lead Time
-            string[] partsKeys = new string[] { "Time Option:", "Time Number:", "Time Unit:" };
-            string[] partsValues = new string[] { "Express", "5", "Days" };
-
-            // Add key-value pairs to the table with bold keys and regular values
-            for (int i = 0; i < partsKeys.Length; i++)
+            if (quoteModel.TimeNumber == null && quoteModel.TimeOption == "Number" || quoteModel.TimeOption == "Range" && quoteModel.TimeRangeFrom == null)
             {
-                // Key (Bold and Dark Gray)
-                partsLeadTimeTable.AddCell(new Paragraph(partsKeys[i])
-                    .SetFontSize(13)
-                    .SimulateBold()
-                    .SetFontColor(ColorConstants.DARK_GRAY)
-                    .SetPadding(5)); // Add padding inside the cell
-
-                // Value (Regular text, with left alignment)
-                partsLeadTimeTable.AddCell(new Paragraph(partsValues[i])
-                    .SetTextAlignment(TextAlignment.LEFT)
-                    .SetPadding(5)); // Add padding inside the cell
+                return null; // Return null if conditions are not met
             }
+
+            // Determine the number of columns
+            int columnCount = quoteModel.TimeOption == "Range" && quoteModel.TimeRangeFrom != null ? 4 : 3;
+
+            // Create the table and set no borders
+            Table partsLeadTimeTable = new Table(columnCount)
+                .UseAllAvailableWidth()
+                .SetBorder(Border.NO_BORDER)
+                .SetFontSize(12);
+
+            // Add headers with no borders
+            partsLeadTimeTable.AddCell(new Paragraph("Time Option")
+                .SimulateBold()
+                .SetTextAlignment(TextAlignment.CENTER)
+                .SetPaddingTop(5)
+                .SetPaddingBottom(5))
+                .SetBorder(Border.NO_BORDER);
+
+            if (columnCount == 4)
+            {
+                partsLeadTimeTable.AddCell(new Paragraph("Time Range From")
+                    .SimulateBold()
+                    .SetTextAlignment(TextAlignment.CENTER)
+                    .SetPaddingTop(5)
+                    .SetPaddingBottom(5))
+                    .SetBorder(Border.NO_BORDER);
+
+                partsLeadTimeTable.AddCell(new Paragraph("Time Range To")
+                    .SimulateBold()
+                    .SetTextAlignment(TextAlignment.CENTER)
+                    .SetPaddingTop(5)
+                    .SetPaddingBottom(5))
+                    .SetBorder(Border.NO_BORDER);
+            }
+            else
+            {
+                partsLeadTimeTable.AddCell(new Paragraph("Time Number")
+                    .SimulateBold()
+                    .SetTextAlignment(TextAlignment.CENTER)
+                    .SetPaddingTop(5)
+                    .SetPaddingBottom(5))
+                    .SetBorder(Border.NO_BORDER);
+            }
+
+            partsLeadTimeTable.AddCell(new Paragraph("Time Unit")
+                .SimulateBold()
+                .SetTextAlignment(TextAlignment.CENTER)
+                .SetPaddingTop(5)
+                .SetPaddingBottom(5))
+                .SetBorder(Border.NO_BORDER);
+
+            // Add row data with no borders
+            partsLeadTimeTable.AddCell(new Paragraph(quoteModel.TimeOption)
+                .SetTextAlignment(TextAlignment.CENTER)
+                .SetPaddingTop(5)
+                .SetPaddingBottom(5))
+                .SetBorder(Border.NO_BORDER);
+
+            if (quoteModel.TimeOption == "Range")
+            {
+                partsLeadTimeTable.AddCell(new Paragraph(quoteModel.TimeRangeFrom.ToString())
+                    .SetTextAlignment(TextAlignment.CENTER)
+                    .SetPaddingTop(5)
+                    .SetPaddingBottom(5))
+                    .SetBorder(Border.NO_BORDER);
+
+                partsLeadTimeTable.AddCell(new Paragraph(quoteModel.TimeRangeTo.ToString())
+                    .SetTextAlignment(TextAlignment.CENTER)
+                    .SetPaddingTop(5)
+                    .SetPaddingBottom(5))
+                    .SetBorder(Border.NO_BORDER);
+            }
+            else
+            {
+                partsLeadTimeTable.AddCell(new Paragraph(quoteModel.TimeNumber.ToString())
+                    .SetTextAlignment(TextAlignment.CENTER)
+                    .SetPaddingTop(5)
+                    .SetPaddingBottom(5))
+                    .SetBorder(Border.NO_BORDER);
+            }
+
+            partsLeadTimeTable.AddCell(new Paragraph(quoteModel.TimeUnit)
+                .SetTextAlignment(TextAlignment.CENTER)
+                .SetPaddingTop(5)
+                .SetPaddingBottom(5))
+                .SetBorder(Border.NO_BORDER);
+
             return partsLeadTimeTable;
         }
 
         private Table FillDescriptionofServicesTable(QuoteModel quoteModel)
         {
             // Create a table with 2 columns for Message, Disclaimer, and Description of Services
-            Table messageTable = new Table(2).UseAllAvailableWidth(); // 2 columns, full width
-            messageTable.SetBorder(Border.NO_BORDER);  // Set border to none for the entire table
+            Table messageTable = new Table(2).SetBorder(Border.NO_BORDER).UseAllAvailableWidth(); // 2 columns, full width
 
             // Add the "Message" section (first row)
             messageTable.AddCell(new Paragraph("Message")
                 .SetTextAlignment(TextAlignment.LEFT)
                 .SetFontSize(13)
+                .SetBorder(Border.NO_BORDER)
                 .SimulateBold());
             messageTable.AddCell(new Paragraph(quoteModel.Message)
                 .SetTextAlignment(TextAlignment.LEFT)
                 .SetFontSize(12)
+                .SetBorder(Border.NO_BORDER)
                 .SetFontColor(ColorConstants.BLACK));
 
             // Add the "Disclaimer" section (second row)
             messageTable.AddCell(new Paragraph("Disclaimer")
                 .SetTextAlignment(TextAlignment.LEFT)
+                .SetBorder(Border.NO_BORDER)
                 .SetFontSize(13)
                 .SimulateBold());
             messageTable.AddCell(new Paragraph(quoteModel.Disclaimer)
                 .SetTextAlignment(TextAlignment.LEFT)
                 .SetFontSize(12)
+                .SetBorder(Border.NO_BORDER)
                 .SetFontColor(ColorConstants.BLACK));
 
             // Add the "Description of Services" section (third row)
             messageTable.AddCell(new Paragraph("Description of Services:")
                 .SetTextAlignment(TextAlignment.LEFT)
                 .SetFontSize(13)
+                .SetBorder(Border.NO_BORDER)
                 .SimulateBold());
             messageTable.AddCell(new Paragraph(quoteModel.DescriptionOfServices)
                 .SetTextAlignment(TextAlignment.LEFT)
                 .SetFontSize(12)
+                .SetBorder(Border.NO_BORDER)
                 .SetFontColor(ColorConstants.BLACK));
 
             return messageTable;
@@ -248,8 +345,13 @@ namespace MyApp.ServiceModel.Helper
 
         private Table FillProposedCallTable(QuoteModel quoteModel)
         {
+            if (quoteModel.ProposedBreakouts == null)
+            {
+                return null; // Return null if quoteModel is null
+            }
+
             // Create a table with 6 columns for initial call breakout
-            Table proposedCallTable = new Table(6).UseAllAvailableWidth(); // Make table full width
+            Table proposedCallTable = new Table(6).UseAllAvailableWidth().SetBorder(Border.NO_BORDER).SetFontSize(12); // Make table full width
 
             // Add header cells to the table
             proposedCallTable.AddHeaderCell("Cost Type")
@@ -276,32 +378,48 @@ namespace MyApp.ServiceModel.Helper
             }
 
             // Add rows with colspan for Sub Total, Tax, and Total
-            proposedCallTable.AddCell(new Paragraph("Sub Total")
+            proposedCallTable.AddCell(new Cell(1, 3).SetBorder(Border.NO_BORDER));
+            proposedCallTable.AddCell(new Cell(1, 2).Add(new Paragraph("Sub Total")
                 .SetTextAlignment(TextAlignment.LEFT)
-                .SimulateBold()); // Use SimulateBold instead of SetBold
-            proposedCallTable.AddCell(new Paragraph(quoteModel.ProposedTotals.ProposedSubTotal.ToString())
-                .SetTextAlignment(TextAlignment.CENTER));
+                .SimulateBold())
+                .SetBorder(Border.NO_BORDER)
+                .SetPaddingTop(5));
+            proposedCallTable.AddCell(new Cell(1, 1).Add(new Paragraph(quoteModel.ProposedTotals.ProposedSubTotal.ToString())
+                .SetTextAlignment(TextAlignment.LEFT))
+                .SetBorder(Border.NO_BORDER)
+                .SetPaddingTop(5));
 
             // Repeat for Tax and Total rows
-            proposedCallTable.AddCell(new Paragraph("Tax")
+            proposedCallTable.AddCell(new Cell(1, 3).SetBorder(Border.NO_BORDER));
+            proposedCallTable.AddCell(new Cell(1, 2).Add(new Paragraph("Tax")
                 .SetTextAlignment(TextAlignment.LEFT)
-                .SimulateBold());
-            proposedCallTable.AddCell(new Paragraph(quoteModel.ProposedTotals.ProposedTax.ToString())
-                .SetTextAlignment(TextAlignment.CENTER));
+                .SimulateBold())
+                .SetBorder(Border.NO_BORDER));
+            proposedCallTable.AddCell(new Cell(1, 1).Add(new Paragraph(quoteModel.ProposedTotals.ProposedTax.ToString())
+                .SetTextAlignment(TextAlignment.LEFT))
+                .SetBorder(Border.NO_BORDER));
 
-            proposedCallTable.AddCell(new Paragraph("Proposed Quote Total")
+            proposedCallTable.AddCell(new Cell(1, 3).SetBorder(Border.NO_BORDER));
+            proposedCallTable.AddCell(new Cell(1, 2).Add(new Paragraph("Proposed Quote Total")
                 .SetTextAlignment(TextAlignment.LEFT)
-                .SimulateBold());
-            proposedCallTable.AddCell(new Paragraph(quoteModel.ProposedTotals.ProposedInitialCallTotal.ToString())
-                .SetTextAlignment(TextAlignment.CENTER));
+                .SimulateBold())
+                .SetBorder(Border.NO_BORDER));
+            proposedCallTable.AddCell(new Cell(1, 1).Add(new Paragraph(quoteModel.ProposedTotals.ProposedInitialCallTotal.ToString())
+                .SetTextAlignment(TextAlignment.LEFT))
+                .SetBorder(Border.NO_BORDER));
 
             return proposedCallTable;
         }
 
         private Table FillInitialCallTable(QuoteModel quoteModel)
         {
+            if (quoteModel.IncurredBreakouts == null)
+            {
+                return null; // Return null if quoteModel is null
+            }
+
             // Create a table with 6 columns for initial call breakout
-            Table initialCallTable = new Table(6).UseAllAvailableWidth(); // Make table full width
+            Table initialCallTable = new Table(6).UseAllAvailableWidth().SetBorder(Border.NO_BORDER).SetFontSize(12); // Make table full width
 
             // Add header cells to the table
             initialCallTable.AddHeaderCell("Cost Type")
@@ -328,99 +446,53 @@ namespace MyApp.ServiceModel.Helper
                 initialCallTable.AddCell(incurredBreakout.InitialCallSubTotal.ToString());
             }
 
-            // Add rows with colspan for Sub Total, Tax, and Total
-            initialCallTable.AddCell(new Paragraph("Sub Total")
+            initialCallTable.AddCell(new Cell(1, 3).SetBorder(Border.NO_BORDER));
+            initialCallTable.AddCell(new Cell(1, 2).Add(new Paragraph("Sub Total")
                 .SetTextAlignment(TextAlignment.LEFT)
-                .SimulateBold()); // Use SimulateBold instead of SetBold
-            initialCallTable.AddCell(new Paragraph(quoteModel.IncurredTotals.IncurredSubTotal.ToString())
-                .SetTextAlignment(TextAlignment.CENTER));
+                .SimulateBold())
+                .SetBorder(Border.NO_BORDER)
+                .SetPaddingTop(5));
+            initialCallTable.AddCell(new Cell(1, 1).Add(new Paragraph(quoteModel.IncurredTotals.IncurredSubTotal.ToString())
+                .SetTextAlignment(TextAlignment.LEFT))
+                .SetBorder(Border.NO_BORDER)
+                .SetPaddingTop(5));
 
-            // Repeat for Tax and Total rows
-            initialCallTable.AddCell(new Paragraph("Tax")
-                .SetTextAlignment(TextAlignment.LEFT)
-                .SimulateBold());
-            initialCallTable.AddCell(new Paragraph(quoteModel.IncurredTotals.IncurredTax.ToString())
-                .SetTextAlignment(TextAlignment.CENTER));
 
-            initialCallTable.AddCell(new Paragraph("Initial Call Total")
+            initialCallTable.AddCell(new Cell(1, 3).SetBorder(Border.NO_BORDER));
+            initialCallTable.AddCell(new Cell(1, 2).Add(new Paragraph("Tax")
                 .SetTextAlignment(TextAlignment.LEFT)
-                .SimulateBold());
-            initialCallTable.AddCell(new Paragraph(quoteModel.IncurredTotals.IncurredInitialCallTotal.ToString())
-                .SetTextAlignment(TextAlignment.CENTER));
+                .SimulateBold())
+                .SetBorder(Border.NO_BORDER));
+            initialCallTable.AddCell(new Cell(1, 1).Add(new Paragraph(quoteModel.IncurredTotals.IncurredTax.ToString())
+                .SetTextAlignment(TextAlignment.LEFT))
+                .SetBorder(Border.NO_BORDER));
+
+            initialCallTable.AddCell(new Cell(1, 3).SetBorder(Border.NO_BORDER));
+            initialCallTable.AddCell(new Cell(1, 2).Add(new Paragraph("Initial Call Total")
+                .SetTextAlignment(TextAlignment.LEFT)
+                .SimulateBold())
+                .SetBorder(Border.NO_BORDER));
+            initialCallTable.AddCell(new Cell(1, 1).Add(new Paragraph(quoteModel.IncurredTotals.IncurredInitialCallTotal.ToString())
+                .SetTextAlignment(TextAlignment.LEFT))
+                .SetBorder(Border.NO_BORDER));
 
             return initialCallTable;
         }
 
-        private Table FillPersonalDetailsTable(QuoteModel quoteModel)
+        // Helper method to add key-value pair as a Paragraph
+        private void AddKeyValueParagraph(string key, string value, Document document)
         {
-            // Create a table with 2 columns for personal details
-            Table personalDetailsTable = new Table(2).UseAllAvailableWidth(); // Make table full width
+            Paragraph paragraph = new Paragraph();
 
-            personalDetailsTable.AddCell(new Paragraph("SMG Vendor PO #")
-                .SimulateBold()
-                .SetFontColor(ColorConstants.BLACK)
-                .SetPadding(5));
-            personalDetailsTable.AddCell(new Paragraph(quoteModel.SMG_Vendor_PO)
-                .SetTextAlignment(TextAlignment.LEFT)
-                .SetPadding(5));
+            // Add bold key
+            paragraph.Add(new Text(key).SimulateBold());
 
-            personalDetailsTable.AddCell(new Paragraph("Date")
-                .SimulateBold()
-                .SetFontColor(ColorConstants.BLACK)
-                .SetPadding(5));
-            personalDetailsTable.AddCell(new Paragraph(quoteModel.Date.ToString("dd-MM-yyyy"))
-                .SetTextAlignment(TextAlignment.LEFT)
-                .SetPadding(5));
+            // Add the value (without bold)
+            paragraph.Add(new Text(" " + value));
 
-            personalDetailsTable.AddCell(new Paragraph("SMG Client")
-                .SimulateBold()
-                .SetFontColor(ColorConstants.BLACK)
-                .SetPadding(5));
-            personalDetailsTable.AddCell(new Paragraph(quoteModel.SMG_CLIENT)
-                .SetTextAlignment(TextAlignment.LEFT)
-                .SetPadding(5));
+            // Add the complete paragraph to the document
+            document.Add(paragraph.SetFontColor(ColorConstants.BLACK).SetPadding(2));
 
-            personalDetailsTable.AddCell(new Paragraph("Store #")
-                .SimulateBold()
-                .SetFontColor(ColorConstants.BLACK)
-                .SetPadding(5));
-            personalDetailsTable.AddCell(new Paragraph(quoteModel.StoreNumber)
-                .SetTextAlignment(TextAlignment.LEFT)
-                .SetPadding(5));
-
-            personalDetailsTable.AddCell(new Paragraph("Location")
-                .SimulateBold()
-                .SetFontColor(ColorConstants.BLACK)
-                .SetPadding(5));
-            personalDetailsTable.AddCell(new Paragraph(quoteModel.Location)
-                .SetTextAlignment(TextAlignment.LEFT)
-                .SetPadding(5));
-
-            personalDetailsTable.AddCell(new Paragraph("Vendor")
-                .SimulateBold()
-                .SetFontColor(ColorConstants.BLACK)
-                .SetPadding(5));
-            personalDetailsTable.AddCell(new Paragraph(quoteModel.Vendor)
-                .SetTextAlignment(TextAlignment.LEFT)
-                .SetPadding(5));
-
-            personalDetailsTable.AddCell(new Paragraph("Email")
-                .SimulateBold()
-                .SetFontColor(ColorConstants.BLACK)
-                .SetPadding(5));
-            personalDetailsTable.AddCell(new Paragraph(quoteModel.Email)
-                .SetTextAlignment(TextAlignment.LEFT)
-                .SetPadding(5));
-
-            personalDetailsTable.AddCell(new Paragraph("Service Rep Name")
-                .SimulateBold()
-                .SetFontColor(ColorConstants.BLACK)
-                .SetPadding(5));
-            personalDetailsTable.AddCell(new Paragraph(quoteModel.ServiceRepName)
-                .SetTextAlignment(TextAlignment.LEFT)
-                .SetPadding(5));
-
-            return personalDetailsTable;
         }
 
         private async Task UploadPdfToAzureBlobAsync(byte[] pdfStream, string id, string blobName)
@@ -441,6 +513,65 @@ namespace MyApp.ServiceModel.Helper
             await blobClient.UploadAsync(new MemoryStream(pdfStream), overwrite: true);
 
             Console.WriteLine("PDF uploaded to Azure Blob Storage.");
+        }
+
+        private async Task<MemoryStream> ReadPdfFromAzureBlobAsync(string id, string blobName)
+        {
+            // Create a BlobServiceClient
+            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+
+            // Get the container reference
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+
+            // Get the blob reference
+            BlobClient blobClient = containerClient.GetBlobClient($"{id}_{blobName}");
+
+            // Check if the blob exists
+            if (await blobClient.ExistsAsync())
+            {
+                // Download the blob content to a MemoryStream
+                BlobDownloadInfo download = await blobClient.DownloadAsync();
+
+                // Create a MemoryStream and copy the downloaded data into it
+                MemoryStream memoryStream = new MemoryStream();
+                await download.Content.CopyToAsync(memoryStream);
+
+                // Set the position of the memory stream to the beginning for reading
+                memoryStream.Position = 0;
+
+                Console.WriteLine("PDF readed from Azure Blob Storage.");
+                return memoryStream;
+            }
+            else
+            {
+                Console.WriteLine("Blob does not exist.");
+                return null;
+            }
+        }
+
+        private Paragraph PrintIsIncurredCost(QuoteModel quoteModel)
+        {
+            // Create the bold portion of the text
+            // Create bold text for "Incurred Cost? :"
+            Text boldText = new Text("Incurred Cost? : ").SimulateBold().SetFontColor(ColorConstants.DARK_GRAY);
+            Text normalText;
+            if (quoteModel.IncurredBreakouts != null) {
+
+                normalText = new Text("Yes").SetFontColor(ColorConstants.DARK_GRAY);
+            }
+            else
+            {
+                normalText = new Text("No").SetFontColor(ColorConstants.DARK_GRAY);
+            }
+
+            // Combine the bold and unbold text into a single paragraph
+            Paragraph isIncurredCost = new Paragraph()
+                .Add(boldText)
+                .Add(normalText)
+                .SetTextAlignment(TextAlignment.LEFT)
+                .SetFontSize(12);
+
+            return isIncurredCost;
         }
 
     }

@@ -278,8 +278,6 @@ namespace MyApp.ServiceModel.Helper
                 .Replace("{{inccuredContainer}}", serviceTable)
                 .Replace("{{PartsLeadContainer}}", partsLeadNumberTemplate);
 
-            
-
             return populatedHtml;
         }
 
