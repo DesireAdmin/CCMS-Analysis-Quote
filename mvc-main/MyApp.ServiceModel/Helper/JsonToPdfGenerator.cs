@@ -271,9 +271,9 @@ namespace MyApp.ServiceModel.Helper
                 .Replace("{{ProposedSubTotal}}", quoteModel.ProposedTotals.ProposedSubTotal.ToString())
                 .Replace("{{ProposedTax}}", quoteModel.ProposedTotals.ProposedTax.ToString())
                 .Replace("{{ProposedInitialCallTotal}}", quoteModel.ProposedTotals.ProposedInitialCallTotal.ToString())
-                .Replace("{{message}}", quoteModel.Message)
+                //.Replace("{{message}}", quoteModel.Message)
                 .Replace("{{disclaimer}}", quoteModel.Disclaimer)
-                .Replace("{{servicesDescription}}", quoteModel.DescriptionOfServices)
+                //.Replace("{{servicesDescription}}", quoteModel.DescriptionOfServices)
                 .Replace("{{proposedBreakoutsRows}}", proposedBreakoutsRows)
                 .Replace("{{inccuredContainer}}", serviceTable)
                 .Replace("{{PartsLeadContainer}}", partsLeadNumberTemplate);

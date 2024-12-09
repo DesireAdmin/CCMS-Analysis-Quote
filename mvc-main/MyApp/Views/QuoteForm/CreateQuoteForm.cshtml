@@ -30,10 +30,10 @@
                     </div>
                     <div class="form-group col-md-4 mb-4">
                         <div>
-                            <label asp-for="SMG_CLIENT">SMG Client<span class="text-danger">*</span></label>
+                            <label asp-for="SMG_CLIENT">Store Name<span class="text-danger">*</span></label>
                         </div>
                         <div>
-                            <input id="smg-client" asp-for="SMG_CLIENT" class="form-control" placeholder="Enter SMG CLIENT" />
+                            <input id="smg-client" asp-for="SMG_CLIENT" class="form-control" placeholder="Enter Store Name" />
                         </div>
                         <div>
                             <span asp-validation-for="SMG_CLIENT" id="smg-client-error" class="text-danger"></span>
@@ -49,11 +49,13 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4 mb-4">
-                        <div class="form-group">
-                            <label asp-for="Location">Location<span class="text-danger">*</span></label>
-                            <input asp-for="Location" id="location" class="form-control" maxlength="60" placeholder="Enter Location" />
-                            <span asp-validation-for="Location" id="location-error" class="text-danger"></span>
+                    <div class="form-group col-md-4 mb-4">
+                        <div>
+                            <label asp-for="Location">Address</label>
+                        </div>
+                        <div>
+                            <input asp-for="Location" id="location" class="form-control" maxlength="60" placeholder="Enter Address" />
+                            @* Validation message removed as Address is optional *@
                         </div>
                     </div>
 
@@ -74,11 +76,20 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4 mb-4">
+                    @* <div class="col-md-4 mb-4">
                         <div class="form-group">
-                            <label asp-for="StoreNumber">Store Number<span class="text-danger">*</span></label>
+                            <label asp-for="StoreNumber">Store Number</label>
                             <input asp-for="StoreNumber" id="store-number" class="form-control" maxlength="30" placeholder="Enter Store Number" />
-                            <span asp-validation-for="StoreNumber" id="store-number-error" class="text-danger"></span>
+                          
+                        </div>
+                    </div> *@
+                    <div class="form-group col-md-4 mb-4">
+                        <div>
+                            <label asp-for="StoreNumber">Store Number</label>
+                        </div>
+                        <div>
+                            <input asp-for="StoreNumber" id="store-number" class="form-control" maxlength="30" placeholder="Enter Store Number" />
+                            @* Validation message removed as Store Number is optional *@
                         </div>
                     </div>
 
@@ -435,7 +446,7 @@
                     <h3>Service Proposal</h3>
                 </div>
                 <div class="ServiceProposal-from-contain">
-                    <div class="row">
+                    @* <div class="row">
                         <div class="col-md-6 mb-6">
                             <div class="form-group">
                                 <label asp-for="Message">Message<span style="color: red;">*</span></label>
@@ -450,14 +461,19 @@
                                 <span asp-validation-for="Disclaimer" id="disclaimer-error" class="text-danger"></span>
                             </div>
                         </div>
-                    </div>
+                    </div> *@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
+                                <label asp-for="Disclaimer"> Disclaimer </label>
+                                <textarea asp-for="Disclaimer" id="disclaimer" class="form-control" maxlength="240" placeholder="Enter Disclaimer"></textarea>
+                                <span asp-validation-for="Disclaimer" id="disclaimer-error" class="text-danger"></span>
+                            </div>
+                            @* <div class="form-group">
                                 <label asp-for="DescriptionOfServices">Description of services<span style="color: red;">*</span></label>
                                 <textarea asp-for="DescriptionOfServices" id="description-of-services" class="form-control required" maxlength="240" placeholder="Enter Description of Services"></textarea>
                                 <span asp-validation-for="DescriptionOfServices" id="description-of-services-error" class="text-danger"></span>
-                            </div>
+                            </div> *@
                         </div>
                     </div>
                 </div>
@@ -661,7 +677,7 @@
                                         </div>
                                         <div class="row pl-2 pr-2 mt-2">
                                             <div class="form-group col-md-6">
-                                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">SMG Client:</h4></div>
+                                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Store Name:</h4></div>
                                                 <div>
                                                     <span id="modal-SMGClient"></span>
                                                 </div>
@@ -675,7 +691,7 @@
                                         </div>
                                         <div class="row pr-2 pl-2 mt-2">
                                             <div class="form-group col-md-6">
-                                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Location:</h4></div>
+                                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Address:</h4></div>
                                                 <div>
                                                     <span id="modal-Location"></span>
                                                 </div>
@@ -707,7 +723,7 @@
                                                 <h4>SUMMARY OF INITIAL CALL</h4>
                                             </div>
                                             <div class="modal-service-date">
-                                                <span class="service-date-label">Service Date: 2024-10-29</span>
+                                                <span class="service-date-label">Service Date: <span id="modal-service-Date"></span></span>
                                             </div>
                                             <div class="initial-call-breakout mb-2">
                                                 <div>
@@ -813,7 +829,7 @@
                                         </div>
                                         <div class="ServiceProposal-from-contain">
                                             <div class="mddl additional-details">
-                                                <div class="row">
+                                                @* <div class="row">
                                                     <div class="col-md-6">
                                                         <div>
                                                             <label for="message" class="message-label text-base font-medium text-gray-700 dark:text-gray-300">Message</label>
@@ -831,15 +847,21 @@
                                                             <div><span id="disclaimer-modal" class="disclaimer-input"></span></div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </div> *@
                                                 <div class="row">
                                                     <div class="col-md-12 mt-3">
                                                         <div>
+                                                            <label for="disclaimer" class="disclaimer-label text-base font-medium text-gray-700 dark:text-gray-300">Disclaimer</label>
+                                                        </div>
+                                                        <div>
+                                                            <div><span id="disclaimer-modal" class="disclaimer-input"></span></div>
+                                                        </div>
+                                                        @* <div>
                                                             <label for="services" class="services-label text-base font-medium text-gray-700 dark:text-gray-300">Description of Services</label>
                                                         </div>
                                                         <div>
                                                             <div><span id="services-modal" class="services-input"></span></div>
-                                                        </div>
+                                                        </div> *@
                                                     </div>
                                                 </div>
 
@@ -891,8 +913,8 @@
                                 </div>
                                 <div class="mt-5">
                                     <label asp-for="SignatureName">Signature Name <span class="text-danger">*</span></label>
-                                    <input class="form-control" id="signatureNameInput" name="SignatureName" maxlength="" placeholder="Enter your name" />
-                                    <span id="signatureNameError" class="text-danger"></span>
+                                    <input class="form-control" id="signatureNameInput" name="SignatureName" maxlength="40" placeholder="Enter your name" />
+                                    <span asp-validation-for="SignatureName" class="text-danger"></span>
                                 </div>
                                 <div class="mt-3">
                                     <label>
@@ -1147,6 +1169,7 @@
             console.log(file);
             debugger
             if (file) {
+                $("#fileInput-error").text('');
                 $('#fileName').text(file.name);
                 $('#fileDisplay').show();
                 $('#uploadButton').hide(); // Hide the upload button once a file is selected
@@ -1331,6 +1354,18 @@
             $('#modal-Vendor').text($("#vendor").val());
             $('#modal-Location').text($("#location").val());
             $('#modal-ServiceRepName').text($("#service-rep-name").val());
+            // let originalDatee = response.data.serviceDate;
+
+            // // Convert the date string to a Date object
+            // let dateObjectt = new Date(originalDatee);
+
+            // // Format the date to "dd-MM-yyyy"
+            // let formattedDatee = dateObjectt.getDate().toString().padStart(2, '0') + '-' +
+            //     (dateObjectt.getMonth() + 1).toString().padStart(2, '0') + '-' +
+            //     dateObjectt.getFullYear();
+
+            // Set the formatted date to the element
+            $('#modal-service-Date').text($("#service-date").val());
             $('#initial-subtotal').text($("#Incurred-Sub-Total").val());
             $('#initial-tax').text($("#Incurred-Tax").val());
             $('#initial-total').text($("#Incurred-Initial-Call-Total").val());
@@ -1597,20 +1632,20 @@
 
     function validateServiceProposal() {
         var isvalidateServiceProposal = true;
-        if ($("#message").val() == '' || $("#message").val() == null) {
-            $("#message-error").text("Message is required");
-            isvalidateServiceProposal = false;
-        }
+        // if ($("#message").val() == '' || $("#message").val() == null) {
+        //     $("#message-error").text("Message is required");
+        //     isvalidateServiceProposal = false;
+        // }
 
-        if ($("#disclaimer").val() == '' || $("#disclaimer").val() == null) {
-            $("#disclaimer-error").text("Disclaimer is required");
-            isvalidateServiceProposal = false;
-        }
+        // if ($("#disclaimer").val() == '' || $("#disclaimer").val() == null) {
+        //     $("#disclaimer-error").text("Disclaimer is required");
+        //     isvalidateServiceProposal = false;
+        // }
 
-        if ($("#description-of-services").val() == '' || $("#description-of-services").val() == null) {
-            $("#description-of-services-error").text("Description of Services is required.");
-            isvalidateServiceProposal = false;
-        }
+        // if ($("#description-of-services").val() == '' || $("#description-of-services").val() == null) {
+        //     $("#description-of-services-error").text("Description of Services is required.");
+        //     isvalidateServiceProposal = false;
+        // }
 
         return isvalidateServiceProposal;
     }
@@ -1649,9 +1684,8 @@
             $("#smg-client-error").text("Client name is required.");
         }
 
-        if (LocationVal == null || LocationVal == '') {
-            isValidSMGFacilitiesProposalForm = false;
-            $("#location-error").text("Location is required.");
+        if (LocationVal == null || LocationVal.trim() === '') {
+            $("#location-error").text(''); // Clear error as it is optional
         }
 
         if (VendorVal == null || VendorVal == '') {
@@ -1683,15 +1717,14 @@
         }
 
         if (StoreNumberVal == null || StoreNumberVal.trim() === '') {
-            isValidSMGFacilitiesProposalForm = false;
-            $("#store-number-error").text("Store number is required.");
+            $("#store-number-error").text(''); // Clear error as it is optional
         } else {
             const digitOnlyPattern = /^\d+$/;
             if (!digitOnlyPattern.test(StoreNumberVal)) {
                 isValidSMGFacilitiesProposalForm = false;
                 $("#store-number-error").text("Store number must be numeric.");
             } else {
-                $("#store-number-error").text(""); // Clear error if validation passes
+                $("#store-number-error").text(''); // Clear error if validation passes
             }
         }
 

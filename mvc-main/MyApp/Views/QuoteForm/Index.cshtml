@@ -73,7 +73,7 @@
                             }
                             @foreach (var item in Model)
                             {
-                                FormattedDate = item.Date.ToString("dd-MM-yyyy");
+                                FormattedDate = item.Date.ToString("MM-dd-yyyy");
 
                                 <tr>
                                     <td class="text-center">@index</td>
@@ -153,7 +153,7 @@
                         </div>
                         <div class="row pl-2 pr-2 mt-2">
                             <div class="form-group col-md-6">
-                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">SMG Client:</h4></div>
+                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Store Name:</h4></div>
                                 <div>
                                     <span id="modal-SMGClient"></span>
                                 </div>
@@ -167,7 +167,7 @@
                         </div>
                         <div class="row pr-2 pl-2 mt-2">
                             <div class="form-group col-md-6">
-                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Location:</h4></div>
+                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Address:</h4></div>
                                 <div>
                                     <span id="modal-Location"></span>
                                 </div>
@@ -193,13 +193,14 @@
                         </div>
                     </div>
                     
-                    <div class="mt-5">
-                        <div class="modal-smg-facilities-proposal-form-details">
+                    <div class="mt-5 modal-smg-facilities-proposal-form-details">
+                        <div class="">
                             <div class="summary-section header-form-title">
                                 <h4>SUMMARY OF INITIAL CALL</h4>
                             </div>
                             <div class="modal-service-date">
-                                <span class="service-date-label">Service Date: 2024-10-29</span>
+                                <span class="service-date-label">Service Date: <span id="modal-service-Date"></span></span>
+                            </div> 
                             </div>
                             <div class="initial-call-breakout p-2 mb-2">
                                 <div>
@@ -299,14 +300,14 @@
                     
                         </div>
                     </div>
-
+                
                     <div class="ServiceProposal-container">
                         <div class="header-form-title">
                             <h3>Service Proposal</h3>
                         </div>
                         <div class="ServiceProposal-from-contain">
                             <div class="mddl additional-details">
-                                <div class="row">
+                                @* <div class="row">
                                     <div class="col-md-6">
                                         <div>
                                             <label for="message" class="message-label text-base font-medium text-gray-700 dark:text-gray-300">Message</label>
@@ -324,16 +325,26 @@
                                             <div><span id="disclaimer" class="disclaimer-input"></span></div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> *@
+                            @if (!string.IsNullOrEmpty(Model.FirstOrDefault()?.Disclaimer))
+                            {
                                 <div class="row">
-                                    <div class="col-md-12 mt-3">
+                                    <div>
+                                        <label for="disclaimer" class="disclaimer-label text-base font-medium text-gray-700 dark:text-gray-300">Disclaimer</label>
+                                    </div>
+                                    <div>
+                                        <div><span id="disclaimer" class="disclaimer-input"></span></div>
+                                    </div>
+                                </div>
+                            }
+                                    @* <div class="col-md-12 mt-3">
                                         <div>
                                             <label for="services" class="services-label text-base font-medium text-gray-700 dark:text-gray-300">Description of Services</label>
                                         </div>
                                         <div>
                                             <div><span id="services" class="services-input"></span></div>
                                         </div>
-                                    </div>
+                                    </div> *@
                                 </div>
 
                             </div>
@@ -341,11 +352,13 @@
                         </div>
                     </div>
 
-                    <div class="DocAttachAndPartLeadTime d-none" id="modalPartsLeadSection" >
+                    <div class="DocAttachAndPartLeadTime d-none" style="margin:20px" id="modalPartsLeadSection" >
                         <div class="header-form-title">
                             <h3>Parts Lead Time</h3>
                         </div>
+                <div class="DocAttachAndPartLeadTimeContain" >
 
+                      
                             <div class="row">
                                 <div class="col-md-4">
                                     <div><label><b>Time Option</b></label></div>
@@ -358,7 +371,7 @@
                                     </div>
                                     <div>
                                         <div class="row" style="display:none" id="modalPartsRange">
-                                            <div class="col-md-6">
+                                    <div class="col-md-6" style="margin-top: -25px;">
                                                 <div><label><b>Time Range From</b></label></div>
                                                 <div><span id="Modal-Time-Range-From"></span></div>
                                             </div>
@@ -370,17 +383,18 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <div><label>Time Unit</label></div>
+                            <div><label><b>Time Unit</b></label></div>
                                     <div><span id="Modal-Time-Unit"></span></div>
                                 </div>
                             </div>
-                    </div>
-
                 </div>
-            </div>
+                        </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
             </div>
+                </div>
+            </div>
+            
 
 </div>
 
@@ -400,7 +414,19 @@
                     if (response.success) {
                         console.log(response);
                         $('#modal-SMGVendorPO').text(response.data.smG_Vendor_PO);
-                        $('#modal-Date').text(response.data.date);
+                            let originalDate = response.data.date;
+
+                            // Convert the date string to a Date object
+                            let dateObject = new Date(originalDate);
+
+                            // Format the date to "dd-MM-yyyy"
+                        let formattedDate = (dateObject.getMonth() + 1).toString().padStart(2, '0') + '-' +
+                            dateObject.getDate().toString().padStart(2, '0') + '-' +
+                            dateObject.getFullYear();
+
+                            // Set the formatted date to the element
+                            $('#modal-Date').text(formattedDate);
+                        //$('#modal-Date').text(response.data.date);
                         $('#modal-SMGClient').text(response.data.smG_CLIENT);
                         $('#modal-StoreNumber').text(response.data.storeNumber);
                         $('#modal-Email').text(response.data.email);
@@ -413,12 +439,30 @@
                         $('#quote-subtotal').text(response.data.proposedTotals.proposedSubTotal);
                         $('#quote-tax').text(response.data.proposedTotals.proposedTax);
                         $('#quote-total').text(response.data.proposedTotals.proposedInitialCallTotal);
-                        $('#message').text(response.data.message);
-                        $('#disclaimer').text(response.data.disclaimer);
-                        $('#services').text(response.data.descriptionOfServices);
+                        //$('#message').text(response.data.message);
+                            let originalDatee = response.data.serviceDate;
+
+                            // Convert the date string to a Date object
+                            let dateObjectt = new Date(originalDatee);
+
+                            // Format the date to "dd-MM-yyyy"
+                        let formattedDatee = (dateObject.getMonth() + 1).toString().padStart(2, '0') + '-' +
+                            dateObject.getDate().toString().padStart(2, '0') + '-' +
+                            dateObject.getFullYear();
+
+                            // Set the formatted date to the element
+                            $('#modal-service-Date').text(formattedDatee);
+                            //$('#modal-service-Date').text(response.data.serviceDate);
+                        //$('#disclaimer').text(response.data.disclaimer);
+                            if (response.data.disclaimer && response.data.disclaimer.trim() !== '') {
+                                $('#disclaimer').text(response.data.disclaimer);
+                                $('#disclaimer').closest('.row').show(); // Show the Disclaimer row
+                            } else {
+                                $('#disclaimer').closest('.row').hide(); // Hide the Disclaimer row if null/empty
+                            }
+                        //$('#services').text(response.data.descriptionOfServices);
                         $('#incurredIssueDescription').text(response.data.incurredIssueDescription);
                         $('#proposedIssueDescription').text(response.data.proposedIssueDescription);
-
                         if(response.data.timeOption == 'Range' && response.data.timeRangeFrom != ''){
                             $('#time').css('display', 'none');
                             $('#modalPartsRange').css('display', 'inline');

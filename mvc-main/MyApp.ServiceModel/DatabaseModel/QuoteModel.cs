@@ -24,7 +24,7 @@ namespace MyApp.ServiceModel.DatabaseModel
 
         public DateTime Date { get; set; }
 
-        [Display(Name = "SMG Client")]
+        [Display(Name = "Store Name")]
         [Required(ErrorMessage = "Client name is required.")]
         [System.ComponentModel.DataAnnotations.StringLength(40, ErrorMessage = "Client name cannot exceed 40 characters.")]
         [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Client name can only contain alphabetic characters and spaces.")]
@@ -32,11 +32,9 @@ namespace MyApp.ServiceModel.DatabaseModel
 
         [Display(Name = "Store number")]
         [RegularExpression(@"^\d+$", ErrorMessage = "Store number must be numeric.")]
-        public string StoreNumber { get; set; }
+        public string? StoreNumber { get; set; }
 
-        [Required(ErrorMessage = "Location is required.")]
-        [System.ComponentModel.DataAnnotations.StringLength(60, ErrorMessage = "Location cannot exceed 60 characters.")]
-        public string Location { get; set; }
+        public string? Location { get; set; }
 
         [Required(ErrorMessage = "Vendor is required.")]
         public string Vendor { get; set; }
@@ -73,16 +71,10 @@ namespace MyApp.ServiceModel.DatabaseModel
         [Required(ErrorMessage = "AttachmentFile is required.")]
         public IFormFile AttachmentFile { get; set; }
 
-        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Message is required.")]
-        public string Message { get; set; }
-
-        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Disclaimer is required.")]
-        public string Disclaimer { get; set; }
-
-        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Description of Services is required.")]
-        public string DescriptionOfServices { get; set; }
+        public string? Disclaimer { get; set; }
 
         //[System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Signature Name of Services is required.")]
+        [Display(Name = "SignatureName")]
         [Required(ErrorMessage = "Signature Name is required.")]
         [System.ComponentModel.DataAnnotations.StringLength(40, ErrorMessage = "Signature Name cannot exceed 40 characters.")]
         [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Signature Name can only contain letters and spaces.")]

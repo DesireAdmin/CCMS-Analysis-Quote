@@ -83,9 +83,9 @@ namespace MyApp.ServiceModel.Helper
                 // Adding key-value pairs as Paragraphs
                 AddKeyValueParagraph("SMG Vendor PO # :", quoteModel.SMG_Vendor_PO, document);
                 AddKeyValueParagraph("Date :", quoteModel.Date.ToString("dd-MM-yyyy"), document);
-                AddKeyValueParagraph("SMG Client :", quoteModel.SMG_CLIENT, document);
+                AddKeyValueParagraph("Store Name :", quoteModel.SMG_CLIENT, document);
                 AddKeyValueParagraph("Store # :", quoteModel.StoreNumber, document);
-                AddKeyValueParagraph("Location :", quoteModel.Location, document);
+                AddKeyValueParagraph("Address :", quoteModel.Location, document);
                 AddKeyValueParagraph("Vendor :", quoteModel.Vendor, document);
                 AddKeyValueParagraph("Email :", quoteModel.Email, document);
                 AddKeyValueParagraph("Service Rep Name :", quoteModel.ServiceRepName, document);
@@ -162,10 +162,10 @@ namespace MyApp.ServiceModel.Helper
 
                 // Add the personal details table to the document
                 Table descriptionofServicesTable = FillDescriptionofServicesTable(quoteModel);
-                if (descriptionofServicesTable != null)
-                {
+                //if (descriptionofServicesTable != null)
+                //{
                     document.Add(descriptionofServicesTable);
-                }
+                //}
 
                 Table partsLeadTimeTable = FillPartsLeadTime(quoteModel);
                 if (partsLeadTimeTable != null)
@@ -305,40 +305,44 @@ namespace MyApp.ServiceModel.Helper
             Table messageTable = new Table(2).SetBorder(Border.NO_BORDER).UseAllAvailableWidth(); // 2 columns, full width
 
             // Add the "Message" section (first row)
-            messageTable.AddCell(new Paragraph("Message")
-                .SetTextAlignment(TextAlignment.LEFT)
-                .SetFontSize(13)
-                .SetBorder(Border.NO_BORDER)
-                .SimulateBold());
-            messageTable.AddCell(new Paragraph(quoteModel.Message)
-                .SetTextAlignment(TextAlignment.LEFT)
-                .SetFontSize(12)
-                .SetBorder(Border.NO_BORDER)
-                .SetFontColor(ColorConstants.BLACK));
+            //messageTable.AddCell(new Paragraph("Message")
+            //    .SetTextAlignment(TextAlignment.LEFT)
+            //    .SetFontSize(13)
+            //    .SetBorder(Border.NO_BORDER)
+            //    .SimulateBold());
+            //messageTable.AddCell(new Paragraph(quoteModel.Message)
+            //    .SetTextAlignment(TextAlignment.LEFT)
+            //    .SetFontSize(12)
+            //    .SetBorder(Border.NO_BORDER)
+            //    .SetFontColor(ColorConstants.BLACK));
 
             // Add the "Disclaimer" section (second row)
-            messageTable.AddCell(new Paragraph("Disclaimer")
+            if(quoteModel.Disclaimer != null)
+            {
+                messageTable.AddCell(new Paragraph("Disclaimer")
                 .SetTextAlignment(TextAlignment.LEFT)
                 .SetBorder(Border.NO_BORDER)
                 .SetFontSize(13)
                 .SimulateBold());
-            messageTable.AddCell(new Paragraph(quoteModel.Disclaimer)
-                .SetTextAlignment(TextAlignment.LEFT)
-                .SetFontSize(12)
-                .SetBorder(Border.NO_BORDER)
-                .SetFontColor(ColorConstants.BLACK));
+                messageTable.AddCell(new Paragraph(quoteModel.Disclaimer)
+                    .SetTextAlignment(TextAlignment.LEFT)
+                    .SetFontSize(12)
+                    .SetBorder(Border.NO_BORDER)
+                    .SetFontColor(ColorConstants.BLACK));
+            }
+            
 
             // Add the "Description of Services" section (third row)
-            messageTable.AddCell(new Paragraph("Description of Services:")
-                .SetTextAlignment(TextAlignment.LEFT)
-                .SetFontSize(13)
-                .SetBorder(Border.NO_BORDER)
-                .SimulateBold());
-            messageTable.AddCell(new Paragraph(quoteModel.DescriptionOfServices)
-                .SetTextAlignment(TextAlignment.LEFT)
-                .SetFontSize(12)
-                .SetBorder(Border.NO_BORDER)
-                .SetFontColor(ColorConstants.BLACK));
+            //messageTable.AddCell(new Paragraph("Description of Services:")
+            //    .SetTextAlignment(TextAlignment.LEFT)
+            //    .SetFontSize(13)
+            //    .SetBorder(Border.NO_BORDER)
+            //    .SimulateBold());
+            //messageTable.AddCell(new Paragraph(quoteModel.DescriptionOfServices)
+            //    .SetTextAlignment(TextAlignment.LEFT)
+            //    .SetFontSize(12)
+            //    .SetBorder(Border.NO_BORDER)
+            //    .SetFontColor(ColorConstants.BLACK));
 
             return messageTable;
         }
