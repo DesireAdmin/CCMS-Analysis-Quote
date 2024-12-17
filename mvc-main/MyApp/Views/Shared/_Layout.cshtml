@@ -18,6 +18,16 @@
               crossorigin="anonymous">
     </environment>
 
+    <environment include="Production">
+        <link rel="stylesheet" href="~/lib/css/font-awesome/css/all.css" />
+        <link rel="stylesheet" href="~/lib/Bootstrap/bootstrap-5.0.2-dist/css/bootstrap.min.css" />
+    </environment>
+    <environment exclude="Production">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"
+              asp-fallback-href="~/lib/css/font-awesome/css/all.min.css"
+              crossorigin="anonymous">
+    </environment>
+
     <link rel="stylesheet" href="/css/app.css"/>
     <link rel="stylesheet" href="/css/typography.css"/>
     <link rel="stylesheet" href="/css/site.css"/>
@@ -192,6 +202,18 @@
             crossorigin="anonymous">
     </script>
 </environment>
+
+    <environment include="Production">
+        <script src="~/lib/js/jquery.js"></script>
+        <script src="~/lib/Bootstrap/bootstrap-5.0.2-dist/js/bootstrap.min.js"></script>
+    </environment>
+    <environment exclude="Production">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+                asp-fallback-src="~/lib/js/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous">
+        </script>
+    </environment>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/lib/toastr/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>

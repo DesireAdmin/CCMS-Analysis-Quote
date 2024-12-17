@@ -25,9 +25,9 @@ namespace MyApp.ServiceModel.DatabaseModel
         public DateTime Date { get; set; }
 
         [Display(Name = "Store Name")]
-        [Required(ErrorMessage = "Client name is required.")]
-        [System.ComponentModel.DataAnnotations.StringLength(40, ErrorMessage = "Client name cannot exceed 40 characters.")]
-        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Client name can only contain alphabetic characters and spaces.")]
+        [Required(ErrorMessage = "Store Name is required.")]
+        [System.ComponentModel.DataAnnotations.StringLength(40, ErrorMessage = "Store Name cannot exceed 40 characters.")]
+        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Store Name can only contain alphabetic characters and spaces.")]
         public string SMG_CLIENT { get; set; }
 
         [Display(Name = "Store number")]
@@ -84,15 +84,15 @@ namespace MyApp.ServiceModel.DatabaseModel
         public bool IsChecked { get; set; } = false;
 
         [Display(Name = "Time Option")]
-        [Required(ErrorMessage = "Time Option is required.")]
-        public string TimeOption { get; set; } // "Number" or "Range"
+        //[Required(ErrorMessage = "Time Option is required.")]
+        public string? TimeOption { get; set; }  // "Number" or "Range"
 
         [Display(Name = "Time Number")]
         [System.ComponentModel.DataAnnotations.Range(1, int.MaxValue, ErrorMessage = "Time Number must be greater than 0.")]
         public int? TimeNumber { get; set; } // For "Number" option
 
         [Display(Name = "Time Unit")]
-        public string TimeUnit { get; set; } = "0";// "Day" or "Week" for "Number" option
+        public string? TimeUnit { get; set; } = "0";// "Day" or "Week" for "Number" option
 
         [Display(Name = "Time Range From")]
         public int? TimeRangeFrom { get; set; } // For "Range" option

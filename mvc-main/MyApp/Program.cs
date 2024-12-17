@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using ServiceStack;
 using MyApp.Data;
 using MyApp.ServiceInterface;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,26 +28,7 @@ services.AddIdentity<ApplicationUser, IdentityRole>(options => {
     .AddDefaultTokenProviders();
 
 services.AddTransient<IBradEmailSender, BradEmailService>();
-services.AddAuthentication(IISDefaults.AuthenticationScheme)
-    .AddFacebook(options => { /* Create App https://developers.facebook.com/apps */
-        options.AppId = config["oauth.facebook.AppId"]!;
-        options.AppSecret = config["oauth.facebook.AppSecret"]!;
-        options.SaveTokens = true;
-        options.Scope.Clear();
-        config.GetSection("oauth.facebook.Permissions").GetChildren()
-            .Each(x => options.Scope.Add(x.Value!));
-    })
-    .AddGoogle(options => { /* Create App https://console.developers.google.com/apis/credentials */
-        options.ClientId = config["oauth.google.ConsumerKey"]!;
-        options.ClientSecret = config["oauth.google.ConsumerSecret"]!;
-        options.SaveTokens = true;
-    })
-    .AddMicrosoftAccount(options => { /* Create App https://apps.dev.microsoft.com */
-        options.ClientId = config["oauth.microsoft.AppId"]!;
-        options.ClientSecret = config["oauth.microsoft.AppSecret"]!;
-        options.SaveTokens = true;
-    });
-    
+
 services.Configure<ForwardedHeadersOptions>(options => {
     //https://github.com/aspnet/IISIntegration/issues/140#issuecomment-215135928
     options.ForwardedHeaders = ForwardedHeaders.XForwardedProto;
@@ -91,6 +73,11 @@ services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, AdditionalUserC
 
 // Register all services
 services.AddServiceStack(typeof(MyServices).Assembly);
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration["AzureExplorer:PrimaryConnectionString:blob"]!, preferMsi: true);
+    clientBuilder.AddQueueServiceClient(builder.Configuration["AzureExplorer:PrimaryConnectionString:queue"]!, preferMsi: true);
+});
 
 var app = builder.Build();
 

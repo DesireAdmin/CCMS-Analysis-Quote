@@ -446,22 +446,6 @@
                     <h3>Service Proposal</h3>
                 </div>
                 <div class="ServiceProposal-from-contain">
-                    @* <div class="row">
-                        <div class="col-md-6 mb-6">
-                            <div class="form-group">
-                                <label asp-for="Message">Message<span style="color: red;">*</span></label>
-                                <textarea asp-for="Message" id="message" class="form-control required" maxlength="150" placeholder="Enter Message"></textarea>
-                                <span asp-validation-for="Message" id="message-error" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-6">
-                            <div class="form-group">
-                                <label asp-for="Disclaimer"> Disclaimer<span style="color: red;">*</span> </label>
-                                <textarea asp-for="Disclaimer" id="disclaimer" class="form-control required" maxlength="240" placeholder="Enter Disclaimer"></textarea>
-                                <span asp-validation-for="Disclaimer" id="disclaimer-error" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div> *@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
@@ -469,11 +453,6 @@
                                 <textarea asp-for="Disclaimer" id="disclaimer" class="form-control" maxlength="240" placeholder="Enter Disclaimer"></textarea>
                                 <span asp-validation-for="Disclaimer" id="disclaimer-error" class="text-danger"></span>
                             </div>
-                            @* <div class="form-group">
-                                <label asp-for="DescriptionOfServices">Description of services<span style="color: red;">*</span></label>
-                                <textarea asp-for="DescriptionOfServices" id="description-of-services" class="form-control required" maxlength="240" placeholder="Enter Description of Services"></textarea>
-                                <span asp-validation-for="DescriptionOfServices" id="description-of-services-error" class="text-danger"></span>
-                            </div> *@
                         </div>
                     </div>
                 </div>
@@ -488,33 +467,6 @@
                     <div id="PartsLeadTimeCoponentTitle" style="display: none;">
                         <h4 id="ProposedBreakoutTableText">Parts Lead Time</h4>
                     </div>
-                    @* <div class="mt-4">
-                    <div>
-                    <label asp-for="SignatureName">Signature Name <span class="text-danger">*</span></label>
-                    </div>
-                    <div>
-                    <input class="form-control" asp-for="SignatureName" placeholder="Enter your name" />
-                    </div>
-                    <div>
-                    <span asp-validation-for="SignatureName" class="text-danger"></span>
-                    </div>
-                    <div class="mt-1">
-                    <label>
-                    <div class="d-flex">
-                    <div>
-                    <input type="checkbox" id="cbox1" asp-for="IsChecked">
-                    </div>
-                    <div class="ml-2">
-                    I confirm that I have read and understood the proposal.
-                    </div>
-                    </div>
-                    <div class="mt-1">
-                    <span asp-validation-for="IsChecked" class="text-danger"></span>
-                    </div>
-                    </label>
-                    </div>
-                    </div> *@
-
                     @*Parts *@
                     <div class="row mt-2" id="PartsLeadTimeCoponentDesc" style="display: none;">
 
@@ -1093,9 +1045,10 @@
                 // Make Techs field editable only for Labor
                 techsField.prop('readonly', !isLabor);
 
-                // If CostType is not Labor, clear the Techs field
+                // If CostType is not Labor, clear the Techs field and remove validation messages
                 if (!isLabor) {
                     techsField.val('');
+                    $thisRow.find('span.validation-msg').remove(); // Remove any validation messages for Techs
                 }
             });
         }
@@ -1136,7 +1089,7 @@
         });
 
         // Remove row and recalculate totals
-        $('#proposedBreakoutTable, #incurredBreakoutTable').on('click', '.remove-btn', function () {
+        $('#incurredBreakoutTable').on('click', '.remove-btn', function () {
             const tableId = $(this).closest('table').attr('id');
             const tbody = $(this).closest('tbody');
             const rowCount = tbody.find('tr').length;
@@ -1148,6 +1101,66 @@
             } else {
                 toastr.error("At least one row must remain in the table.");
             }
+            calculateTotal('#proposedBreakoutTable',
+                'input[name="ProposedTotals.ProposedSubTotal"]',
+                'input[name="ProposedTotals.ProposedTax"]',
+                'input[name="ProposedTotals.ProposedInitialCallTotal"]');
+            calculateTotal('#incurredBreakoutTable',
+                'input[name="IncurredTotals.IncurredSubTotal"]',
+                'input[name="IncurredTotals.IncurredTax"]',
+                'input[name="IncurredTotals.IncurredInitialCallTotal"]');
+            calculateGrandTotal();
+        });
+        $('#proposedBreakoutTable').on('click', '.remove-btn', function () {
+            const tableId = $(this).closest('table').attr('id');
+            const tbody = $(this).closest('tbody');
+            const rowCount = tbody.find('tr').length;
+
+            console.log("Row count before removal:", rowCount);
+
+            if (rowCount > 1) {
+                const currentRow = $(this).closest('tr');
+                currentRow.remove(); // Remove the row
+
+                // Check if any row still has Cost Type = "Materials"
+                let isMaterialsSelected = false;
+                $('#proposedBreakoutTable select[name$=".CostType"]').each(function () {
+                    const costType = $(this).val();
+                    if (costType === "Materials") {
+                        isMaterialsSelected = true;
+                    }
+                });
+
+                // Show or hide the Parts Lead Time component based on remaining rows
+                if (isMaterialsSelected) {
+                    console.log("Keeping PartsLeadTimeCoponent visible");
+                    $('#PartsLeadTimeCoponentTitle').show();
+                    $('#PartsLeadTimeCoponentDesc').show();
+                    $("#PartsLeadTimeCoponentHeading").text("Document Attachment and Parts Lead Time");
+                } else {
+                    console.log("Hiding PartsLeadTimeCoponent and clearing data");
+
+                    // Hide the Parts Lead Time component
+                    $('#PartsLeadTimeCoponentTitle').hide();
+                    $('#PartsLeadTimeCoponentDesc').hide();
+                    $("#PartsLeadTimeCoponentHeading").text("Document Attachment");
+
+                    // Clear the data in the Parts Lead Time fields
+                    $('#timeOption').val(''); // Reset Time Option
+                    $('#Time-Number').val(''); // Clear Time Number
+                    $('#Time-Range-From').val(''); // Clear Time Range From
+                    $('#Time-Range-To').val(''); // Clear Time Range To
+                    $('#Time-Unit').val(''); // Clear Time Unit
+
+                    // Hide both Number and Range option fields
+                    $('#numberOptionFields').hide();
+                    $('#rangeOptionFields').hide();
+                }
+            } else {
+                toastr.error("At least one row must remain in the table.");
+            }
+
+            // Recalculate totals after removal
             calculateTotal('#proposedBreakoutTable',
                 'input[name="ProposedTotals.ProposedSubTotal"]',
                 'input[name="ProposedTotals.ProposedTax"]',
@@ -1341,31 +1354,46 @@
         }
 
         if (isSubmited == true) {
-            toastr.success("The table is valid and ready for submission.");
+            toastr.success("The form is valid and ready for submission.");
         }
 
         debugger
         if (isSubmited == true) {
             $('#modal-SMGVendorPO').text($("#smg-vendor-po").val());
-            $('#modal-Date').text($("#date-quote-form").val());
+            //$('#modal-Date').text($("#date-quote-form").val());
+            //$('#modal-Date').text(formattedDateQuoteForm);
             $('#modal-SMGClient').text($("#smg-client").val());
             $('#modal-StoreNumber').text($("#store-number").val());
             $('#modal-Email').text($("#email").val());
             $('#modal-Vendor').text($("#vendor").val());
             $('#modal-Location').text($("#location").val());
             $('#modal-ServiceRepName').text($("#service-rep-name").val());
-            // let originalDatee = response.data.serviceDate;
+            let dateQuoteFormValue = $("#date-quote-form").val();
+            let serviceDateValue = $("#service-date").val();
 
-            // // Convert the date string to a Date object
-            // let dateObjectt = new Date(originalDatee);
+            if (!dateQuoteFormValue || !serviceDateValue) {
+                console.error("Date fields are empty or invalid.");
+                return; // Exit if dates are not valid
+            }
 
-            // // Format the date to "dd-MM-yyyy"
-            // let formattedDatee = dateObjectt.getDate().toString().padStart(2, '0') + '-' +
-            //     (dateObjectt.getMonth() + 1).toString().padStart(2, '0') + '-' +
-            //     dateObjectt.getFullYear();
+            let dateQuoteFormObject = new Date(dateQuoteFormValue);
+            let serviceDateObject = new Date(serviceDateValue);
+
+            let formattedDateQuoteForm = (dateQuoteFormObject.getMonth() + 1).toString().padStart(2, '0') + '/' +
+                dateQuoteFormObject.getDate().toString().padStart(2, '0') + '/' +
+                dateQuoteFormObject.getFullYear();
+
+            let formattedServiceDate = (serviceDateObject.getMonth() + 1).toString().padStart(2, '0') + '/' +
+                serviceDateObject.getDate().toString().padStart(2, '0') + '/' +
+                serviceDateObject.getFullYear();
+
+            // Set formatted values to modal
+            $('#modal-Date').text(formattedDateQuoteForm);
+            $('#modal-service-Date').text(formattedServiceDate);
 
             // Set the formatted date to the element
-            $('#modal-service-Date').text($("#service-date").val());
+            //$('#modal-service-Date').text(formattedServiceDate);
+            //$('#modal-service-Date').text($("#service-date").val());
             $('#initial-subtotal').text($("#Incurred-Sub-Total").val());
             $('#initial-tax').text($("#Incurred-Tax").val());
             $('#initial-total').text($("#Incurred-Initial-Call-Total").val());
@@ -1566,6 +1594,69 @@
         $(ele).parent().find('span.validation-msg').remove();
     }
 
+    // function validateBreakoutTables() {
+    //     let tableSelector = '#proposedBreakoutTable';
+    //     const isIncurredTableShown = $('#toggleSwitch').attr('aria-checked') === 'true';
+    //     if (isIncurredTableShown) tableSelector += ', #incurredBreakoutTable';
+
+    //     const costTypesWhichRequiredDesc = ['Materials', 'Equipment', 'Fees', 'Miscellaneous', 'Other'];
+    //     let isValid = true;
+
+    //     $(tableSelector).find('tbody tr').each(function () {
+    //         const $thisRow = $(this);
+
+    //         // Validate CostType field
+    //         const costType = $thisRow.find(`[name$='CostType']`);
+    //         if (costType.val() === '--select--' || costType.val() === '') {
+    //             isValid = false;
+    //             showValidationMsg(costType);
+    //         }
+
+    //         // Validate other fields
+    //         $thisRow.find('select, input, textarea').not('[readonly]').each(function () {
+    //             const $this = $(this);
+    //             if ($this.attr('name').includes('.Description')) {
+    //                 if (costTypesWhichRequiredDesc.includes($thisRow.find(`[name$='CostType']`).val())) {
+    //                     isValid = isValid === false ? false : $this.val() !== '';
+    //                     if ($this.val() === '') {
+    //                         showValidationMsg($this);
+    //                     }
+    //                 }
+    //             } else if ($this.attr('name').includes('.Techs')) {
+    //                 if ($thisRow.find(`[name$='CostType']`).val() === 'Labor') {
+    //                     isValid = isValid === false ? false : $this.val() !== '';
+    //                     if ($this.val() === '') {
+    //                         showValidationMsg($this);
+    //                     }
+    //                 }
+    //             } else {
+    //                 isValid = isValid === false ? false : $this.val() !== '';
+    //                 if ($this.val() === '') {
+    //                     showValidationMsg($this);
+    //                 }
+    //             }
+    //         });
+    //     });
+
+    //     var isIncurredCostToggleVal = ($('input[name="IsIncurredCost"]:checked').val().toLowerCase() === 'true');
+    //     if (isIncurredCostToggleVal == true) {
+    //         if ($("#Incurred-Issue-Description").val() == null || $("#Incurred-Issue-Description").val() == '') {
+    //             isValid = false;
+    //             $("#Incurred-Issue-Description-error").text("Description is required.");
+    //         }
+    //         if ($("#Proposed-Issue-Description").val() == null || $("#Proposed-Issue-Description").val() == '') {
+    //             isValid = false;
+    //             $("#Proposed-Issue-Description-error").text("Description is required.");
+    //         }
+    //     } else {
+    //         if ($("#Proposed-Issue-Description").val() == null || $("#Proposed-Issue-Description").val() == '') {
+    //             isValid = false;
+    //             $("#Proposed-Issue-Description-error").text("Description is required.");
+    //         }
+    //     }
+
+    //     return isValid;
+    // }
     function validateBreakoutTables() {
         let tableSelector = '#proposedBreakoutTable';
         const isIncurredTableShown = $('#toggleSwitch').attr('aria-checked') === 'true';
@@ -1585,24 +1676,32 @@
             }
 
             // Validate other fields
-            $thisRow.find('select, input, textarea').not('[readonly]').each(function () {
+            $thisRow.find('select, input, textarea').not('[readonly], :disabled').each(function () {
                 const $this = $(this);
+
+                // Description field validation
                 if ($this.attr('name').includes('.Description')) {
                     if (costTypesWhichRequiredDesc.includes($thisRow.find(`[name$='CostType']`).val())) {
-                        isValid = isValid === false ? false : $this.val() !== '';
+                        isValid = isValid && $this.val() !== '';
                         if ($this.val() === '') {
                             showValidationMsg($this);
                         }
                     }
-                } else if ($this.attr('name').includes('.Techs')) {
+                }
+
+                // Techs field validation
+                else if ($this.attr('name').includes('.Techs')) {
                     if ($thisRow.find(`[name$='CostType']`).val() === 'Labor') {
-                        isValid = isValid === false ? false : $this.val() !== '';
+                        isValid = isValid && $this.val() !== '';
                         if ($this.val() === '') {
                             showValidationMsg($this);
                         }
                     }
-                } else {
-                    isValid = isValid === false ? false : $this.val() !== '';
+                }
+
+                // Other fields validation
+                else {
+                    isValid = isValid && $this.val() !== '';
                     if ($this.val() === '') {
                         showValidationMsg($this);
                     }
@@ -1610,18 +1709,19 @@
             });
         });
 
-        var isIncurredCostToggleVal = ($('input[name="IsIncurredCost"]:checked').val().toLowerCase() === 'true');
-        if (isIncurredCostToggleVal == true) {
-            if ($("#Incurred-Issue-Description").val() == null || $("#Incurred-Issue-Description").val() == '') {
+        // Validate description fields for incurred cost toggle
+        const isIncurredCostToggleVal = $('input[name="IsIncurredCost"]:checked').val().toLowerCase() === 'true';
+        if (isIncurredCostToggleVal) {
+            if ($("#Incurred-Issue-Description").val() === '') {
                 isValid = false;
                 $("#Incurred-Issue-Description-error").text("Description is required.");
             }
-            if ($("#Proposed-Issue-Description").val() == null || $("#Proposed-Issue-Description").val() == '') {
+            if ($("#Proposed-Issue-Description").val() === '') {
                 isValid = false;
                 $("#Proposed-Issue-Description-error").text("Description is required.");
             }
         } else {
-            if ($("#Proposed-Issue-Description").val() == null || $("#Proposed-Issue-Description").val() == '') {
+            if ($("#Proposed-Issue-Description").val() === '') {
                 isValid = false;
                 $("#Proposed-Issue-Description-error").text("Description is required.");
             }
@@ -1677,11 +1777,11 @@
             const regex = /^[a-zA-Z\s]+$/;
             if (regex.test(SMGClientVal) == false) {
                 isValidSMGFacilitiesProposalForm = false;
-                $("#smg-client-error").text("Client name can only contain alphabetic characters and spaces.");
+                $("#smg-client-error").text("Store Name can only contain alphabetic characters and spaces.");
             }
         } else {
             isValidSMGFacilitiesProposalForm = false;
-            $("#smg-client-error").text("Client name is required.");
+            $("#smg-client-error").text("Store Name is required.");
         }
 
         if (LocationVal == null || LocationVal.trim() === '') {

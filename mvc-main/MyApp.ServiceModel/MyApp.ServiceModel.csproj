@@ -18,7 +18,6 @@
     <PackageReference Include="itext7.bouncy-castle-adapter" Version="9.0.0" />
     
     <!-- Use BouncyCastle beta version -->
-    <PackageReference Include="BouncyCastle.Crypto" Version="1.8.0-beta4" />
     
     <!-- Additional dependency if needed -->
     <PackageReference Include="BouncyCastle.Cryptography" Version="2.4.0" />

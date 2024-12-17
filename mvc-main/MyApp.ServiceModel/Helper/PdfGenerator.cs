@@ -167,22 +167,26 @@ namespace MyApp.ServiceModel.Helper
                     document.Add(descriptionofServicesTable);
                 //}
 
-                Table partsLeadTimeTable = FillPartsLeadTime(quoteModel);
-                if (partsLeadTimeTable != null)
+                if (!string.IsNullOrEmpty(quoteModel.TimeOption))
                 {
-                    // Add some spacing
-                    document.Add(new Paragraph("\n"));
+                    Table partsLeadTimeTable = FillPartsLeadTime(quoteModel);
+                    if (partsLeadTimeTable != null)
+                    {
+                        // Add some spacing
+                        document.Add(new Paragraph("\n"));
 
-                    // Add "Parts Lead Time" section
-                    Paragraph partsLeadTimeHeading = new Paragraph("Parts Lead Time")
-                        .SetTextAlignment(TextAlignment.CENTER)
-                        .SetFontSize(18)
-                        .SimulateBold()
-                        .SetFontColor(ColorConstants.DARK_GRAY); // Subtle color for heading
-                    document.Add(partsLeadTimeHeading);
+                        // Add "Parts Lead Time" section
+                        Paragraph partsLeadTimeHeading = new Paragraph("Parts Lead Time")
+                            .SetTextAlignment(TextAlignment.CENTER)
+                            .SetFontSize(18)
+                            .SimulateBold()
+                            .SetFontColor(ColorConstants.DARK_GRAY); // Subtle color for heading
+                        document.Add(partsLeadTimeHeading);
 
-                    document.Add(partsLeadTimeTable);
+                        document.Add(partsLeadTimeTable);
+                    }
                 }
+                
 
                 // Finalize the document
                 document.Close();

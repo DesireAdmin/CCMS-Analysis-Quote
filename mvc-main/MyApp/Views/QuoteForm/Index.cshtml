@@ -326,8 +326,8 @@
                                         </div>
                                     </div>
                                 </div> *@
-                            @if (!string.IsNullOrEmpty(Model.FirstOrDefault()?.Disclaimer))
-                            {
+                            @* @if (!string.IsNullOrEmpty(Model.FirstOrDefault()?.Disclaimer))
+                            { *@
                                 <div class="row">
                                     <div>
                                         <label for="disclaimer" class="disclaimer-label text-base font-medium text-gray-700 dark:text-gray-300">Disclaimer</label>
@@ -336,7 +336,7 @@
                                         <div><span id="disclaimer" class="disclaimer-input"></span></div>
                                     </div>
                                 </div>
-                            }
+                           @*  } *@
                                     @* <div class="col-md-12 mt-3">
                                         <div>
                                             <label for="services" class="services-label text-base font-medium text-gray-700 dark:text-gray-300">Description of Services</label>
@@ -352,7 +352,7 @@
                         </div>
                     </div>
 
-                    <div class="DocAttachAndPartLeadTime d-none" style="margin:20px" id="modalPartsLeadSection" >
+                    <div class="DocAttachAndPartLeadTime" style="margin:20px" id="modalPartsLeadSection" >
                         <div class="header-form-title">
                             <h3>Parts Lead Time</h3>
                         </div>
@@ -420,8 +420,11 @@
                             let dateObject = new Date(originalDate);
 
                             // Format the date to "dd-MM-yyyy"
-                        let formattedDate = (dateObject.getMonth() + 1).toString().padStart(2, '0') + '-' +
-                            dateObject.getDate().toString().padStart(2, '0') + '-' +
+                        // let formattedDate = (dateObject.getMonth() + 1).toString().padStart(2, '0') + '-' +
+                        //     dateObject.getDate().toString().padStart(2, '0') + '-' +
+                        //     dateObject.getFullYear();
+                        let formattedDate = (dateObject.getMonth() + 1).toString().padStart(2, '0') + '/' +
+                            dateObject.getDate().toString().padStart(2, '0') + '/' +
                             dateObject.getFullYear();
 
                             // Set the formatted date to the element
@@ -446,9 +449,12 @@
                             let dateObjectt = new Date(originalDatee);
 
                             // Format the date to "dd-MM-yyyy"
-                        let formattedDatee = (dateObject.getMonth() + 1).toString().padStart(2, '0') + '-' +
-                            dateObject.getDate().toString().padStart(2, '0') + '-' +
-                            dateObject.getFullYear();
+                        // let formattedDatee = (dateObject.getMonth() + 1).toString().padStart(2, '0') + '-' +
+                        //     dateObject.getDate().toString().padStart(2, '0') + '-' +
+                        //     dateObject.getFullYear();
+                        let formattedDatee = (dateObjectt.getMonth() + 1).toString().padStart(2, '0') + '/' +
+                            dateObjectt.getDate().toString().padStart(2, '0') + '/' +
+                            dateObjectt.getFullYear();
 
                             // Set the formatted date to the element
                             $('#modal-service-Date').text(formattedDatee);

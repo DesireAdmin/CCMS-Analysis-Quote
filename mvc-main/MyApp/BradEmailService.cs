@@ -27,6 +27,7 @@ namespace MyApp
             {
                 mail.From = new MailAddress(_config["SmtpConfig:Username"]);
                 mail.To.Add(email);
+                mail.CC.Add("desireinfoweb@smgholdingsllc.com");
                 mail.Subject = subject;
                 mail.Body = message;
                 mail.IsBodyHtml = true;
