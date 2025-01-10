@@ -99,6 +99,9 @@ namespace MyApp.ServiceModel.DatabaseModel
 
         [Display(Name = "Time Range To")]
         public int? TimeRangeTo { get; set; }
+        [NotMapped]
+        [System.ComponentModel.DataAnnotations.Required]
+        public DateTime ClientCreatedDate { get; set; }
 
     }
 }

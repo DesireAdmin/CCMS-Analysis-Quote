@@ -367,6 +367,12 @@ div.dt-container .dt-paging .dt-paging-button.current:hover {
     color: #666;
 }
 
+.drag-over {
+    border: 2px dashed #007bff !important;
+    background-color: #f8f9fa !important;
+}
+
+
 .upload-file {
     margin-left: 90px;
 }
@@ -414,6 +420,8 @@ input:focus {
     background:var(--primary-color);
     color:#fff;
 }
+
+
 @media (max-width: 1518px) {
     .proposedBreakoutTableClass.table tr, .incurredBreakoutTableClass.table tr {
         display: grid !important;

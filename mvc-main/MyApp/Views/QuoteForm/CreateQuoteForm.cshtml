@@ -166,7 +166,7 @@
                                 <label asp-for="ServiceDate">ServiceDate<span class="text-danger">*</span></label>
                             </div>
                             <divc class="">
-                                <input asp-for="ServiceDate" id="service-date" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly />
+                                <input asp-for="ServiceDate" id="service-date" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
                             </divc>
                         </div>
                     </div>
@@ -192,7 +192,7 @@
                                 <thead class="form-head-title">
                                     <tr>
                                         <th>Cost Type</th>
-                                        <th>Description</th>
+                                        <th>Description<span class="text-danger">*</span></th>
                                         <th>#Techs</th>
                                         <th>Quantity/Hours</th>
                                         <th>Rate</th>
@@ -335,7 +335,7 @@
                                 <thead class="form-head-title">
                                     <tr>
                                         <th>Cost Type</th>
-                                        <th>Description</th>
+                                        <th>Description<span class="text-danger">*</span></th>
                                         <th>#Techs</th>
                                         <th>Quantity/Hours</th>
                                         <th>Rate</th>
@@ -373,7 +373,7 @@
                                                 <div class="form-table-label"><label>#Techs</label></div>
                                             </div>
                                             <div>
-                                                <input type="number" class="form-control" name="ProposedBreakouts[0].Techs" placeholder="Techs" readonly />
+                                                <input type="number" class="form-control" name="ProposedBreakouts[0].Techs" placeholder="Techs" style="visibility: hidden;" />
                                             </div>
                                         </td>
 
@@ -417,22 +417,42 @@
                                         <div class="mr-5">
                                             <label class="font-bold">Sub Total</label>
                                         </div>
-                                        <div><input type="text" id="Proposed-Sub-Total" class="form-control" name="ProposedTotals.ProposedSubTotal" readonly /></div>
-
+                                        <div>
+                                            <input type="text" id="Proposed-Sub-Total" class="form-control" name="ProposedTotals.ProposedSubTotal" readonly />
+                                        </div>
                                     </div>
                                     <div class="d-flex justify-content-end align-items-baseline m-2">
-                                        <div class="mr-5 font-bold"><label>Tax</label></div>
-                                        <div><input type="number" id="Proposed-Tax" min="0" class="form-control" name="ProposedTotals.ProposedTax" /></div>
-
+                                        <div class="mr-5 font-bold">
+                                            <label>Tax</label>
+                                        </div>
+                                        <div>
+                                            <input type="number" id="Proposed-Tax" min="0" class="form-control" name="ProposedTotals.ProposedTax" />
+                                        </div>
                                     </div>
                                     <div class="d-flex justify-content-end align-items-baseline m-2">
-                                        <div class="mr-5 font-bold"><label>Initial Call Total</label></div>
+                                        <div class="mr-5 font-bold">
+                                            <label>Proposed Call Total</label>
+                                        </div>
                                         <div>
                                             <input type="text" class="form-control" id="Proposed-Initial-Call-Total" name="ProposedTotals.ProposedInitialCallTotal" readonly />
                                         </div>
                                     </div>
+
+                                    <div class="d-flex justify-content-end align-items-baseline m-2">
+                                        <div class="mr-5 font-bold">
+                                            <label asp-for="QuoteGrandTotal">QUOTE GRAND TOTAL</label>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <span class="mr-2"><b>$</b></span>
+                                            <input asp-for="QuoteGrandTotal" id="quote-grand-total" class="form-control" placeholder="Grand total" readonly />
+                                            <input asp-for="QuoteGrandTotal" type="hidden" />
+                                        </div>
+                                    </div>
                                 </div>
+
                             </div>
+
+                            
 
                         </div>
 
@@ -441,9 +461,74 @@
                 </div>
             </div>
 
+            <div class="DocAttachAndPartLeadTime" id="PartsLeadTimeCoponentDesc" style="display: none;">
+                <div class="header-form-title">
+                    <h3 id="PartsLeadTimeCoponentHeading">Parts Lead Time</h3>
+                </div>
+                @*Parts *@
+                <div class="row mt-2" >
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label asp-for="TimeOption">Time Option<span style="color: red;">*</span>:</label>
+                            <select asp-for="TimeOption" class="form-control" id="timeOption">
+                                <option value="">Select Time Option</option>
+                                <option selected value="Number">Number</option>
+                                <option value="Range">Range</option>
+                            </select>
+                            <span asp-validation-for="TimeOption" id="timeOption-error" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div>
+                            <!-- Number option fields -->
+                            <div id="numberOptionFields">
+                                <div class="form-group">
+                                    <label asp-for="TimeNumber">Time Number<span style="color: red;">*</span>:</label>
+                                    <input asp-for="TimeNumber" id="Time-Number" type="number" class="form-control" />
+                                    <span asp-validation-for="TimeNumber" id="Time-Number-error" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Range option fields -->
+                        <div id="rangeOptionFields" class="row justify-content-center" style="display: none;">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="TimeRangeFrom">Time Range From<span style="color: red;">*</span>:</label>
+                                    <input asp-for="TimeRangeFrom" id="Time-Range-From" type="number" class="form-control" />
+                                    <span asp-validation-for="TimeRangeFrom" id="Time-Range-From-error" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="TimeRangeTo">Time Range To<span style="color: red;">*</span>:</label>
+                                    <input asp-for="TimeRangeTo" type="number" id="Time-Range-To" class="form-control" />
+                                    <span asp-validation-for="TimeRangeTo" id="Time-Range-To-error" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label asp-for="TimeUnit">Time Unit<span style="color: red;">*</span>:</label>
+                            <select asp-for="TimeUnit" id="Time-Unit" class="form-control" style="width:100% !important"> 
+                                <option value="">Select Time Unit</option>
+                                <option value="Day">Day</option>
+                                <option value="Week">Week</option>
+                            </select>
+                            <span asp-validation-for="TimeUnit" id="Time-Unit-error" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+
+            
             <div class="ServiceProposal-container">
                 <div class="header-form-title">
-                    <h3>Service Proposal</h3>
+                    <h3>Disclaimers</h3>
                 </div>
                 <div class="ServiceProposal-from-contain">
                     <div class="row">
@@ -460,83 +545,22 @@
             </div>
             <div class="DocAttachAndPartLeadTime">
                 <div class="header-form-title">
-                    <h3 id="PartsLeadTimeCoponentHeading">Document Attachment</h3>
+                    <h3 id="DocumentAttachmentCoponentHeading">Document Attachment</h3>
                 </div>
 
                 <div class="DocAttachAndPartLeadTimeContain">
-                    <div id="PartsLeadTimeCoponentTitle" style="display: none;">
-                        <h4 id="ProposedBreakoutTableText">Parts Lead Time</h4>
-                    </div>
-                    @*Parts *@
-                    <div class="row mt-2" id="PartsLeadTimeCoponentDesc" style="display: none;">
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label asp-for="TimeOption">Time Option<span style="color: red;">*</span>:</label>
-                                <select asp-for="TimeOption" class="form-control" id="timeOption">
-                                    <option value="">Select Time Option</option>
-                                    <option selected value="Number">Number</option>
-                                    <option value="Range">Range</option>
-                                </select>
-                                <span asp-validation-for="TimeOption" id="timeOption-error" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div>
-                                <!-- Number option fields -->
-                                <div id="numberOptionFields">
-                                    <div class="form-group">
-                                        <label asp-for="TimeNumber">Time Number<span style="color: red;">*</span>:</label>
-                                        <input asp-for="TimeNumber" id="Time-Number" type="number" class="form-control" />
-                                        <span asp-validation-for="TimeNumber" id="Time-Number-error" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Range option fields -->
-                            <div id="rangeOptionFields" class="row justify-content-center" style="display: none;">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label asp-for="TimeRangeFrom">Time Range From<span style="color: red;">*</span>:</label>
-                                        <input asp-for="TimeRangeFrom" id="Time-Range-From" type="number" class="form-control" />
-                                        <span asp-validation-for="TimeRangeFrom" id="Time-Range-From-error" class="text-danger"></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label asp-for="TimeRangeTo">Time Range To<span style="color: red;">*</span>:</label>
-                                        <input asp-for="TimeRangeTo" type="number" id="Time-Range-To" class="form-control" />
-                                        <span asp-validation-for="TimeRangeTo" id="Time-Range-To-error" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label asp-for="TimeUnit">Time Unit<span style="color: red;">*</span>:</label>
-                                <select asp-for="TimeUnit" id="Time-Unit" class="form-control">
-                                    <option value="">Select Time Unit</option>
-                                    <option value="Day">Day</option>
-                                    <option value="Week">Week</option>
-                                </select>
-                                <span asp-validation-for="TimeUnit" id="Time-Unit-error" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="fileAttachmentClass mt-4">
                         <div class="upload-area">
                             <label asp-for="AttachmentFile">Upload Attachment<span style="color: red;">*</span>: </label>
 
-                            <div class="file-drop-area text-center">
+                            <div class="file-drop-area drag-over text-center" id="fileDropArea">
                                 <div style="justify-self: center;">
                                     <img src="https://img.icons8.com/?size=100&id=joVKpp2EUeU9&format=png&color=000000" height="80px"
                                          width="80px" alt="icon">
                                 </div>
 
                                 <p>Drag files here or browse to upload.</p>
-                                <p>Allowed file types: .jpg, .jpeg, .png, .gif, .pdf, .doc, .docx. Max size: 10MB.</p>
+                                <p>Allowed file types: .jpg, .jpeg, .png, .gif, .pdf, .doc, .docx, .xls, .xlsx, .csv. Max size: 10MB.</p>
                                 <input asp-for="AttachmentFile" type="file" class="form-control d-none upload-file" id="fileInput" />
                                 <div id="fileDisplay" style="display: none;">
                                     <span id="fileName"></span>
@@ -548,6 +572,7 @@
                         <span asp-validation-for="AttachmentFile" id="fileInput-error" class="text-danger"></span>
                     </div>
                 </div>
+
 
             </div>
             <div style=" justify-self: end; margin-top:20px;">
@@ -871,12 +896,13 @@
                                 <div class="mt-3">
                                     <label>
                                         <input type="checkbox" id="confirmationCheckbox" />
-                                        I confirm that I have read and understood the proposal.
+                                        I have reviewed above proposal and confirm all information is accurate
                                     </label>
                                     <span id="checkboxError" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="modal-footer">
+                                <input id="createdDate" asp-for="ClientCreatedDate" readonly style="display: none;" />
                                 <button type="button" id="btnModalClose2" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
                                 <button type="button" id="confirmSubmitBtn" class="btn btn-outline-primary">Confirm & Submit</button>
                                 <button type="submit" id="modalSubmit" class="d-none">Confirm & Submit</button>
@@ -1042,16 +1068,16 @@
                 const techsField = $thisRow.find('input[name*="Techs"]'); // Target the corresponding Techs field
                 const isLabor = $(this).val() === 'Labor';
 
-                // Make Techs field editable only for Labor
-                techsField.prop('readonly', !isLabor);
-
-                // If CostType is not Labor, clear the Techs field and remove validation messages
-                if (!isLabor) {
-                    techsField.val('');
+                if (isLabor) {
+                    techsField.prop('readonly', false).css('visibility', 'visible'); // Make editable and visible
+                } else {
+                    techsField.prop('readonly', true).val('').css('visibility', 'hidden'); // Clear value and make invisible
                     $thisRow.find('span.validation-msg').remove(); // Remove any validation messages for Techs
                 }
             });
         }
+
+
 
         // Call the function initially for the table
         toggleTechsField('#incurredBreakoutTable');
@@ -1134,16 +1160,12 @@
                 // Show or hide the Parts Lead Time component based on remaining rows
                 if (isMaterialsSelected) {
                     console.log("Keeping PartsLeadTimeCoponent visible");
-                    $('#PartsLeadTimeCoponentTitle').show();
                     $('#PartsLeadTimeCoponentDesc').show();
-                    $("#PartsLeadTimeCoponentHeading").text("Document Attachment and Parts Lead Time");
                 } else {
                     console.log("Hiding PartsLeadTimeCoponent and clearing data");
 
                     // Hide the Parts Lead Time component
-                    $('#PartsLeadTimeCoponentTitle').hide();
                     $('#PartsLeadTimeCoponentDesc').hide();
-                    $("#PartsLeadTimeCoponentHeading").text("Document Attachment");
 
                     // Clear the data in the Parts Lead Time fields
                     $('#timeOption').val(''); // Reset Time Option
@@ -1170,30 +1192,6 @@
                 'input[name="IncurredTotals.IncurredTax"]',
                 'input[name="IncurredTotals.IncurredInitialCallTotal"]');
             calculateGrandTotal();
-        });
-
-        $('#uploadButton').on('click', function () {
-            $('#fileInput').click();
-        });
-
-        // Display file name and remove button when a file is selected
-        $('#fileInput').on('change', function () {
-            const file = this.files[0];
-            console.log(file);
-            debugger
-            if (file) {
-                $("#fileInput-error").text('');
-                $('#fileName').text(file.name);
-                $('#fileDisplay').show();
-                $('#uploadButton').hide(); // Hide the upload button once a file is selected
-            }
-        });
-
-        // Clear the file input and reset display when "X" is clicked
-        $('#removeFileButton').on('click', function () {
-            $('#fileInput').val(''); // Clear the input
-            $('#fileDisplay').hide(); // Hide the file display area
-            $('#uploadButton').show(); // Show the upload button again
         });
 
         function calculateSubTotal(row) {
@@ -1233,18 +1231,14 @@
             // Show or hide the Parts Lead Time component
             if (isMaterialsSelected) {
                 console.log("Showing PartsLeadTimeCoponent");
-                $('#PartsLeadTimeCoponentTitle').show();
                 $('#PartsLeadTimeCoponentDesc').show();
 
                 // Change the content of the h3 element
-                $("#PartsLeadTimeCoponentHeading").text("Document Attachment and Parts Lead Time");
                 isMaterialsSelected = true;
             } else {
                 console.log("Hiding PartsLeadTimeCoponent");
-                $('#PartsLeadTimeCoponentTitle').hide();
                 $('#PartsLeadTimeCoponentDesc').hide();
 
-                $("#PartsLeadTimeCoponentHeading").text("Document Attachment");
                 isMaterialsSelected = false;
             }
         });
@@ -1326,7 +1320,73 @@
             }
         });
 
+        const fileDropArea = $('#fileDropArea');
+        const fileInput = $('#fileInput');
+
+        // Trigger file input click on button click
+        $('#uploadButton').on('click', function () {
+            fileInput.click();
+        });
+
+        // File selected via input
+        fileInput.on('change', function () {
+            handleFiles(this.files);
+        });
+
+        // Drag-and-drop events
+        fileDropArea.on('dragover', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            fileDropArea.addClass('drag-over'); // Add styling for visual feedback
+        });
+
+        fileDropArea.on('dragleave', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            fileDropArea.removeClass('drag-over'); // Remove styling
+        });
+
+        fileDropArea.on('drop', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            fileDropArea.removeClass('drag-over'); // Remove styling
+            const files = e.originalEvent.dataTransfer.files;
+            handleFiles(files); // Handle dropped files
+        });
+
+        // Handle file selection
+        function handleFiles(files) {
+            const file = files[0];
+            if (file) {
+                const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv'];
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+
+                // Validate file type and size
+                if (!allowedExtensions.includes(fileExtension)) {
+                    $("#fileInput-error").text(`Allowed file types are: ${allowedExtensions.join(', ')}.`);
+                    return;
+                }
+                if (file.size > 10 * 1024 * 1024)
+                { // 10MB limit
+                    $("#fileInput-error").text('File size exceeds 10MB. Please upload a smaller file.');
+                    return;
+                }
+
+                $("#fileInput-error").text('');
+                $('#fileName').text(file.name);
+                $('#fileDisplay').show();
+                $('#uploadButton').hide();
+            }
+        }
+
+        // Remove file on button click
+        $('#removeFileButton').on('click', function () {
+            fileInput.val(''); // Clear the input
+            $('#fileDisplay').hide(); // Hide the file display area
+            $('#uploadButton').show(); // Show the upload button again
+        });
     });
+
 
     $("#submitBtnId").click(function () {
 
@@ -1337,8 +1397,25 @@
         let isvalidateSMGFacilitiesProposalForm = validateSMGFacilitiesProposalForm();
         let isValidPartsLead = validatePartsLeadTime();
 
+            // Get current date and time
+        var now = new Date();
+
+        // Format as 'YYYY-MM-DD HH:mm:ss'
+        var year = now.getFullYear();
+        var month = String(now.getMonth() + 1).padStart(2, '0'); // Add leading zero
+        var day = String(now.getDate()).padStart(2, '0');
+        var hours = String(now.getHours()).padStart(2, '0');
+        var minutes = String(now.getMinutes()).padStart(2, '0');
+        var seconds = String(now.getSeconds()).padStart(2, '0');
+
+        // Combine into desired format
+        var currentDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+
+        // Format the date and time as 'YYYY-MM-DDTHH:mm' for compatibility with HTML datetime-local input
+        $('#createdDate').val(currentDateTime);
+
         debugger
-       
         if (isvalidateSMGFacilitiesProposalForm == false) {
             isSubmited = false;
             toastr.error("There is an error in the SMG Facilities Proposal form. ");
@@ -1875,39 +1952,7 @@
 
         }
 
-
-        const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx'];
-        const maxFileSize = 10 * 1024 * 1024; // 10MB in bytes
-        const fileInput = document.getElementById("fileInput");
-        const fileError = document.getElementById("fileInput-error");
-
-        // Clear previous error message
-        fileError.innerText = "";
-
-        if (!fileInput.files || fileInput.files.length === 0) {
-            isPartsLeadTime = false;
-            fileError.innerText = "Document Attachment is required.";
-            return isPartsLeadTime;
-        }
-
-        const file = fileInput.files[0];
-
-        // Validate file size
-        if (file.size > maxFileSize) {
-            isPartsLeadTime = false;
-            fileError.innerText = "File size must not exceed 10MB.";
-            return isPartsLeadTime;
-        }
-
-        debugger
-        // Validate file extension
-        const fileExtension = file.name.split('.').pop().toLowerCase();
-        if (!allowedExtensions.includes(fileExtension)) {
-            
-            isPartsLeadTime = false;
-            fileError.innerText = `Allowed file types are: ${allowedExtensions.join(', ')}.`;
-        }
-
+        
         return isPartsLeadTime;
     }
 

@@ -11,6 +11,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<ProposedBreakout> ProposedBreakouts { get; set; }
     public DbSet<IncurredTotal> IncurredTotals { get; set; }
     public DbSet<ProposedTotal> ProposedTotals { get; set; }
+    public DbSet<HistoryLogs> HistoryLogs { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // QuoteModel - ProposedBreakout relationship

@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Protocols;
 using MyApp.Data;
 using MyApp.ServiceModel.DatabaseModel;
 using System.Net.Mail;
+using System.Text;
 
 namespace MyApp.Controllers
 {
@@ -77,93 +78,128 @@ namespace MyApp.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateQuoteForm(QuoteModel model)
         {
-            if (model.IsChecked == false)
+            string logType = "Success";
+            StringBuilder logMessageBuilder = new StringBuilder();
+            string quoteModelId = model.Id;
+
+            try
             {
-                ModelState.AddModelError("IsChecked", "Please confirm that the provided information is accurate by checking the confirmation box before submitting the form.");
-                return View("CreateQuoteForm", model);
-            }
-            if (string.IsNullOrEmpty(model.SignatureName))
-            {
-                ModelState.AddModelError("SignatureName", "This field is required.");
-                return View("CreateQuoteForm", model);
-            }
-            // Handle the signature upload
-            if (model.AttachmentFile != null && model.AttachmentFile.Length > 0)
-            {
-                string signatureUrl = await UploadSignatureAsync(model.AttachmentFile, model.Id);
-                if (string.IsNullOrEmpty(signatureUrl))
+                if (model.IsChecked == false)
                 {
-                    ModelState.AddModelError("AttachmentFile", "Failed to upload signature file.");
-                    return View(model);
+                    ModelState.AddModelError("IsChecked", "Please confirm that the provided information is accurate by checking the confirmation box before submitting the form.");
+                    return View("CreateQuoteForm", model);
+                }
+                if (string.IsNullOrEmpty(model.SignatureName))
+                {
+                    ModelState.AddModelError("SignatureName", "This field is required.");
+                    return View("CreateQuoteForm", model);
+                }
+                // Handle the signature upload
+                if (model.AttachmentFile != null && model.AttachmentFile.Length > 0)
+                {
+                    string signatureUrl = await UploadSignatureAsync(model.AttachmentFile, model.Id);
+
+                    // Update logs
+                    logMessageBuilder.AppendLine($"[{model.ClientCreatedDate}] Uploaded signature file: [{model.AttachmentFile.FileName}]");
+                    if (string.IsNullOrEmpty(signatureUrl))
+                    {
+                        // Update logs
+                        logType = "Error";
+                        logMessageBuilder.AppendLine($"Failed to uploaded signature file: [{model.AttachmentFile.FileName}]");
+                        ModelState.AddModelError("AttachmentFile", "Failed to upload signature file.");
+                        return View(model);
+                    }
+                    else
+                    {
+                        long fileSizeInBytes = model.AttachmentFile.Length; // Size in bytes
+                        long fileSizeInKilobytes = fileSizeInBytes / 1024; // Size in KB
+                        long fileSizeInMegabytes = fileSizeInKilobytes / 1024; // Size in MB
+                        if (fileSizeInMegabytes > 10)
+                        {
+                            ModelState.AddModelError("AttachmentFile", "Please upload file less than 10MB.");
+                            return View("CreateQuoteForm", model);
+                        }
+                    }
+                    model.AttachmentUrl = signatureUrl;
                 }
                 else
                 {
-                    long fileSizeInBytes = model.AttachmentFile.Length; // Size in bytes
-                    long fileSizeInKilobytes = fileSizeInBytes / 1024; // Size in KB
-                    long fileSizeInMegabytes = fileSizeInKilobytes / 1024; // Size in MB
-                    if (fileSizeInMegabytes > 10)
+                    // Update logs
+                    logMessageBuilder.AppendLine($"[{model.ClientCreatedDate}] Uploaded signature file is Empty: [{model.AttachmentFile.FileName}]");
+                    model.AttachmentUrl = "";
+                }
+
+                // Store ProposedBreakouts data
+                if (model.ProposedBreakouts != null)
+                {
+                    foreach (var proposed in model.ProposedBreakouts)
                     {
-                        ModelState.AddModelError("AttachmentFile", "Please upload file less than 10MB.");
-                        return View("CreateQuoteForm", model);
+                        proposed.Id = proposed.Id ?? GenerateUniqueId("PROPOSED_");
+                        proposed.QuoteModelId = model.Id;
+                        _context.ProposedBreakouts.Add(proposed);
                     }
                 }
-                model.AttachmentUrl = signatureUrl;
-            }
-            else
-            {
-                model.AttachmentUrl = "";
-            }
 
-            // Store ProposedBreakouts data
-            if (model.ProposedBreakouts != null)
-            {
-                foreach (var proposed in model.ProposedBreakouts)
+                // Store IncurredBreakouts and IncurredTotals based on IsIncurredCost
+                if (!model.IsIncurredCost)
                 {
-                    proposed.Id = proposed.Id ?? GenerateUniqueId("PROPOSED_");
-                    proposed.QuoteModelId = model.Id;
-                    _context.ProposedBreakouts.Add(proposed);
+                    model.IncurredBreakouts = null;
+                    //model.IncurredTotals = null;
                 }
-            }
-
-            // Store IncurredBreakouts and IncurredTotals based on IsIncurredCost
-            if (!model.IsIncurredCost)
-            {
-                model.IncurredBreakouts = null;
-                //model.IncurredTotals = null;
-            }
-            else
-            {
-                if (model.IncurredBreakouts != null)
+                else
                 {
-                    foreach (var incurred in model.IncurredBreakouts)
+                    if (model.IncurredBreakouts != null)
                     {
-                        if (!string.IsNullOrEmpty(incurred.Description))
+
+
+                        foreach (var incurred in model.IncurredBreakouts)
                         {
-                            incurred.Id = incurred.Id ?? GenerateUniqueId("INCURRED_");
-                            incurred.QuoteModelId = model.Id;
-                            _context.IncurredBreakouts.Add(incurred);
+                            if (!string.IsNullOrEmpty(incurred.Description))
+                            {
+                                incurred.Id = incurred.Id ?? GenerateUniqueId("INCURRED_");
+                                incurred.QuoteModelId = model.Id;
+                                _context.IncurredBreakouts.Add(incurred);
+                            }
                         }
                     }
                 }
+                var grandTotal = model.QuoteGrandTotal;
+                _context.QuoteModels.Add(model);
+                await _context.SaveChangesAsync();
+
+                // Upadate logs
+                logMessageBuilder.AppendLine($"Quote form successfully added to database [{quoteModelId}]");
+
+                var pdfdata = await new MyApp.ServiceModel.Helper.PdfGenerator(_configuration).GeneratePdf(model, logMessageBuilder);
+
+                // Update LogType Status
+                logType = pdfdata == null ? "Error" : logType;
+
+                var emailbody = _bradEmail.returnHtmlBody();
+
+                emailbody = emailbody.Replace("{{Clientname}}", model.SMG_CLIENT);
+                emailbody = emailbody.Replace("{{SMGVendorPO}}", model.SMG_Vendor_PO);
+                emailbody = emailbody.Replace("{{SMGClient}}", model.SMG_CLIENT);
+                emailbody = emailbody.Replace("{{StoreNumber}}", model.StoreNumber);
+                emailbody = emailbody.Replace("{{Email}}", model.Email);
+                emailbody = emailbody.Replace("{{Date}}", model.Date.ToString());
+                emailbody = emailbody.Replace("{{Location}}", model.Location);
+                await _bradEmail.SendEmailAsync(model.Email, "Brad email", emailbody, pdfdata, model.AttachmentFile);
+
+                logMessageBuilder.AppendLine($"Email sent to [{model.Email}]");
+                return RedirectToAction("SubmitSuccess");
             }
-            var grandTotal = model.QuoteGrandTotal;
-            _context.QuoteModels.Add(model);
-            await _context.SaveChangesAsync();
-
-            var pdfdata = await new MyApp.ServiceModel.Helper.PdfGenerator(_configuration).GeneratePdf(model);
-
-            var emailbody = _bradEmail.returnHtmlBody();
-
-            emailbody = emailbody.Replace("{{Clientname}}", model.SMG_CLIENT);
-            emailbody = emailbody.Replace("{{SMGVendorPO}}", model.SMG_Vendor_PO);
-            emailbody = emailbody.Replace("{{SMGClient}}", model.SMG_CLIENT);
-            emailbody = emailbody.Replace("{{StoreNumber}}", model.StoreNumber);
-            emailbody = emailbody.Replace("{{Email}}", model.Email);
-            emailbody = emailbody.Replace("{{Date}}", model.Date.ToString());
-            emailbody = emailbody.Replace("{{Location}}", model.Location);
-            await _bradEmail.SendEmailAsync(model.Email, "Brad email", emailbody, pdfdata, model.AttachmentFile);
-
-            return RedirectToAction("SubmitSuccess");
+            finally
+            {
+                // Update logs
+                _context.HistoryLogs.Add(new HistoryLogs
+                {
+                    LogType = logType,
+                    LogMessage = logMessageBuilder.ToString(),
+                    QuoteModelId = quoteModelId
+                });
+                await _context.SaveChangesAsync();
+            }
         }
 
         private async Task<string> UploadSignatureAsync(IFormFile file, string quoteModelId)

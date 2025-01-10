@@ -13,6 +13,7 @@ using MyApp.ServiceModel.DatabaseModel;
 using System.IO;
 using System.Diagnostics.Metrics;
 using Azure.Storage.Blobs.Models;
+using System.Text;
 
 namespace MyApp.ServiceModel.Helper
 {
@@ -30,181 +31,208 @@ namespace MyApp.ServiceModel.Helper
             containerName = _configuration.GetSection("AzureExplorer:ContainerName2").Value;
 
         }
-        public async Task<MemoryStream> GeneratePdf(QuoteModel quoteModel)
+        public async Task<MemoryStream> GeneratePdf(QuoteModel quoteModel, StringBuilder logMessageBuilder)
         {
-            try
+            MemoryStream memoryStream = null;
+            int attempt = 0;
+            int maxRetries = 1;
+            while (attempt <= maxRetries)
             {
-                MemoryStream memoryStream = new MemoryStream(); // Do not use `using` here
-
-                // Create a PdfWriter
-                PdfWriter writer = new PdfWriter(memoryStream, new WriterProperties().SetCompressionLevel(CompressionConstants.BEST_COMPRESSION)); // Prevent automatic stream closure
-                PdfDocument pdf = new PdfDocument(writer);
-                Document document = new Document(pdf);
-
-                #region Title
-                // Add a table with 2 columns to hold the logo and the title
-                float[] columnWidths = { 1, 5 }; // Adjust column widths as needed
-                Table logoAndTitleTable = new Table(columnWidths).UseAllAvailableWidth();
-                logoAndTitleTable.SetBorder(Border.NO_BORDER); // Remove table borders
-
-                var folderName = Path.Combine("wwwroot", "img");
-                var folderPath = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-                var fileName = "SMGFacilitiesLogo.jpg";
-
-                string logoPath = Path.Combine(folderPath, fileName);
-                //D:\DesireInfoweb\Bradly\Master\mvc - main\MyApp\wwwroot\img\SMGFacilitiesLogo.jpg
-
-                // Add the logo to the first cell
-                ImageData logoData = ImageDataFactory.Create(logoPath);
-                Image logo = new Image(logoData).ScaleToFit(50, 50);
-                logoAndTitleTable.AddCell(new Cell()
-                    .Add(logo)
-                    .SetBorder(Border.NO_BORDER)
-                    .SetVerticalAlignment(VerticalAlignment.MIDDLE)); // Align logo vertically
-
-                // Add the title to the second cell
-                Paragraph heading = new Paragraph("SMG Facilities Proposal Form Summary")
-                    .SetTextAlignment(TextAlignment.LEFT) // Align to the left of the cell
-                    .SetFontSize(24)
-                    .SimulateBold(); // Make it bold
-                logoAndTitleTable.AddCell(new Cell()
-                    .Add(heading)
-                    .SetBorder(Border.NO_BORDER)
-                    .SetVerticalAlignment(VerticalAlignment.MIDDLE)); // Align title vertically
-
-                // Add the table to the document
-                document.Add(logoAndTitleTable);
-
-                // Add some spacing below
-                document.Add(new Paragraph("\n"));
-
-                #endregion
-
-                // Adding key-value pairs as Paragraphs
-                AddKeyValueParagraph("SMG Vendor PO # :", quoteModel.SMG_Vendor_PO, document);
-                AddKeyValueParagraph("Date :", quoteModel.Date.ToString("dd-MM-yyyy"), document);
-                AddKeyValueParagraph("Store Name :", quoteModel.SMG_CLIENT, document);
-                AddKeyValueParagraph("Store # :", quoteModel.StoreNumber, document);
-                AddKeyValueParagraph("Address :", quoteModel.Location, document);
-                AddKeyValueParagraph("Vendor :", quoteModel.Vendor, document);
-                AddKeyValueParagraph("Email :", quoteModel.Email, document);
-                AddKeyValueParagraph("Service Rep Name :", quoteModel.ServiceRepName, document);
-
-                // Add some spacing
-                document.Add(new Paragraph("\n"));
-                document.Add(PrintIsIncurredCost(quoteModel));
-
-                #region Breakout Tables
-                // Add the Initial Breakout table to the document
-                Table initialCallTable = FillInitialCallTable(quoteModel);
-                if (initialCallTable != null)
+                try
                 {
-                    // Add "INITIAL CALL BREAKOUT" section
-                    Paragraph initialCallHeading = new Paragraph("INITIAL CALL BREAKOUT")
-                        .SetTextAlignment(TextAlignment.CENTER)
-                        .SetFontSize(14)
-                        .SimulateBold()
-                        .SetFontColor(ColorConstants.DARK_GRAY);
-                    Paragraph incurredIssueDescriptionHeading = new Paragraph("Issue(s) discovered while on-site & Description of Work Performed :")
-                        .SetTextAlignment(TextAlignment.LEFT)
-                        .SetFontSize(12)
-                        .SimulateBold()
-                        .SetFontColor(ColorConstants.DARK_GRAY)
-                        .SetPaddingTop(5);
-                    Paragraph incurredIssueDescription = new Paragraph(quoteModel.IncurredIssueDescription)
-                        .SetTextAlignment(TextAlignment.LEFT)
-                        .SetFontSize(12)
-                        .SetFontColor(ColorConstants.DARK_GRAY)
-                        .SetPaddingBottom(5);
+                    memoryStream = new MemoryStream();
 
-                    document.Add(initialCallHeading);
-                    document.Add(incurredIssueDescriptionHeading);
-                    document.Add(incurredIssueDescription);
+                    // Create a PdfWriter
+                    PdfWriter writer = new PdfWriter(memoryStream, new WriterProperties().SetCompressionLevel(CompressionConstants.BEST_COMPRESSION)); // Prevent automatic stream closure
+                    PdfDocument pdf = new PdfDocument(writer);
+                    Document document = new Document(pdf);
 
-                    document.Add(initialCallTable);
+                    #region Title
+                    // Add a table with 2 columns to hold the logo and the title
+                    float[] columnWidths = { 1, 5 }; // Adjust column widths as needed
+                    Table logoAndTitleTable = new Table(columnWidths).UseAllAvailableWidth();
+                    logoAndTitleTable.SetBorder(Border.NO_BORDER); // Remove table borders
+
+                    var folderName = Path.Combine("wwwroot", "img");
+                    var folderPath = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+                    var fileName = "SMGFacilitiesLogo.jpg";
+
+                    string logoPath = Path.Combine(folderPath, fileName);
+                    //D:\DesireInfoweb\Bradly\Master\mvc - main\MyApp\wwwroot\img\SMGFacilitiesLogo.jpg
+
+                    // Add the logo to the first cell
+                    ImageData logoData = ImageDataFactory.Create(logoPath);
+                    Image logo = new Image(logoData).ScaleToFit(50, 50);
+                    logoAndTitleTable.AddCell(new Cell()
+                        .Add(logo)
+                        .SetBorder(Border.NO_BORDER)
+                        .SetVerticalAlignment(VerticalAlignment.MIDDLE)); // Align logo vertically
+
+                    // Add the title to the second cell
+                    Paragraph heading = new Paragraph("SMG Facilities Proposal Form Summary")
+                        .SetTextAlignment(TextAlignment.LEFT) // Align to the left of the cell
+                        .SetFontSize(24)
+                        .SimulateBold(); // Make it bold
+                    logoAndTitleTable.AddCell(new Cell()
+                        .Add(heading)
+                        .SetBorder(Border.NO_BORDER)
+                        .SetVerticalAlignment(VerticalAlignment.MIDDLE)); // Align title vertically
+
+                    // Add the table to the document
+                    document.Add(logoAndTitleTable);
+
+                    // Add some spacing below
+                    document.Add(new Paragraph("\n"));
+
+                    #endregion
+
+                    // Adding key-value pairs as Paragraphs
+                    AddKeyValueParagraph("SMG Vendor PO # :", quoteModel.SMG_Vendor_PO, document);
+                    AddKeyValueParagraph("Date :", quoteModel.Date.ToString("dd-MM-yyyy"), document);
+                    AddKeyValueParagraph("Store Name :", quoteModel.SMG_CLIENT, document);
+                    AddKeyValueParagraph("Store # :", quoteModel.StoreNumber, document);
+                    AddKeyValueParagraph("Address :", quoteModel.Location, document);
+                    AddKeyValueParagraph("Vendor :", quoteModel.Vendor, document);
+                    AddKeyValueParagraph("Email :", quoteModel.Email, document);
+                    AddKeyValueParagraph("Service Rep Name :", quoteModel.ServiceRepName, document);
+
                     // Add some spacing
                     document.Add(new Paragraph("\n"));
-                }
+                    document.Add(PrintIsIncurredCost(quoteModel));
 
-                // Add the proposed call breakout table to the document
-                Table proposedCallTable = FillProposedCallTable(quoteModel);
-                if (proposedCallTable != null)
-                {
-                    // Add "INITIAL CALL BREAKOUT" section
-                    Paragraph proposedCallHeading = new Paragraph("SUMMARY OF PROPOSED QUOTED WORK")
-                        .SetTextAlignment(TextAlignment.CENTER)
-                        .SetFontSize(14)
-                        .SimulateBold()
-                        .SetFontColor(ColorConstants.DARK_GRAY); // Subtle color for heading
-
-                    Paragraph proposedIssueDescriptionHeading = new Paragraph("Detailed description of proposed work to address unresolved issues. :")
-                        .SetTextAlignment(TextAlignment.LEFT)
-                        .SetFontSize(12)
-                        .SimulateBold()
-                        .SetFontColor(ColorConstants.DARK_GRAY)
-                        .SetPaddingTop(5);
-                    Paragraph proposedIssueDescription = new Paragraph(quoteModel.ProposedIssueDescription)
-                        .SetTextAlignment(TextAlignment.LEFT)
-                        .SetFontSize(12)
-                        .SetFontColor(ColorConstants.DARK_GRAY)
-                        .SetPaddingBottom(5);
-
-                    document.Add(proposedCallHeading);
-                    document.Add(proposedIssueDescriptionHeading);
-                    document.Add(proposedIssueDescription);
-
-                    document.Add(proposedCallTable);
-                }
-                #endregion
-
-                // Add some spacing
-                document.Add(new Paragraph("\n"));
-
-                // Add the personal details table to the document
-                Table descriptionofServicesTable = FillDescriptionofServicesTable(quoteModel);
-                //if (descriptionofServicesTable != null)
-                //{
-                    document.Add(descriptionofServicesTable);
-                //}
-
-                if (!string.IsNullOrEmpty(quoteModel.TimeOption))
-                {
-                    Table partsLeadTimeTable = FillPartsLeadTime(quoteModel);
-                    if (partsLeadTimeTable != null)
+                    #region Breakout Tables
+                    // Add the Initial Breakout table to the document
+                    Table initialCallTable = FillInitialCallTable(quoteModel);
+                    if (initialCallTable != null)
                     {
+                        // Add "INITIAL CALL BREAKOUT" section
+                        Paragraph initialCallHeading = new Paragraph("INITIAL CALL BREAKOUT")
+                            .SetTextAlignment(TextAlignment.CENTER)
+                            .SetFontSize(14)
+                            .SimulateBold()
+                            .SetFontColor(ColorConstants.DARK_GRAY);
+                        Paragraph incurredIssueDescriptionHeading = new Paragraph("Issue(s) discovered while on-site & Description of Work Performed :")
+                            .SetTextAlignment(TextAlignment.LEFT)
+                            .SetFontSize(12)
+                            .SimulateBold()
+                            .SetFontColor(ColorConstants.DARK_GRAY)
+                            .SetPaddingTop(5);
+                        Paragraph incurredIssueDescription = new Paragraph(quoteModel.IncurredIssueDescription)
+                            .SetTextAlignment(TextAlignment.LEFT)
+                            .SetFontSize(12)
+                            .SetFontColor(ColorConstants.DARK_GRAY)
+                            .SetPaddingBottom(5);
+
+                        document.Add(initialCallHeading);
+                        document.Add(incurredIssueDescriptionHeading);
+                        document.Add(incurredIssueDescription);
+
+                        document.Add(initialCallTable);
                         // Add some spacing
                         document.Add(new Paragraph("\n"));
+                    }
 
-                        // Add "Parts Lead Time" section
-                        Paragraph partsLeadTimeHeading = new Paragraph("Parts Lead Time")
+                    // Add the proposed call breakout table to the document
+                    Table proposedCallTable = FillProposedCallTable(quoteModel);
+                    if (proposedCallTable != null)
+                    {
+                        // Add "INITIAL CALL BREAKOUT" section
+                        Paragraph proposedCallHeading = new Paragraph("SUMMARY OF PROPOSED QUOTED WORK")
                             .SetTextAlignment(TextAlignment.CENTER)
-                            .SetFontSize(18)
+                            .SetFontSize(14)
                             .SimulateBold()
                             .SetFontColor(ColorConstants.DARK_GRAY); // Subtle color for heading
-                        document.Add(partsLeadTimeHeading);
 
-                        document.Add(partsLeadTimeTable);
+                        Paragraph proposedIssueDescriptionHeading = new Paragraph("Detailed description of proposed work to address unresolved issues. :")
+                            .SetTextAlignment(TextAlignment.LEFT)
+                            .SetFontSize(12)
+                            .SimulateBold()
+                            .SetFontColor(ColorConstants.DARK_GRAY)
+                            .SetPaddingTop(5);
+                        Paragraph proposedIssueDescription = new Paragraph(quoteModel.ProposedIssueDescription)
+                            .SetTextAlignment(TextAlignment.LEFT)
+                            .SetFontSize(12)
+                            .SetFontColor(ColorConstants.DARK_GRAY)
+                            .SetPaddingBottom(5);
+
+                        document.Add(proposedCallHeading);
+                        document.Add(proposedIssueDescriptionHeading);
+                        document.Add(proposedIssueDescription);
+
+                        document.Add(proposedCallTable);
                     }
+                    #endregion
+
+                    // Add some spacing
+                    document.Add(new Paragraph("\n"));
+
+                    // Add the personal details table to the document
+                    Table descriptionofServicesTable = FillDescriptionofServicesTable(quoteModel);
+                    //if (descriptionofServicesTable != null)
+                    //{
+                    document.Add(descriptionofServicesTable);
+                    //}
+
+                    if (!string.IsNullOrEmpty(quoteModel.TimeOption))
+                    {
+                        Table partsLeadTimeTable = FillPartsLeadTime(quoteModel);
+                        if (partsLeadTimeTable != null)
+                        {
+                            // Add some spacing
+                            document.Add(new Paragraph("\n"));
+
+                            // Add "Parts Lead Time" section
+                            Paragraph partsLeadTimeHeading = new Paragraph("Parts Lead Time")
+                                .SetTextAlignment(TextAlignment.CENTER)
+                                .SetFontSize(18)
+                                .SimulateBold()
+                                .SetFontColor(ColorConstants.DARK_GRAY); // Subtle color for heading
+                            document.Add(partsLeadTimeHeading);
+
+                            document.Add(partsLeadTimeTable);
+                        }
+                    }
+
+                    // Finalize the document
+                    document.Close();
+
+                    if (memoryStream == null)
+                    {
+                        logMessageBuilder.AppendLine($"Error, Generated PDF is empty for Quote ID: [{quoteModel.Id}]");
+                        continue;
+                    }
+
+                    // Upload the PDF to Azure Blob Storage
+                    await UploadPdfToAzureBlobAsync(memoryStream.ToArray(), quoteModel.Id, blobName);
+                    logMessageBuilder.AppendLine($"PDF uploaded successfully for Quote ID: [{quoteModel.Id}]");
+
+                    //// Reset the memory stream position to the beginning
+                    //memoryStream.Position = 0;
+
+                    MemoryStream readMemoryStream = await ReadPdfFromAzureBlobAsync(quoteModel.Id, blobName);
+
+                    if (readMemoryStream == null || readMemoryStream.Length == 0)
+                    {
+                        logMessageBuilder.AppendLine($"Error, Failed to read PDF from Azure for Quote ID:: [{quoteModel.Id}_{blobName}]");
+                    }
+                    else
+                    {
+                        logMessageBuilder.AppendLine($"PDF read successfully from Azure for Quote ID: [{quoteModel.Id}]");
+                    }
+                    return readMemoryStream;
                 }
-                
-
-                // Finalize the document
-                document.Close();
-
-                // Upload the PDF to Azure Blob Storage
-                await UploadPdfToAzureBlobAsync(memoryStream.ToArray(), quoteModel.Id, blobName);
-
-                //// Reset the memory stream position to the beginning
-                //memoryStream.Position = 0;
-
-                MemoryStream readMemoryStream = await ReadPdfFromAzureBlobAsync(quoteModel.Id, blobName);
-                return readMemoryStream;
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error Occured while generating pdf : {ex.Message}");
+                    logMessageBuilder.AppendLine($"Error Occured while generating pdf : {ex.Message}");
+                    return null;
+                }
+                finally
+                {
+                    attempt++;
+                }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error Occured while generating pdf : {ex.Message}");
-                return null;
-            }
+            return null;
         }
 
         private Table FillPartsLeadTime(QuoteModel quoteModel)
