@@ -68,7 +68,7 @@ namespace MyApp.ServiceModel.DatabaseModel
         public ProposedTotal ProposedTotals { get; set; } = new ProposedTotal();
         public string AttachmentUrl { get; set; }
         [NotMapped]
-        [Required(ErrorMessage = "AttachmentFile is required.")]
+        //[Required(ErrorMessage = "AttachmentFile is required.")]
         public IFormFile AttachmentFile { get; set; }
 
         public string? Disclaimer { get; set; }

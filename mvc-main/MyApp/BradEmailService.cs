@@ -16,6 +16,7 @@ namespace MyApp
     public class BradEmailService : IBradEmailSender
     {
         public readonly IConfiguration _config;
+
         public BradEmailService(IConfiguration configurationManager)
         {
             _config = configurationManager;
@@ -31,20 +32,24 @@ namespace MyApp
                 mail.Subject = subject;
                 mail.Body = message;
                 mail.IsBodyHtml = true;
-                var attachment = new Attachment(pdfAttachment, "GeneratedDocument.pdf", "application/pdf");
-                mail.Attachments.Add(attachment);
 
-                var memoryStream = new MemoryStream();
+                // Attach PDF file if it's provided
+                if (pdfAttachment != null && pdfAttachment.Length > 0)
+                {
+                    var attachment = new Attachment(pdfAttachment, "GeneratedDocument.pdf", "application/pdf");
+                    mail.Attachments.Add(attachment);
+                }
 
-                await file.CopyToAsync(memoryStream);
-                memoryStream.Position = 0;
-                var attachmentClient = new Attachment(memoryStream, file.FileName, file.ContentType);
-                mail.Attachments.Add(attachmentClient);
+                // Attach the client file if it's provided
+                if (file != null)
+                {
+                    var memoryStream = new MemoryStream();
+                    await file.CopyToAsync(memoryStream);
+                    memoryStream.Position = 0;
+                    var attachmentClient = new Attachment(memoryStream, file.FileName, file.ContentType);
+                    mail.Attachments.Add(attachmentClient);
+                }
 
-
-
-
-                //mail.Attachments.Add(new Attachment("D:\\TestFile.txt"));//--Uncomment this to send any attachment  
                 using (SmtpClient smtp = new SmtpClient(_config["SmtpConfig:Host"], 587))
                 {
                     smtp.Credentials = new NetworkCredential(_config["SmtpConfig:Username"], _config["SmtpConfig:Password"]);
@@ -58,7 +63,6 @@ namespace MyApp
 
         public string returnHtmlBody()
         {
-            //string FilePath = "..\\MyApp.Common\\HTMLTemplate\\sendEmailNotFillAnswer.html";
             var folderName = Path.Combine("Resources", "HTMLTemplate");
             var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
             var fileName = "BradQuoteform.html";
@@ -68,9 +72,7 @@ namespace MyApp
             {
                 using (StreamReader streamReader = new StreamReader(actualFilePath))
                 {
-
                     string html = streamReader.ReadToEnd();
-                    streamReader.Close();
                     return html;
                 }
             }

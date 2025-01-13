@@ -125,7 +125,7 @@ namespace MyApp.Controllers
                 else
                 {
                     // Update logs
-                    logMessageBuilder.AppendLine($"[{model.ClientCreatedDate}] Uploaded signature file is Empty: [{model.AttachmentFile.FileName}]");
+                    logMessageBuilder.AppendLine($"[{model.ClientCreatedDate}] Uploaded signature file is Empty.");
                     model.AttachmentUrl = "";
                 }
 
@@ -184,7 +184,15 @@ namespace MyApp.Controllers
                 emailbody = emailbody.Replace("{{Email}}", model.Email);
                 emailbody = emailbody.Replace("{{Date}}", model.Date.ToString());
                 emailbody = emailbody.Replace("{{Location}}", model.Location);
-                await _bradEmail.SendEmailAsync(model.Email, "Brad email", emailbody, pdfdata, model.AttachmentFile);
+                if (model.AttachmentFile != null && model.AttachmentFile.Length > 0)
+                {
+                    await _bradEmail.SendEmailAsync(model.Email, "Brad email", emailbody, pdfdata, model.AttachmentFile);
+                }
+                else
+                {
+                    // No file attachment, pass null for the file
+                    await _bradEmail.SendEmailAsync(model.Email, "Brad email", emailbody, pdfdata, null);
+                }
 
                 logMessageBuilder.AppendLine($"Email sent to [{model.Email}]");
                 return RedirectToAction("SubmitSuccess");
