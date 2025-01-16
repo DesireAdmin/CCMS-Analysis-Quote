@@ -77,11 +77,11 @@
                 </div>
                 <div class="row">
                     @* <div class="col-md-4 mb-4">
-                        <div class="form-group">
-                            <label asp-for="StoreNumber">Store Number</label>
-                            <input asp-for="StoreNumber" id="store-number" class="form-control" maxlength="30" placeholder="Enter Store Number" />
-                          
-                        </div>
+                    <div class="form-group">
+                    <label asp-for="StoreNumber">Store Number</label>
+                    <input asp-for="StoreNumber" id="store-number" class="form-control" maxlength="30" placeholder="Enter Store Number" />
+
+                    </div>
                     </div> *@
                     <div class="form-group col-md-4 mb-4">
                         <div>
@@ -96,7 +96,7 @@
                     <div class="col-md-4 mb-4">
                         <div class="form-group">
                             <label asp-for="ServiceRepName">Service Rep Name<span class="text-danger">*</span></label>
-                            <input asp-for="ServiceRepName" id="service-rep-name"  class="form-control" maxlength="40" placeholder="Enter Service Rep Name" />
+                            <input asp-for="ServiceRepName" id="service-rep-name" class="form-control" maxlength="40" placeholder="Enter Service Rep Name" />
                             <span asp-validation-for="ServiceRepName" id="service-rep-name-error" class="text-danger"></span>
                         </div>
                     </div>
@@ -123,41 +123,11 @@
 
             </div>
 
-            <div class="contain-toogle-incurredcost">
-                <div class="form-group">
-                    <div class="d-none">
-                        <label>
-                            <input type="radio" id="IsIncurredCostYes" class="IsIncurredCostYN" name="IsIncurredCost" value="true"> Yes
-                        </label>
-                        <label>
-                            <input type="radio" id="IsIncurredCostNo" class="IsIncurredCostYN" checked="checked" name="IsIncurredCost" value="false" checked> No
-                        </label>
-                    </div>
-                    <div class="d-flex text-base">
-                        <div class="bold-red"><b>Incurred Cost?</b></div>
-                        <div class="ml-3">
-                            <button type="button" id="toggleSwitch" class="bg-gray-200 dark:bg-gray-700 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:ring-offset-black" role="switch" aria-checked="false">
-                                <span class="pointer-events-none relative inline-block h-5 w-5 rounded-full bg-white dark:bg-black shadow transform ring-0 transition ease-in-out duration-200" id="switchInner">
-                                    <span class="absolute cyes inset-0 h-full w-full flex items-center justify-center opacity-0 transition-opacity" aria-hidden="true" id="yesText">
-                                        <span class="text-success">Y</span>
-                                    </span>
-                                    <span class="absolute cno inset-0 h-full w-full flex items-center justify-center opacity-100 transition-opacity" aria-hidden="true" id="noText">
-                                        <span class="text-danger">N</span>
-                                    </span>
-                                </span>
-                            </button>
-                        </div>
-                        <div class="contain-isIncurredCost">
-                            <label class="isIncurredCost">Proposed Breakout</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Dynamic Incurred Breakout Table -->
             <div style="margin-top: 12px;">
                 <div class="header-form-title quoteform-table-title">
-                    <h3>Proposed Breakout</h3>
+                    <h3>Incurred cost and Proposed Breakout</h3>
                 </div>
                 <div class="quoteform-table-container">
                     <div>
@@ -172,7 +142,7 @@
                     </div>
 
                     @* Incurred Breakout Table *@
-                    <div id="incurredBreakoutTableContain" style="display: none;">
+                    <div id="incurredBreakoutTableContain">
                         <div>
                             <h4 id="incurredSection">Incurred Breakout Table</h4>
                         </div>
@@ -201,80 +171,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>
-                                            <div>
-                                                <div>
-                                                    <div class="form-table-label">
-                                                        <label>Cost Type</label>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <select class="form-control" name="IncurredBreakouts[0].CostType">
-                                                        <option selected>--select--</option>
-                                                        <option value="Labor">Labor</option>
-                                                        <option value="Materials">Materials</option>
-                                                        <option value="Travel">Travel</option>
-                                                        <option value="Equipment">Equipment</option>
-                                                        <option value="Disposal">Disposal</option>
-                                                        <option value="Fees">Fees</option>
-                                                        <option value="Permitting">Permitting</option>
-                                                        <option value="Miscellaneous">Miscellaneous</option>
-                                                        <option value="Other">Other</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                        </td>
-                                        <td>
-                                            <div>
-                                                <div class="form-table-label"><label>Description</label></div>
-                                                <div>
-                                                    <textarea class="form-control" maxlength="240" name="IncurredBreakouts[0].Description" placeholder="Description"></textarea>
-
-                                                </div>
-                                            </div>
-
-                                        </td>
-                                        <td>
-                                            <div>
-                                                <div class="form-table-label"><label>#Techs</label></div>
-                                            </div>
-                                            <div>
-                                                <input type="number" class="form-control" name="IncurredBreakouts[0].Techs" placeholder="Techs" readonly />
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div>
-                                                <div class="form-table-label"><label>Quantity</label></div>
-                                                <div>
-                                                    <input type="number" class="form-control" name="IncurredBreakouts[0].Quantity" placeholder="Quantity" min="0">
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div>
-                                                <div class="form-table-label"><label>Rate</label></div>
-                                                <div>
-                                                    <input type="number" class="form-control" name="IncurredBreakouts[0].Rate" placeholder="Rate" min="0">
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div>
-                                                <div class="form-table-label"><label>Initial Call Sub Total</label></div>
-                                                <div>
-                                                    <input type="text" class="form-control" name="IncurredBreakouts[0].InitialCallSubTotal" readonly />
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-danger remove-btn">X</button>
-                                        </td>
-                                        @* <td>
-                                        <button type="button" class="btn btn-success add-btn">+</button>
-                                        </td> *@
-                                    </tr>
+                                  
                                 </tbody>
                             </table>
                             <div>
@@ -452,7 +349,7 @@
 
                             </div>
 
-                            
+
 
                         </div>
 
@@ -513,7 +410,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label asp-for="TimeUnit">Time Unit<span style="color: red;">*</span>:</label>
-                            <select asp-for="TimeUnit" id="Time-Unit" class="form-control" style="width:100% !important"> 
+                            <select asp-for="TimeUnit" id="Time-Unit" class="form-control" style="width:100% !important">
                                 <option value="">Select Time Unit</option>
                                 <option value="Day">Day</option>
                                 <option value="Week">Week</option>
@@ -523,9 +420,8 @@
                     </div>
                 </div>
 
-                </div>
+            </div>
 
-            
             <div class="ServiceProposal-container">
                 <div class="header-form-title">
                     <h3>Disclaimers</h3>
@@ -802,28 +698,28 @@
                                     </div>
                                     <div class="ServiceProposal-container">
                                         <div class="header-form-title">
-                                            <h3>Service Proposal</h3>
+                                            <h3>Disclaimers</h3>
                                         </div>
                                         <div class="ServiceProposal-from-contain">
                                             <div class="mddl additional-details">
                                                 @* <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div>
-                                                            <label for="message" class="message-label text-base font-medium text-gray-700 dark:text-gray-300">Message</label>
+                                                <div class="col-md-6">
+                                                <div>
+                                                <label for="message" class="message-label text-base font-medium text-gray-700 dark:text-gray-300">Message</label>
 
-                                                        </div>
-                                                        <div>
-                                                            <div><span class="message-input" id="message-modal"></span></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div>
-                                                            <label for="disclaimer" class="disclaimer-label text-base font-medium text-gray-700 dark:text-gray-300">Disclaimer</label>
-                                                        </div>
-                                                        <div>
-                                                            <div><span id="disclaimer-modal" class="disclaimer-input"></span></div>
-                                                        </div>
-                                                    </div>
+                                                </div>
+                                                <div>
+                                                <div><span class="message-input" id="message-modal"></span></div>
+                                                </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                <div>
+                                                <label for="disclaimer" class="disclaimer-label text-base font-medium text-gray-700 dark:text-gray-300">Disclaimer</label>
+                                                </div>
+                                                <div>
+                                                <div><span id="disclaimer-modal" class="disclaimer-input"></span></div>
+                                                </div>
+                                                </div>
                                                 </div> *@
                                                 <div class="row">
                                                     <div class="col-md-12 mt-3">
@@ -834,10 +730,10 @@
                                                             <div><span id="disclaimer-modal" class="disclaimer-input"></span></div>
                                                         </div>
                                                         @* <div>
-                                                            <label for="services" class="services-label text-base font-medium text-gray-700 dark:text-gray-300">Description of Services</label>
+                                                        <label for="services" class="services-label text-base font-medium text-gray-700 dark:text-gray-300">Description of Services</label>
                                                         </div>
                                                         <div>
-                                                            <div><span id="services-modal" class="services-input"></span></div>
+                                                        <div><span id="services-modal" class="services-input"></span></div>
                                                         </div> *@
                                                     </div>
                                                 </div>
@@ -942,7 +838,7 @@
                 $('#Time-Number').val('');
                 $('#numberOptionFields').hide();
                 $('#rangeOptionFields').hide();
-               
+
             }
         });
 
@@ -1011,23 +907,6 @@
                 $('#modalSubmit').click();
             }
         });
-        //$('#incurredBreakoutTableContain').hide();
-        // Toggle visibility of sections based on IsIncurredCost
-        toggleIncurredBreakoutTable();
-
-        // Listen to the toggle button
-        $('#toggleSwitch').click(function () {
-            let isChecked = $('#IsIncurredCostYes').prop('checked');
-            if (isChecked) {
-                $('#IsIncurredCostYes').prop('checked', true);
-                $('#IsIncurredCostNo').prop('checked', false);
-
-            } else {
-                $('#IsIncurredCostNo').prop('checked', true);
-                $('#IsIncurredCostYes').prop('checked', false);
-            }
-            toggleIncurredBreakoutTable();
-        });
 
         // Close Modal
         $("#confirmationModal").on("hidden.bs.modal", function () {
@@ -1035,17 +914,7 @@
             $('.proposed-quote-table tbody tr').remove();
         });
 
-        // Function to show or hide incurred breakout table and handle data clearing
-        function toggleIncurredBreakoutTable() {
-            if ($('#IsIncurredCostYes').is(':checked')) {
-                // Show Incurred Breakout Table if "Yes" is selected
-                $('#incurredBreakoutTableContain').show();
-            } else {
-                // Hide Incurred Breakout Table and clear data if "No" is selected
-                $('#incurredBreakoutTableContain').hide();
-                clearIncurredBreakoutTableData();
-            }
-        }
+ 
 
         // Clear all data in the incurred breakout table
         function clearIncurredBreakoutTableData() {
@@ -1084,8 +953,93 @@
         toggleTechsField('#proposedBreakoutTable');
 
         function addNewRow(tableSelector, type) {
-            const lastIndex = $(tableSelector + ' tbody tr').length;
-            const newRow = $(tableSelector + ' tbody tr:first').clone(true);
+            const tableBody = $(tableSelector + ' tbody');
+            const lastIndex = tableBody.find('tr').length;
+
+            // Check if the table has no rows
+            if (lastIndex === 0) {
+                // Create a new row from the provided HTML structure if no rows exist
+                const newRowHtml = `
+                <tr>
+                    <td>
+                        <div>
+                            <div>
+                                <div class="form-table-label">
+                                    <label>Cost Type</label>
+                                </div>
+                            </div>
+                            <div>
+                                <select class="form-control" name="${type}[0].CostType">
+                                    <option selected>--select--</option>
+                                    <option value="Labor">Labor</option>
+                                    <option value="Materials">Materials</option>
+                                    <option value="Travel">Travel</option>
+                                    <option value="Equipment">Equipment</option>
+                                    <option value="Disposal">Disposal</option>
+                                    <option value="Fees">Fees</option>
+                                    <option value="Permitting">Permitting</option>
+                                    <option value="Miscellaneous">Miscellaneous</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="form-table-label"><label>Description</label></div>
+                            <div>
+                                <textarea class="form-control" maxlength="240" name="${type}[0].Description" placeholder="Description"></textarea>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="form-table-label"><label>#Techs</label></div>
+                        </div>
+                        <div>
+                            <input type="number" class="form-control" name="${type}[0].Techs" placeholder="Techs" readonly />
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="form-table-label"><label>Quantity</label></div>
+                            <div>
+                                <input type="number" class="form-control" name="${type}[0].Quantity" placeholder="Quantity" min="0">
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="form-table-label"><label>Rate</label></div>
+                            <div>
+                                <input type="number" class="form-control" name="${type}[0].Rate" placeholder="Rate" min="0">
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="form-table-label"><label>Initial Call Sub Total</label></div>
+                            <div>
+                                <input type="text" class="form-control" name="${type}[0].InitialCallSubTotal" readonly />
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger remove-btn">X</button>
+                    </td>
+                </tr>
+            `;
+
+                // Append the new row to the table body
+                tableBody.append(newRowHtml);
+
+                // Trigger change for the select dropdown
+                tableBody.find('select[name*="CostType"]').trigger('change');
+                return; // Exit since the row has been added
+            }
+
+            // If rows exist, clone the first row as usual
+            const newRow = tableBody.find('tr:first').clone(true);
 
             // Clear values and change add button to remove
             newRow.find('input, select, textarea').val('');
@@ -1100,11 +1054,12 @@
             newRow.find('input[name$=".InitialCallSubTotal"]').attr('name', `${type}[${lastIndex}].InitialCallSubTotal`);
 
             // Append the new row to the table
-            $(tableSelector + ' tbody').append(newRow);
+            tableBody.append(newRow);
 
-            // Manually trigger the change event for the new row's dropdown
+            // Trigger change for the select dropdown
             newRow.find('select[name*="CostType"]').trigger('change');
         }
+    
 
         // Event listener for adding a new row
         $('#addRowButton').on('click', function () {
@@ -1116,26 +1071,34 @@
 
         // Remove row and recalculate totals
         $('#incurredBreakoutTable').on('click', '.remove-btn', function () {
-            const tableId = $(this).closest('table').attr('id');
-            const tbody = $(this).closest('tbody');
-            const rowCount = tbody.find('tr').length;
+            $(this).closest('tr').remove(); // Remove the row
 
-            console.log("Row count before removal:", rowCount);
+            var table = document.querySelector('#incurredBreakoutTable');
+            var tbody = table.querySelector('tbody');
+            var rows = tbody.getElementsByTagName('tr'); // Get all rows in tbody specifically
 
-            if (rowCount > 1) {
-                $(this).closest('tr').remove(); // Remove the row
-            } else {
-                toastr.error("At least one row must remain in the table.");
+            console.log("Row count before removal:", rows.length);
+
+            if (rows.length < 1) {
+                $("#Incurred-Issue-Description-error").val('');
+                $("#Incurred-Issue-Description").val('');
+                $('#Incurred-Sub-Total').val('');
+                $('#Incurred-Tax').val('');
+                $('#Incurred-Initial-Call-Total ').val('');
+            }else{
+                calculateTotal('#proposedBreakoutTable',
+                    'input[name="ProposedTotals.ProposedSubTotal"]',
+                    'input[name="ProposedTotals.ProposedTax"]',
+                    'input[name="ProposedTotals.ProposedInitialCallTotal"]');
+                calculateTotal('#incurredBreakoutTable',
+                    'input[name="IncurredTotals.IncurredSubTotal"]',
+                    'input[name="IncurredTotals.IncurredTax"]',
+                    'input[name="IncurredTotals.IncurredInitialCallTotal"]');
+                calculateGrandTotal();
             }
-            calculateTotal('#proposedBreakoutTable',
-                'input[name="ProposedTotals.ProposedSubTotal"]',
-                'input[name="ProposedTotals.ProposedTax"]',
-                'input[name="ProposedTotals.ProposedInitialCallTotal"]');
-            calculateTotal('#incurredBreakoutTable',
-                'input[name="IncurredTotals.IncurredSubTotal"]',
-                'input[name="IncurredTotals.IncurredTax"]',
-                'input[name="IncurredTotals.IncurredInitialCallTotal"]');
-            calculateGrandTotal();
+
+
+            
         });
         $('#proposedBreakoutTable').on('click', '.remove-btn', function () {
             const tableId = $(this).closest('table').attr('id');
@@ -1397,7 +1360,7 @@
         let isvalidateSMGFacilitiesProposalForm = validateSMGFacilitiesProposalForm();
         let isValidPartsLead = validatePartsLeadTime();
 
-            // Get current date and time
+        // Get current date and time
         var now = new Date();
 
         // Format as 'YYYY-MM-DD HH:mm:ss'
@@ -1493,61 +1456,55 @@
             }
             $('#Modal-Time-Unit').text($("#TimeUnit").val());
 
+            var table = document.querySelector('#incurredBreakoutTable');
+            var tbody = table.querySelector('tbody');
+            var rows = tbody.getElementsByTagName('tr'); // Get all rows in tbody specifically
 
-            const selectedValue = $('input[name="IsIncurredCost"]:checked').val();
-
-            debugger
-            if (selectedValue == "false") {
+            if (rows.length <= 0) {
                 $(".initial-call-breakout").hide();
             } else {
+                $(".initial-call-breakout").show();
                 $('.incurredBreakoutTableClass tbody tr').each(function () {
                     const row = $(this);
-
                     var row1 = $('<tr></tr>');
 
+                    // Create cells with values
                     var costTypeCell = $('<td></td>').append(
                         $('<p></p>').addClass('quote-cost-type').text(row.find('td:nth-child(1) select').val())
                     );
 
-                    // Description cell (using <p>)
                     var descriptionCell = $('<td></td>').append(
                         $('<p></p>')
                             .addClass('quote-description')
                             .text(row.find('td:nth-child(2) textarea').val())
                     );
 
-                    // Cost cell (using <p>)
                     var costCell = $('<td></td>').append(
                         $('<p></p>')
                             .addClass('quote-cost')
                             .text(row.find('td:nth-child(3) input').val())
                     );
 
-                    // Quantity cell (using <p>)
                     var quantityCell = $('<td></td>').append(
                         $('<p></p>')
                             .addClass('quote-quantity')
                             .text(row.find('td:nth-child(4) input').val())
                     );
 
-                    // Techs cell (using <p>)
                     var techsCell = $('<td></td>').append(
                         $('<p></p>')
                             .addClass('quote-techs')
                             .text(row.find('td:nth-child(5) input').val())
                     );
 
-                    // Quote Sub Total cell (using <p>)
                     var subtotalCell = $('<td></td>').append(
                         $('<p></p>')
                             .addClass('quote-subtotal')
                             .text(row.find('td:nth-child(6) input').val())
                     );
 
-
                     // Append all cells to the row
                     row1.append(costTypeCell, descriptionCell, costCell, quantityCell, techsCell, subtotalCell);
-
 
                     // Append the row to the table body1
                     $('.initial-call-table tbody').append(row1);
@@ -1735,9 +1692,14 @@
     //     return isValid;
     // }
     function validateBreakoutTables() {
+        debugger
+
         let tableSelector = '#proposedBreakoutTable';
-        const isIncurredTableShown = $('#toggleSwitch').attr('aria-checked') === 'true';
-        if (isIncurredTableShown) tableSelector += ', #incurredBreakoutTable';
+        // Check if any rows are added
+        var table = document.querySelector('#incurredBreakoutTable');
+        var rows = table.getElementsByTagName('tr'); // Get all the rows in the table
+
+        if (rows.length > 0) tableSelector += ', #incurredBreakoutTable';
 
         const costTypesWhichRequiredDesc = ['Materials', 'Equipment', 'Fees', 'Miscellaneous', 'Other'];
         let isValid = true;
@@ -1786,9 +1748,10 @@
             });
         });
 
-        // Validate description fields for incurred cost toggle
-        const isIncurredCostToggleVal = $('input[name="IsIncurredCost"]:checked').val().toLowerCase() === 'true';
-        if (isIncurredCostToggleVal) {
+        var table = document.querySelector('#incurredBreakoutTable');
+        var rows = table.getElementsByTagName('tr'); // Get all the rows in the table
+        
+        if (rows.length > 1     ) {
             if ($("#Incurred-Issue-Description").val() === '') {
                 isValid = false;
                 $("#Incurred-Issue-Description-error").text("Description is required.");
@@ -1952,7 +1915,7 @@
 
         }
 
-        
+
         return isPartsLeadTime;
     }
 

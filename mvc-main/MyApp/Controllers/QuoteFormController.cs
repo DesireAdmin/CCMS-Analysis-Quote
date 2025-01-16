@@ -141,9 +141,9 @@ namespace MyApp.Controllers
                 }
 
                 // Store IncurredBreakouts and IncurredTotals based on IsIncurredCost
-                if (!model.IsIncurredCost)
+                if (model.IncurredBreakouts == null)
                 {
-                    model.IncurredBreakouts = null;
+                    model.IsIncurredCost = false;
                     //model.IncurredTotals = null;
                 }
                 else

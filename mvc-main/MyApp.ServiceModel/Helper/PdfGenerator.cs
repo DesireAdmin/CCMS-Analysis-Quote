@@ -449,7 +449,7 @@ namespace MyApp.ServiceModel.Helper
 
         private Table FillInitialCallTable(QuoteModel quoteModel)
         {
-            if (quoteModel.IncurredBreakouts == null)
+            if (quoteModel.IncurredBreakouts.Count <= 0 )
             {
                 return null; // Return null if quoteModel is null
             }

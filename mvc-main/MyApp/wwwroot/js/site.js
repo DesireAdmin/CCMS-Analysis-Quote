@@ -24,61 +24,61 @@ function toggleDropdown() {
 }
 
 // Optional: Close dropdown when clicking outside
-document.addEventListener('click', function (event) {
-    const dropdown = document.getElementById('profile-dropdown');
-    const button = document.getElementById('user-menu-button');
-    if (!button.contains(event.target) && !dropdown.contains(event.target)) {
-        dropdown.classList.add('hidden');
-    }
-});
+//document.addEventListener('click', function (event) {
+//    const dropdown = document.getElementById('profile-dropdown');
+//    const button = document.getElementById('user-menu-button');
+//    if (!button.contains(event.target) && !dropdown.contains(event.target)) {
+//        dropdown.classList.add('hidden');
+//    }
+//});
 
 /********************************************/
 
-const toggleSwitch = document.getElementById("toggleSwitch");
-const switchInner = document.getElementById("switchInner");
-const yesText = document.getElementById("yesText");
-const noText = document.getElementById("noText");
+//const toggleSwitch = document.getElementById("toggleSwitch");
+//const switchInner = document.getElementById("switchInner");
+//const yesText = document.getElementById("yesText");
+//const noText = document.getElementById("noText");
 
-toggleSwitch.addEventListener("click", () => {
-    const isChecked = toggleSwitch.getAttribute("aria-checked") === "true";
-    toggleSwitch.setAttribute("aria-checked", !isChecked);
+//toggleSwitch.addEventListener("click", () => {
+//    const isChecked = toggleSwitch.getAttribute("aria-checked") === "true";
+//    toggleSwitch.setAttribute("aria-checked", !isChecked);
 
-    if (isChecked) {
-        switchInner.classList.remove("translate-x-5");
-        switchInner.classList.add("translate-x-0");
-        yesText.classList.remove("opacity-100");
-        yesText.classList.add("opacity-0");
-        noText.classList.remove("opacity-0");
-        noText.classList.add("opacity-100");
-        document.getElementById("IsIncurredCostNo").checked = true;
+//    if (isChecked) {
+//        switchInner.classList.remove("translate-x-5");
+//        switchInner.classList.add("translate-x-0");
+//        yesText.classList.remove("opacity-100");
+//        yesText.classList.add("opacity-0");
+//        noText.classList.remove("opacity-0");
+//        noText.classList.add("opacity-100");
+//        document.getElementById("IsIncurredCostNo").checked = true;
 
-        $('#incurredSection').hide();
-        $('#incurredBreakoutTableContain').hide();
-        $('#incurredBreakoutTableTotal').hide();
-        $(".isIncurredCost").text("Proposed Breakout");
-        $(".quoteform-table-title h3").text("Proposed Breakout");
+//        $('#incurredSection').hide();
+//        $('#incurredBreakoutTableContain').hide();
+//        $('#incurredBreakoutTableTotal').hide();
+//        $(".isIncurredCost").text("Proposed Breakout");
+//        $(".quoteform-table-title h3").text("Proposed Breakout");
 
-        // Clear all data in Incurred Breakout fields when 'No' is selected
-        $('#incurredBreakoutTable').find('input, select').val('');
-        $('#incurredBreakoutTableTotal').find('input, select').val('');
-    } else {
-        //This is for the no
-        switchInner.classList.remove("translate-x-0");
-        switchInner.classList.add("translate-x-5");
-        yesText.classList.remove("opacity-0");
-        yesText.classList.add("opacity-100");
-        noText.classList.remove("opacity-100");
-        noText.classList.add("opacity-0");
-        document.getElementById("IsIncurredCostYes").checked = true;
+//        // Clear all data in Incurred Breakout fields when 'No' is selected
+//        $('#incurredBreakoutTable').find('input, select').val('');
+//        $('#incurredBreakoutTableTotal').find('input, select').val('');
+//    } else {
+//        //This is for the no
+//        switchInner.classList.remove("translate-x-0");
+//        switchInner.classList.add("translate-x-5");
+//        yesText.classList.remove("opacity-0");
+//        yesText.classList.add("opacity-100");
+//        noText.classList.remove("opacity-100");
+//        noText.classList.add("opacity-0");
+//        document.getElementById("IsIncurredCostYes").checked = true;
 
-        $('#incurredSection').show();
-        $('#incurredBreakoutTableContain').show();
-        $('#incurredBreakoutTableTotal').show();
+//        $('#incurredSection').show();
+//        $('#incurredBreakoutTableContain').show();
+//        $('#incurredBreakoutTableTotal').show();
 
-        $(".isIncurredCost").text("Incurred cost and Proposed Breakout");
-        $(".quoteform-table-title h3").text("Incurred cost and Proposed Breakout");
-    }
-});
+//        $(".isIncurredCost").text("Incurred cost and Proposed Breakout");
+//        $(".quoteform-table-title h3").text("Incurred cost and Proposed Breakout");
+//    }
+//});
 
 $('#exampleModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget) // Button that triggered the modal
