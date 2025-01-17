@@ -137,6 +137,7 @@
                             </div>
                             <divc class="">
                                 <input asp-for="ServiceDate" id="service-date" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                <span asp-validation-for="ServiceDate" id="service-date-error" class="text-danger"></span>
                             </divc>
                         </div>
                     </div>
@@ -447,7 +448,7 @@
                 <div class="DocAttachAndPartLeadTimeContain">
                     <div class="fileAttachmentClass mt-4">
                         <div class="upload-area">
-                            <label asp-for="AttachmentFile">Upload Attachment<span style="color: red;">*</span>: </label>
+                            <label asp-for="AttachmentFile">Upload Attachment: </label>
 
                             <div class="file-drop-area drag-over text-center" id="fileDropArea">
                                 <div style="justify-self: center;">
@@ -600,7 +601,7 @@
                                             </div>
                                             <div class="initial-call-breakout mb-2">
                                                 <div>
-                                                    <h4 id="incurredSection" style="text-align: center;">Initial call breakout</h4>
+                                                    <h4 id="incurredSection" style="text-align: center;">Initial Call B reakout</h4>
                                                 </div>
                                                 <div class="p-2">
                                                     <div><label class="text-base font-medium text-gray-700 dark:text-gray-300">Issue(s) discovered while on-site & Description of Work Performed*</label></div>
@@ -647,7 +648,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <h4 id="ProposedBreakoutTableText">Summary of proposed quoted work</h4>
+                                            <h4 id="ProposedBreakoutTableText">Summary Of Proposed Quoted Work</h4>
                                             <div class="proposed-quote-summary table-responsive">
                                                 <div class="p-2">
                                                     <div><label class="text-base font-medium text-gray-700 dark:text-gray-300">Detailed description of proposed work to address unresolved issues</label></div>
@@ -1035,6 +1036,7 @@
 
                 // Trigger change for the select dropdown
                 tableBody.find('select[name*="CostType"]').trigger('change');
+                    
                 return; // Exit since the row has been added
             }
 
@@ -1042,7 +1044,8 @@
             const newRow = tableBody.find('tr:first').clone(true);
 
             // Clear values and change add button to remove
-            newRow.find('input, select, textarea').val('');
+            newRow.find('input, textarea').val('');
+            newRow.find('select').prop('selectedIndex', 0);
             newRow.find('.remove-btn').removeClass('btn-success add-btn').addClass('btn-danger remove-btn').text('X');
 
             // Update names with new index
@@ -1080,7 +1083,7 @@
             console.log("Row count before removal:", rows.length);
 
             if (rows.length < 1) {
-                $("#Incurred-Issue-Description-error").val('');
+                $("#Incurred-Issue-Description-error").text('');
                 $("#Incurred-Issue-Description").val('');
                 $('#Incurred-Sub-Total').val('');
                 $('#Incurred-Tax').val('');
@@ -1283,7 +1286,7 @@
             }
         });
 
-        const fileDropArea = $('#fileDropArea');
+         const fileDropArea = $('#fileDropArea');
         const fileInput = $('#fileInput');
 
         // Trigger file input click on button click
@@ -1309,12 +1312,20 @@
             fileDropArea.removeClass('drag-over'); // Remove styling
         });
 
+        // Modify your existing drop event handler
         fileDropArea.on('drop', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            fileDropArea.removeClass('drag-over'); // Remove styling
-            const files = e.originalEvent.dataTransfer.files;
-            handleFiles(files); // Handle dropped files
+            fileDropArea.removeClass('drag-over');
+    
+            const droppedFiles = e.originalEvent.dataTransfer.files;
+    
+            // Create DataTransfer and assign the dropped file to input
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(droppedFiles[0]);
+            fileInput[0].files = dataTransfer.files;
+    
+            handleFiles(droppedFiles); // Your existing handle files function
         });
 
         // Handle file selection
@@ -1692,7 +1703,7 @@
     //     return isValid;
     // }
     function validateBreakoutTables() {
-        debugger
+        
 
         let tableSelector = '#proposedBreakoutTable';
         // Check if any rows are added
@@ -1764,8 +1775,17 @@
             if ($("#Proposed-Issue-Description").val() === '') {
                 isValid = false;
                 $("#Proposed-Issue-Description-error").text("Description is required.");
+               
             }
         }
+
+        const serviceDateInput = document.getElementById('service-date');
+        const errorMessage = document.getElementById('service-date-error');
+
+        if (!serviceDateInput.value) {
+            isValid = false;
+            errorMessage.textContent = 'Service date is required.';
+        } 
 
         return isValid;
     }
