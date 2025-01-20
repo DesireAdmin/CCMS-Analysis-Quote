@@ -223,8 +223,18 @@ namespace MyApp.ServiceModel.Helper
                 }
                 catch (Exception ex)
                 {
+                    // Log a detailed error message
+                    string detailedErrorMessage = $@"
+                        Error Occurred while generating PDF:
+                        Message: {ex.Message}
+                        StackTrace: {ex.StackTrace}
+                        InnerException: {ex.InnerException?.Message ?? "None"}
+                        Source: {ex.Source}
+                        TargetSite: {ex.TargetSite}
+                        Time: {DateTime.Now}
+                    ";
                     Console.WriteLine($"Error Occured while generating pdf : {ex.Message}");
-                    logMessageBuilder.AppendLine($"Error Occured while generating pdf : {ex.Message}");
+                    logMessageBuilder.AppendLine(detailedErrorMessage);
                     return null;
                 }
                 finally
@@ -293,7 +303,7 @@ namespace MyApp.ServiceModel.Helper
                 .SetBorder(Border.NO_BORDER);
 
             // Add row data with no borders
-            partsLeadTimeTable.AddCell(new Paragraph(quoteModel.TimeOption)
+            partsLeadTimeTable.AddCell(new Paragraph(quoteModel.TimeOption ?? "N/A")
                 .SetTextAlignment(TextAlignment.CENTER)
                 .SetPaddingTop(5)
                 .SetPaddingBottom(5))
@@ -301,13 +311,13 @@ namespace MyApp.ServiceModel.Helper
 
             if (quoteModel.TimeOption == "Range")
             {
-                partsLeadTimeTable.AddCell(new Paragraph(quoteModel.TimeRangeFrom.ToString())
+                partsLeadTimeTable.AddCell(new Paragraph(quoteModel.TimeRangeFrom?.ToString() ?? "N/A")
                     .SetTextAlignment(TextAlignment.CENTER)
                     .SetPaddingTop(5)
                     .SetPaddingBottom(5))
                     .SetBorder(Border.NO_BORDER);
 
-                partsLeadTimeTable.AddCell(new Paragraph(quoteModel.TimeRangeTo.ToString())
+                partsLeadTimeTable.AddCell(new Paragraph(quoteModel.TimeRangeTo?.ToString() ?? "N/A")
                     .SetTextAlignment(TextAlignment.CENTER)
                     .SetPaddingTop(5)
                     .SetPaddingBottom(5))
@@ -315,14 +325,14 @@ namespace MyApp.ServiceModel.Helper
             }
             else
             {
-                partsLeadTimeTable.AddCell(new Paragraph(quoteModel.TimeNumber.ToString())
+                partsLeadTimeTable.AddCell(new Paragraph(quoteModel.TimeNumber?.ToString() ?? "N/A")
                     .SetTextAlignment(TextAlignment.CENTER)
                     .SetPaddingTop(5)
                     .SetPaddingBottom(5))
                     .SetBorder(Border.NO_BORDER);
             }
 
-            partsLeadTimeTable.AddCell(new Paragraph(quoteModel.TimeUnit)
+            partsLeadTimeTable.AddCell(new Paragraph(quoteModel.TimeUnit ?? "N/A")
                 .SetTextAlignment(TextAlignment.CENTER)
                 .SetPaddingTop(5)
                 .SetPaddingBottom(5))
@@ -349,7 +359,7 @@ namespace MyApp.ServiceModel.Helper
             //    .SetFontColor(ColorConstants.BLACK));
 
             // Add the "Disclaimer" section (second row)
-            if(quoteModel.Disclaimer != null)
+            if (quoteModel.Disclaimer != null)
             {
                 messageTable.AddCell(new Paragraph("Disclaimer")
                 .SetTextAlignment(TextAlignment.LEFT)
@@ -362,7 +372,7 @@ namespace MyApp.ServiceModel.Helper
                     .SetBorder(Border.NO_BORDER)
                     .SetFontColor(ColorConstants.BLACK));
             }
-            
+
 
             // Add the "Description of Services" section (third row)
             //messageTable.AddCell(new Paragraph("Description of Services:")
@@ -381,13 +391,13 @@ namespace MyApp.ServiceModel.Helper
 
         private Table FillProposedCallTable(QuoteModel quoteModel)
         {
-            if (quoteModel.ProposedBreakouts == null)
+            if (quoteModel.ProposedBreakouts == null || !quoteModel.ProposedBreakouts.Any())
             {
-                return null; // Return null if quoteModel is null
+                return null;
             }
 
             // Create a table with 6 columns for initial call breakout
-            Table proposedCallTable = new Table(6).UseAllAvailableWidth().SetBorder(Border.NO_BORDER).SetFontSize(12); // Make table full width
+            Table proposedCallTable = new Table(6).UseAllAvailableWidth().SetBorder(Border.NO_BORDER).SetFontSize(12).SetKeepTogether(true); // Make table full width
 
             // Add header cells to the table
             proposedCallTable.AddHeaderCell("Cost Type")
@@ -405,8 +415,8 @@ namespace MyApp.ServiceModel.Helper
 
             foreach (var proposedBreakouts in quoteModel.ProposedBreakouts)
             {
-                proposedCallTable.AddCell(proposedBreakouts.CostType);
-                proposedCallTable.AddCell(proposedBreakouts.Description);
+                proposedCallTable.AddCell(proposedBreakouts.CostType ?? "N/A");
+                proposedCallTable.AddCell(proposedBreakouts.Description ?? "N/A");
                 proposedCallTable.AddCell(proposedBreakouts.Techs.ToString());
                 proposedCallTable.AddCell(proposedBreakouts.Quantity.ToString());
                 proposedCallTable.AddCell(proposedBreakouts.Rate.ToString());
@@ -444,18 +454,27 @@ namespace MyApp.ServiceModel.Helper
                 .SetTextAlignment(TextAlignment.LEFT))
                 .SetBorder(Border.NO_BORDER));
 
+            proposedCallTable.AddCell(new Cell(1, 3).SetBorder(Border.NO_BORDER));
+            proposedCallTable.AddCell(new Cell(1, 2).Add(new Paragraph("QUOTE GRAND TOTAL")
+                .SetTextAlignment(TextAlignment.LEFT)
+                .SimulateBold())
+                .SetBorder(Border.NO_BORDER));
+            proposedCallTable.AddCell(new Cell(1, 1).Add(new Paragraph($"${quoteModel.QuoteGrandTotal.ToString()}")
+                .SetTextAlignment(TextAlignment.LEFT))
+                .SetBorder(Border.NO_BORDER));
+
             return proposedCallTable;
         }
 
-        private Table FillInitialCallTable(QuoteModel quoteModel)
+        private Table FillInitialCallTable(QuoteModel quoteModel)   
         {
-            if (quoteModel.IncurredBreakouts.Count <= 0 )
+            if (quoteModel.IncurredBreakouts == null || quoteModel.IncurredBreakouts.Count <= 0)
             {
-                return null; // Return null if quoteModel is null
+                return null;
             }
 
             // Create a table with 6 columns for initial call breakout
-            Table initialCallTable = new Table(6).UseAllAvailableWidth().SetBorder(Border.NO_BORDER).SetFontSize(12); // Make table full width
+            Table initialCallTable = new Table(6).UseAllAvailableWidth().SetBorder(Border.NO_BORDER).SetFontSize(12).SetKeepTogether(true);
 
             // Add header cells to the table
             initialCallTable.AddHeaderCell("Cost Type")
@@ -474,8 +493,8 @@ namespace MyApp.ServiceModel.Helper
 
             foreach (var incurredBreakout in quoteModel.IncurredBreakouts)
             {
-                initialCallTable.AddCell(incurredBreakout.CostType);
-                initialCallTable.AddCell(incurredBreakout.Description);
+                initialCallTable.AddCell(incurredBreakout.CostType ?? "N/A");
+                initialCallTable.AddCell(incurredBreakout.Description ?? "N/A");
                 initialCallTable.AddCell(incurredBreakout.Techs.ToString());
                 initialCallTable.AddCell(incurredBreakout.Quantity.ToString());
                 initialCallTable.AddCell(incurredBreakout.Rate.ToString());
@@ -521,14 +540,13 @@ namespace MyApp.ServiceModel.Helper
             Paragraph paragraph = new Paragraph();
 
             // Add bold key
-            paragraph.Add(new Text(key).SimulateBold());
+            paragraph.Add(new Text(key ?? "").SimulateBold());
 
-            // Add the value (without bold)
-            paragraph.Add(new Text(" " + value));
+            // Add the value (without bold), replace null with empty string
+            paragraph.Add(new Text(" " + (value ?? "N/A")));
 
             // Add the complete paragraph to the document
             document.Add(paragraph.SetFontColor(ColorConstants.BLACK).SetPadding(2));
-
         }
 
         private async Task UploadPdfToAzureBlobAsync(byte[] pdfStream, string id, string blobName)
@@ -591,8 +609,8 @@ namespace MyApp.ServiceModel.Helper
             // Create bold text for "Incurred Cost? :"
             Text boldText = new Text("Incurred Cost? : ").SimulateBold().SetFontColor(ColorConstants.DARK_GRAY);
             Text normalText;
-            if (quoteModel.IncurredBreakouts != null) {
-
+            if (quoteModel.IncurredBreakouts.Count > 0)
+            {
                 normalText = new Text("Yes").SetFontColor(ColorConstants.DARK_GRAY);
             }
             else

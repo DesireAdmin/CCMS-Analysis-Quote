@@ -4,481 +4,525 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
-    ViewData["Title"] = "Create Quote Form";
+	ViewData["Title"] = "Create Quote Form";
 }
+<style>
+	#loader {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 9999;
+	}
+
+	.loader-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.5);
+	}
+
+	.loader-content {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		text-align: center;
+		background-color: white;
+		padding: 20px;
+		border-radius: 5px;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+	}
+
+		.loader-content p {
+			margin-top: 10px;
+			color: #666;
+		}
+</style>
+<div id="loader" style="display: none;">
+	<div class="loader-overlay"></div>
+	<div class="loader-content">
+		<div class="spinner-border text-primary" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+		<p>Please wait while we process your request...</p>
+	</div>
+</div>
 
 <div class="form-container container">
-    <div class="container mt-4">
+	<div class="container mt-4">
 
 
-        <form asp-action="CreateQuoteForm" method="post" id="submit-quoteform" enctype="multipart/form-data">
-            <div class="header-form-title">
-                <h3>SMG FACILITIES PROPOSAL FORM</h3>
-            </div>
-            <div class="basic-information">
-                <div class="row">
-                    <div class="form-group col-md-4 mb-4">
-                        <div>
-                            <label asp-for="SMG_Vendor_PO">SMG Vendor PO# <span class="text-danger">*</span></label>
-                        </div>
-                        <div>
-                            <input id="smg-vendor-po" class="form-control" asp-for="SMG_Vendor_PO" placeholder="###### or ######-##" />
-                        </div>
-                        <div>
-                            <span asp-validation-for="SMG_Vendor_PO" id="smg-vendor-po-error" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="form-group col-md-4 mb-4">
-                        <div>
-                            <label asp-for="SMG_CLIENT">Store Name<span class="text-danger">*</span></label>
-                        </div>
-                        <div>
-                            <input id="smg-client" asp-for="SMG_CLIENT" class="form-control" placeholder="Enter Store Name" />
-                        </div>
-                        <div>
-                            <span asp-validation-for="SMG_CLIENT" id="smg-client-error" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="form-group col-md-4 mb-4">
-                        <div>
-                            <label asp-for="Date">Date<span class="text-danger">*</span></label>
-                        </div>
-                        <div>
-                            <input asp-for="Date" id="date-quote-form" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly />
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col-md-4 mb-4">
-                        <div>
-                            <label asp-for="Location">Address</label>
-                        </div>
-                        <div>
-                            <input asp-for="Location" id="location" class="form-control" maxlength="60" placeholder="Enter Address" />
-                            @* Validation message removed as Address is optional *@
-                        </div>
-                    </div>
+		<form asp-action="CreateQuoteForm" method="post" id="submit-quoteform" enctype="multipart/form-data">
+			<div class="header-form-title">
+				<h3>SMG FACILITIES PROPOSAL FORM</h3>
+			</div>
+			<div class="basic-information">
+				<div class="row">
+					<div class="form-group col-md-4 mb-4">
+						<div>
+							<label asp-for="SMG_Vendor_PO">SMG Vendor PO# <span class="text-danger">*</span></label>
+						</div>
+						<div>
+							<input id="smg-vendor-po" class="form-control" asp-for="SMG_Vendor_PO" placeholder="###### or ######-##" />
+						</div>
+						<div>
+							<span asp-validation-for="SMG_Vendor_PO" id="smg-vendor-po-error" class="text-danger"></span>
+						</div>
+					</div>
+					<div class="form-group col-md-4 mb-4">
+						<div>
+							<label asp-for="SMG_CLIENT">Store Name<span class="text-danger">*</span></label>
+						</div>
+						<div>
+							<input id="smg-client" asp-for="SMG_CLIENT" class="form-control" placeholder="Enter Store Name" />
+						</div>
+						<div>
+							<span asp-validation-for="SMG_CLIENT" id="smg-client-error" class="text-danger"></span>
+						</div>
+					</div>
+					<div class="form-group col-md-4 mb-4">
+						<div>
+							<label asp-for="Date">Date<span class="text-danger">*</span></label>
+						</div>
+						<div>
+							<input asp-for="Date" id="date-quote-form" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly />
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-md-4 mb-4">
+						<div>
+							<label asp-for="Location">Address</label>
+						</div>
+						<div>
+							<input asp-for="Location" id="location" class="form-control" maxlength="60" placeholder="Enter Address" />
+							@* Validation message removed as Address is optional *@
+						</div>
+					</div>
 
-                    <div class="col-md-4 mb-4">
-                        <div class="form-group">
-                            <label asp-for="Vendor">Vendor<span class="text-danger">*</span></label>
-                            <input asp-for="Vendor" id="vendor" class="form-control" maxlength="60" placeholder="Enter Vendor" />
-                            <span asp-validation-for="Vendor" id="vendor-error" class="text-danger"></span>
-                        </div>
-                    </div>
+					<div class="col-md-4 mb-4">
+						<div class="form-group">
+							<label asp-for="Vendor">Vendor<span class="text-danger">*</span></label>
+							<input asp-for="Vendor" id="vendor" class="form-control" maxlength="60" placeholder="Enter Vendor" />
+							<span asp-validation-for="Vendor" id="vendor-error" class="text-danger"></span>
+						</div>
+					</div>
 
-                    <div class="col-md-4 mb-4">
-                        <div class="form-group">
-                            <label asp-for="Email">Email<span class="text-danger">*</span></label>
-                            <input asp-for="Email" id="email" class="form-control" maxlength="60" placeholder="Enter Email" />
-                            <span asp-validation-for="Email" id="email-error" class="text-danger"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    @* <div class="col-md-4 mb-4">
+					<div class="col-md-4 mb-4">
+						<div class="form-group">
+							<label asp-for="Email">Email<span class="text-danger">*</span></label>
+							<input asp-for="Email" id="email" class="form-control" maxlength="60" placeholder="Enter Email" />
+							<span asp-validation-for="Email" id="email-error" class="text-danger"></span>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					@* <div class="col-md-4 mb-4">
                     <div class="form-group">
                     <label asp-for="StoreNumber">Store Number</label>
                     <input asp-for="StoreNumber" id="store-number" class="form-control" maxlength="30" placeholder="Enter Store Number" />
 
                     </div>
                     </div> *@
-                    <div class="form-group col-md-4 mb-4">
-                        <div>
-                            <label asp-for="StoreNumber">Store Number</label>
-                        </div>
-                        <div>
-                            <input asp-for="StoreNumber" id="store-number" class="form-control" maxlength="30" placeholder="Enter Store Number" />
-                            @* Validation message removed as Store Number is optional *@
-                        </div>
-                    </div>
+					<div class="form-group col-md-4 mb-4">
+						<div>
+							<label asp-for="StoreNumber">Store Number</label>
+						</div>
+						<div>
+							<input asp-for="StoreNumber" id="store-number" class="form-control" maxlength="30" placeholder="Enter Store Number" />
+							@* Validation message removed as Store Number is optional *@
+						</div>
+					</div>
 
-                    <div class="col-md-4 mb-4">
-                        <div class="form-group">
-                            <label asp-for="ServiceRepName">Service Rep Name<span class="text-danger">*</span></label>
-                            <input asp-for="ServiceRepName" id="service-rep-name" class="form-control" maxlength="40" placeholder="Enter Service Rep Name" />
-                            <span asp-validation-for="ServiceRepName" id="service-rep-name-error" class="text-danger"></span>
-                        </div>
-                    </div>
+					<div class="col-md-4 mb-4">
+						<div class="form-group">
+							<label asp-for="ServiceRepName">Service Rep Name<span class="text-danger">*</span></label>
+							<input asp-for="ServiceRepName" id="service-rep-name" class="form-control" maxlength="40" placeholder="Enter Service Rep Name" />
+							<span asp-validation-for="ServiceRepName" id="service-rep-name-error" class="text-danger"></span>
+						</div>
+					</div>
 
-                    <div class="col-md-4 mb-4">
-                        <div class="form-group">
-                            <div class="d-flex justify-content-between grand-total-contain mt-3">
-                                <div class="align-self-center">
-                                    <label asp-for="QuoteGrandTotal"><b>QUOTE GRAND TOTAL</b><span class="text-danger">*</span></label>
-                                </div>
-                                <div class="d-flex">
-                                    <div style="align-self:center;">
-                                        <span><b>$</b></span>
-                                    </div>
-                                    <div class="ml-2">
-                                        <input asp-for="QuoteGrandTotal" id="quote-grand-total" class="form-control" placeholder="Grand total" readonly />
-                                        <input asp-for="QuoteGrandTotal" type="hidden" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+					<div class="col-md-4 mb-4">
+						<div class="form-group">
+							<div class="d-flex justify-content-between grand-total-contain mt-3">
+								<div class="align-self-center">
+									<label asp-for="QuoteGrandTotal"><b>QUOTE GRAND TOTAL</b><span class="text-danger">*</span></label>
+								</div>
+								<div class="d-flex">
+									<div style="align-self:center;">
+										<span><b>$</b></span>
+									</div>
+									<div class="ml-2">
+										<input asp-for="QuoteGrandTotal" id="quote-grand-total" class="form-control" placeholder="Grand total" readonly />
+										<input asp-for="QuoteGrandTotal" type="hidden" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 
-            </div>
-
-
-            <!-- Dynamic Incurred Breakout Table -->
-            <div style="margin-top: 12px;">
-                <div class="header-form-title quoteform-table-title">
-                    <h3>Incurred cost and Proposed Breakout</h3>
-                </div>
-                <div class="quoteform-table-container">
-                    <div>
-                        <div class="d-flex" style="justify-content: end;align-items: baseline;">
-                            <div class="mr-5">
-                                <label asp-for="ServiceDate">ServiceDate<span class="text-danger">*</span></label>
-                            </div>
-                            <divc class="">
-                                <input asp-for="ServiceDate" id="service-date" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                                <span asp-validation-for="ServiceDate" id="service-date-error" class="text-danger"></span>
-                            </divc>
-                        </div>
-                    </div>
-
-                    @* Incurred Breakout Table *@
-                    <div id="incurredBreakoutTableContain">
-                        <div>
-                            <h4 id="incurredSection">Incurred Breakout Table</h4>
-                        </div>
-                        <div>
-                            <div class="row">
-                                <div class="col-md-12" style="padding: 16px 12px;">
-                                    <div class="form-group">
-                                        <label asp-for="IncurredIssueDescription">Issue(s) discovered while on-site & Description of Work Performed<span style="color: red;">*</span></label>
-                                        <textarea asp-for="IncurredIssueDescription" id="Incurred-Issue-Description" class="form-control required" maxlength="240" placeholder="Enter Description"></textarea>
-                                        <span asp-validation-for="IncurredIssueDescription" id="Incurred-Issue-Description-error" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <table class="table table-bordered incurredBreakoutTableClass" id="incurredBreakoutTable">
-                                <thead class="form-head-title">
-                                    <tr>
-                                        <th>Cost Type</th>
-                                        <th>Description<span class="text-danger">*</span></th>
-                                        <th>#Techs</th>
-                                        <th>Quantity/Hours</th>
-                                        <th>Rate</th>
-                                        <th>Initial Call Sub Total</th>
-                                        <th style="width:20px">Remove</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                  
-                                </tbody>
-                            </table>
-                            <div>
-                                <button type="button" class="btn btn-outline-primary add-btn" id="addRowButton">Add Items</button>
-                            </div>
-                            <div class="form-group" id="incurredBreakoutTableTotal">
-                                <div class="text-right" style="margin-right: 61px; font-weight: bold;margin-bottom: 20px;">
-                                    <label>Incurred Total</label>
-                                </div>
-                                <div class="">
-                                    <div class="d-flex justify-content-end align-items-baseline m-2">
-                                        <div class="mr-5">
-                                            <label class="font-bold">Sub Total</label>
-                                        </div>
-                                        <div>
-                                            <input type="text" class="form-control w-200" id="Incurred-Sub-Total" name="IncurredTotals.IncurredSubTotal" readonly />
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-end align-items-baseline m-2">
-                                        <div class="mr-5">
-                                            <label class="font-bold"> Tax</label>
-                                        </div>
-                                        <div>
-                                            <input type="number" min="0" class="form-control w-200" id="Incurred-Tax" name="IncurredTotals.IncurredTax" />
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-end align-items-baseline m-2">
-                                        <div class="mr-5">
-                                            <label class="font-bold">Initial Call Total</label>
-                                        </div>
-                                        <div>
-                                            <input type="text" class="form-control w-200" id="Incurred-Initial-Call-Total" name="IncurredTotals.IncurredInitialCallTotal" readonly />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    @* Proposed Breakout Table *@
-                    <div>
-                        <div>
-                            <h4 id="ProposedBreakoutTableText">Proposed Breakout Table</h4>
-                        </div>
-                        <div>
-                            <div class="row">
-                                <div class="col-md-12" style="padding: 16px 12px;">
-                                    <div class="form-group">
-                                        <label asp-for="ProposedIssueDescription">Detailed description of proposed work to address unresolved issues.<span style="color: red;">*</span></label>
-                                        <textarea asp-for="ProposedIssueDescription" id="Proposed-Issue-Description" class="form-control required" maxlength="240" placeholder="Enter Description of Services"></textarea>
-                                        <span asp-validation-for="ProposedIssueDescription" id="Proposed-Issue-Description-error" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <table class="table table-bordered proposedBreakoutTableClass" id="proposedBreakoutTable">
-                                <thead class="form-head-title">
-                                    <tr>
-                                        <th>Cost Type</th>
-                                        <th>Description<span class="text-danger">*</span></th>
-                                        <th>#Techs</th>
-                                        <th>Quantity/Hours</th>
-                                        <th>Rate</th>
-                                        <th>Initial Call Sub Total</th>
-                                        <th>Remove</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <div class="form-table-label">
-                                                <label>Cost Type</label>
-                                            </div>
-                                            <select class="form-control" name="ProposedBreakouts[0].CostType">
-                                                <option selected>--select--</option>
-                                                <option value="Labor">Labor</option>
-                                                <option value="Materials">Materials</option>
-                                                <option value="Travel">Travel</option>
-                                                <option value="Equipment">Equipment</option>
-                                                <option value="Disposal">Disposal</option>
-                                                <option value="Fees">Fees</option>
-                                                <option value="Permitting">Permitting</option>
-                                                <option value="Miscellaneous">Miscellaneous</option>
-                                                <option value="Other">Other</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <div class="form-table-label"><label>Description</label></div>
-                                            <div>
-                                                <textarea class="form-control" name="ProposedBreakouts[0].Description" maxlength="240" placeholder="Description"></textarea>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div>
-                                                <div class="form-table-label"><label>#Techs</label></div>
-                                            </div>
-                                            <div>
-                                                <input type="number" class="form-control" name="ProposedBreakouts[0].Techs" placeholder="Techs" style="visibility: hidden;" />
-                                            </div>
-                                        </td>
-
-                                        <td>
-                                            <div class="form-table-label"><label>Quantity</label></div>
-                                            <div>
-                                                <input type="number" class="form-control" name="ProposedBreakouts[0].Quantity" placeholder="Quantity" min="0">
-                                            </div>
-
-                                        </td>
-                                        <td>
-                                            <div class="form-table-label"><label>Rate</label></div>
-                                            <div>
-                                                <input type="number" class="form-control" name="ProposedBreakouts[0].Rate" placeholder="Rate" min="0">
-                                            </div>
-
-                                        </td>
-                                        <td>
-                                            <div class="form-table-label"><label>Initial Call Sub Total</label></div>
-                                            <div>
-                                                <input type="text" class="form-control" name="ProposedBreakouts[0].InitialCallSubTotal" readonly />
-                                            </div>
-
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-danger remove-btn">X</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div>
-                                <button type="button" class="btn btn-outline-primary add-btn" id="addRowButton2">Add Items</button>
-                            </div>
-                            <div class="form-group">
-                                <div class="text-right" style="margin-right: 61px; font-weight: bold;margin-bottom: 20px;">
-                                    <label>Proposed Total</label>
-                                </div>
-
-                                <div class="">
-                                    <div class="d-flex justify-content-end align-items-baseline m-2">
-                                        <div class="mr-5">
-                                            <label class="font-bold">Sub Total</label>
-                                        </div>
-                                        <div>
-                                            <input type="text" id="Proposed-Sub-Total" class="form-control" name="ProposedTotals.ProposedSubTotal" readonly />
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-end align-items-baseline m-2">
-                                        <div class="mr-5 font-bold">
-                                            <label>Tax</label>
-                                        </div>
-                                        <div>
-                                            <input type="number" id="Proposed-Tax" min="0" class="form-control" name="ProposedTotals.ProposedTax" />
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-end align-items-baseline m-2">
-                                        <div class="mr-5 font-bold">
-                                            <label>Proposed Call Total</label>
-                                        </div>
-                                        <div>
-                                            <input type="text" class="form-control" id="Proposed-Initial-Call-Total" name="ProposedTotals.ProposedInitialCallTotal" readonly />
-                                        </div>
-                                    </div>
-
-                                    <div class="d-flex justify-content-end align-items-baseline m-2">
-                                        <div class="mr-5 font-bold">
-                                            <label asp-for="QuoteGrandTotal">QUOTE GRAND TOTAL</label>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <span class="mr-2"><b>$</b></span>
-                                            <input asp-for="QuoteGrandTotal" id="quote-grand-total" class="form-control" placeholder="Grand total" readonly />
-                                            <input asp-for="QuoteGrandTotal" type="hidden" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
+			</div>
 
 
+			<!-- Dynamic Incurred Breakout Table -->
+			<div style="margin-top: 12px;">
+				<div class="header-form-title quoteform-table-title">
+					<h3>Incurred cost and Proposed Breakout</h3>
+				</div>
+				<div class="quoteform-table-container">
+					<div>
+						<div class="d-flex" style="justify-content: end;align-items: baseline;">
+							<div class="mr-5">
+								<label asp-for="ServiceDate">ServiceDate<span class="text-danger">*</span></label>
+							</div>
+							<divc class="">
+								<input asp-for="ServiceDate" id="service-date" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+								<span asp-validation-for="ServiceDate" id="service-date-error" class="text-danger"></span>
+							</divc>
+						</div>
+					</div>
 
-                        </div>
+					@* Incurred Breakout Table *@
+					<div id="incurredBreakoutTableContain">
+						<div>
+							<h4 id="incurredSection">Incurred Breakout Table</h4>
+						</div>
+						<div>
+							<div class="row">
+								<div class="col-md-12" style="padding: 16px 12px;">
+									<div class="form-group">
+										<label asp-for="IncurredIssueDescription">Issue(s) discovered while on-site & Description of Work Performed<span style="color: red;">*</span></label>
+										<textarea asp-for="IncurredIssueDescription" id="Incurred-Issue-Description" class="form-control required" maxlength="240" placeholder="Enter Description"></textarea>
+										<span asp-validation-for="IncurredIssueDescription" id="Incurred-Issue-Description-error" class="text-danger"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div>
+							<table class="table table-bordered incurredBreakoutTableClass" id="incurredBreakoutTable">
+								<thead class="form-head-title">
+									<tr>
+										<th>Cost Type</th>
+										<th>Description<span class="text-danger">*</span></th>
+										<th>#Techs</th>
+										<th>Quantity/Hours</th>
+										<th>Rate</th>
+										<th>Initial Call Sub Total</th>
+										<th style="width:20px">Remove</th>
+									</tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+							<div>
+								<button type="button" class="btn btn-outline-primary add-btn" id="addRowButton">Add Items</button>
+							</div>
+							<div class="form-group" id="incurredBreakoutTableTotal">
+								<div class="text-right" style="margin-right: 61px; font-weight: bold;margin-bottom: 20px;">
+									<label>Incurred Total</label>
+								</div>
+								<div class="">
+									<div class="d-flex justify-content-end align-items-baseline m-2">
+										<div class="mr-5">
+											<label class="font-bold">Sub Total</label>
+										</div>
+										<div>
+											<input type="text" class="form-control w-200" id="Incurred-Sub-Total" name="IncurredTotals.IncurredSubTotal" readonly />
+										</div>
+									</div>
+									<div class="d-flex justify-content-end align-items-baseline m-2">
+										<div class="mr-5">
+											<label class="font-bold"> Tax</label>
+										</div>
+										<div>
+											<input type="number" min="0" class="form-control w-200" id="Incurred-Tax" name="IncurredTotals.IncurredTax" />
+										</div>
+									</div>
+									<div class="d-flex justify-content-end align-items-baseline m-2">
+										<div class="mr-5">
+											<label class="font-bold">Initial Call Total</label>
+										</div>
+										<div>
+											<input type="text" class="form-control w-200" id="Incurred-Initial-Call-Total" name="IncurredTotals.IncurredInitialCallTotal" readonly />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
-                    </div>
+					@* Proposed Breakout Table *@
+					<div>
+						<div>
+							<h4 id="ProposedBreakoutTableText">Proposed Breakout Table</h4>
+						</div>
+						<div>
+							<div class="row">
+								<div class="col-md-12" style="padding: 16px 12px;">
+									<div class="form-group">
+										<label asp-for="ProposedIssueDescription">Detailed description of proposed work to address unresolved issues.<span style="color: red;">*</span></label>
+										<textarea asp-for="ProposedIssueDescription" id="Proposed-Issue-Description" class="form-control required" maxlength="240" placeholder="Enter Description of Services"></textarea>
+										<span asp-validation-for="ProposedIssueDescription" id="Proposed-Issue-Description-error" class="text-danger"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div>
+							<table class="table table-bordered proposedBreakoutTableClass" id="proposedBreakoutTable">
+								<thead class="form-head-title">
+									<tr>
+										<th>Cost Type</th>
+										<th>Description<span class="text-danger">*</span></th>
+										<th>#Techs</th>
+										<th>Quantity/Hours</th>
+										<th>Rate</th>
+										<th>Initial Call Sub Total</th>
+										<th>Remove</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>
+											<div class="form-table-label">
+												<label>Cost Type</label>
+											</div>
+											<select class="form-control" name="ProposedBreakouts[0].CostType">
+												<option selected>--select--</option>
+												<option value="Labor">Labor</option>
+												<option value="Materials">Materials</option>
+												<option value="Travel">Travel</option>
+												<option value="Equipment">Equipment</option>
+												<option value="Disposal">Disposal</option>
+												<option value="Fees">Fees</option>
+												<option value="Permitting">Permitting</option>
+												<option value="Miscellaneous">Miscellaneous</option>
+												<option value="Other">Other</option>
+											</select>
+										</td>
+										<td>
+											<div class="form-table-label"><label>Description</label></div>
+											<div>
+												<textarea class="form-control" name="ProposedBreakouts[0].Description" maxlength="240" placeholder="Description"></textarea>
+											</div>
+										</td>
+										<td>
+											<div>
+												<div class="form-table-label"><label>#Techs</label></div>
+											</div>
+											<div>
+												<input type="number" class="form-control" name="ProposedBreakouts[0].Techs" placeholder="Techs" style="visibility: hidden;" />
+											</div>
+										</td>
 
-                </div>
-            </div>
+										<td>
+											<div class="form-table-label"><label>Quantity</label></div>
+											<div>
+												<input type="number" class="form-control" name="ProposedBreakouts[0].Quantity" placeholder="Quantity" min="0">
+											</div>
 
-            <div class="DocAttachAndPartLeadTime" id="PartsLeadTimeCoponentDesc" style="display: none;">
-                <div class="header-form-title">
-                    <h3 id="PartsLeadTimeCoponentHeading">Parts Lead Time</h3>
-                </div>
-                @*Parts *@
-                <div class="row mt-2" >
+										</td>
+										<td>
+											<div class="form-table-label"><label>Rate</label></div>
+											<div>
+												<input type="number" class="form-control" name="ProposedBreakouts[0].Rate" placeholder="Rate" min="0">
+											</div>
 
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label asp-for="TimeOption">Time Option<span style="color: red;">*</span>:</label>
-                            <select asp-for="TimeOption" class="form-control" id="timeOption">
-                                <option value="">Select Time Option</option>
-                                <option selected value="Number">Number</option>
-                                <option value="Range">Range</option>
-                            </select>
-                            <span asp-validation-for="TimeOption" id="timeOption-error" class="text-danger"></span>
-                        </div>
-                    </div>
+										</td>
+										<td>
+											<div class="form-table-label"><label>Initial Call Sub Total</label></div>
+											<div>
+												<input type="text" class="form-control" name="ProposedBreakouts[0].InitialCallSubTotal" readonly />
+											</div>
 
-                    <div class="col-md-4">
-                        <div>
-                            <!-- Number option fields -->
-                            <div id="numberOptionFields">
-                                <div class="form-group">
-                                    <label asp-for="TimeNumber">Time Number<span style="color: red;">*</span>:</label>
-                                    <input asp-for="TimeNumber" id="Time-Number" type="number" class="form-control" />
-                                    <span asp-validation-for="TimeNumber" id="Time-Number-error" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Range option fields -->
-                        <div id="rangeOptionFields" class="row justify-content-center" style="display: none;">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="TimeRangeFrom">Time Range From<span style="color: red;">*</span>:</label>
-                                    <input asp-for="TimeRangeFrom" id="Time-Range-From" type="number" class="form-control" />
-                                    <span asp-validation-for="TimeRangeFrom" id="Time-Range-From-error" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="TimeRangeTo">Time Range To<span style="color: red;">*</span>:</label>
-                                    <input asp-for="TimeRangeTo" type="number" id="Time-Range-To" class="form-control" />
-                                    <span asp-validation-for="TimeRangeTo" id="Time-Range-To-error" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+										</td>
+										<td>
+											<button type="button" class="btn btn-danger remove-btn">X</button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<div>
+								<button type="button" class="btn btn-outline-primary add-btn" id="addRowButton2">Add Items</button>
+							</div>
+							<div class="form-group">
+								<div class="text-right" style="margin-right: 61px; font-weight: bold;margin-bottom: 20px;">
+									<label>Proposed Total</label>
+								</div>
 
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label asp-for="TimeUnit">Time Unit<span style="color: red;">*</span>:</label>
-                            <select asp-for="TimeUnit" id="Time-Unit" class="form-control" style="width:100% !important">
-                                <option value="">Select Time Unit</option>
-                                <option value="Day">Day</option>
-                                <option value="Week">Week</option>
-                            </select>
-                            <span asp-validation-for="TimeUnit" id="Time-Unit-error" class="text-danger"></span>
-                        </div>
-                    </div>
-                </div>
+								<div class="">
+									<div class="d-flex justify-content-end align-items-baseline m-2">
+										<div class="mr-5">
+											<label class="font-bold">Sub Total</label>
+										</div>
+										<div>
+											<input type="text" id="Proposed-Sub-Total" class="form-control" name="ProposedTotals.ProposedSubTotal" readonly />
+										</div>
+									</div>
+									<div class="d-flex justify-content-end align-items-baseline m-2">
+										<div class="mr-5 font-bold">
+											<label>Tax</label>
+										</div>
+										<div>
+											<input type="number" id="Proposed-Tax" min="0" class="form-control" name="ProposedTotals.ProposedTax" />
+										</div>
+									</div>
+									<div class="d-flex justify-content-end align-items-baseline m-2">
+										<div class="mr-5 font-bold">
+											<label>Proposed Call Total</label>
+										</div>
+										<div>
+											<input type="text" class="form-control" id="Proposed-Initial-Call-Total" name="ProposedTotals.ProposedInitialCallTotal" readonly />
+										</div>
+									</div>
 
-            </div>
+									<div class="d-flex justify-content-end align-items-baseline m-2">
+										<div class="mr-5 font-bold">
+											<label asp-for="QuoteGrandTotal">QUOTE GRAND TOTAL</label>
+										</div>
+										<div class="d-flex align-items-center">
+											<span class="mr-2"><b>$</b></span>
+											<input asp-for="QuoteGrandTotal" id="quote-grand-total" class="form-control" placeholder="Grand total" readonly />
+											<input asp-for="QuoteGrandTotal" type="hidden" />
+										</div>
+									</div>
+								</div>
 
-            <div class="ServiceProposal-container">
-                <div class="header-form-title">
-                    <h3>Disclaimers</h3>
-                </div>
-                <div class="ServiceProposal-from-contain">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label asp-for="Disclaimer"> Disclaimer </label>
-                                <textarea asp-for="Disclaimer" id="disclaimer" class="form-control" maxlength="240" placeholder="Enter Disclaimer"></textarea>
-                                <span asp-validation-for="Disclaimer" id="disclaimer-error" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <div class="DocAttachAndPartLeadTime">
-                <div class="header-form-title">
-                    <h3 id="DocumentAttachmentCoponentHeading">Document Attachment</h3>
-                </div>
-
-                <div class="DocAttachAndPartLeadTimeContain">
-                    <div class="fileAttachmentClass mt-4">
-                        <div class="upload-area">
-                            <label asp-for="AttachmentFile">Upload Attachment: </label>
-
-                            <div class="file-drop-area drag-over text-center" id="fileDropArea">
-                                <div style="justify-self: center;">
-                                    <img src="https://img.icons8.com/?size=100&id=joVKpp2EUeU9&format=png&color=000000" height="80px"
-                                         width="80px" alt="icon">
-                                </div>
-
-                                <p>Drag files here or browse to upload.</p>
-                                <p>Allowed file types: .jpg, .jpeg, .png, .gif, .pdf, .doc, .docx, .xls, .xlsx, .csv. Max size: 10MB.</p>
-                                <input asp-for="AttachmentFile" type="file" class="form-control d-none upload-file" id="fileInput" />
-                                <div id="fileDisplay" style="display: none;">
-                                    <span id="fileName"></span>
-                                    <button type="button" id="removeFileButton" class="btn btn-link text-danger p-0">X</button>
-                                </div>
-                                <button type="button" id="uploadButton" class="btn btn-outline-primary mt-2">Upload Attachment</button>
-                            </div>
-                        </div>
-                        <span asp-validation-for="AttachmentFile" id="fileInput-error" class="text-danger"></span>
-                    </div>
-                </div>
+							</div>
 
 
-            </div>
-            <div style=" justify-self: end; margin-top:20px;">
-                @* <button type="button" title="Submit" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Submit</button> *@
-                @* <button type="submit" id="submitBtnId"  class="btn btn-outline-primary">Submit</button> *@
-                <button type="button" id="submitBtnId" class="btn btn-outline-primary">Submit</button>
-            </div>
-            <div>
-                @*<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+
+						</div>
+
+					</div>
+
+				</div>
+			</div>
+
+			<div class="DocAttachAndPartLeadTime" id="PartsLeadTimeCoponentDesc" style="display: none;">
+				<div class="header-form-title">
+					<h3 id="PartsLeadTimeCoponentHeading">Parts Lead Time</h3>
+				</div>
+				@*Parts *@
+				<div class="row mt-2">
+
+					<div class="col-md-4">
+						<div class="form-group">
+							<label asp-for="TimeOption">Time Option<span style="color: red;">*</span>:</label>
+							<select asp-for="TimeOption" class="form-control" id="timeOption">
+								<option value="">Select Time Option</option>
+								<option selected value="Number">Number</option>
+								<option value="Range">Range</option>
+							</select>
+							<span asp-validation-for="TimeOption" id="timeOption-error" class="text-danger"></span>
+						</div>
+					</div>
+
+					<div class="col-md-4">
+						<div>
+							<!-- Number option fields -->
+							<div id="numberOptionFields">
+								<div class="form-group">
+									<label asp-for="TimeNumber">Time Number<span style="color: red;">*</span>:</label>
+									<input asp-for="TimeNumber" id="Time-Number" type="number" class="form-control" />
+									<span asp-validation-for="TimeNumber" id="Time-Number-error" class="text-danger"></span>
+								</div>
+							</div>
+						</div>
+						<!-- Range option fields -->
+						<div id="rangeOptionFields" class="row justify-content-center" style="display: none;">
+							<div class="col-md-6">
+								<div class="form-group">
+									<label asp-for="TimeRangeFrom">Time Range From<span style="color: red;">*</span>:</label>
+									<input asp-for="TimeRangeFrom" id="Time-Range-From" type="number" class="form-control" />
+									<span asp-validation-for="TimeRangeFrom" id="Time-Range-From-error" class="text-danger"></span>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label asp-for="TimeRangeTo">Time Range To<span style="color: red;">*</span>:</label>
+									<input asp-for="TimeRangeTo" type="number" id="Time-Range-To" class="form-control" />
+									<span asp-validation-for="TimeRangeTo" id="Time-Range-To-error" class="text-danger"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-4">
+						<div class="form-group">
+							<label asp-for="TimeUnit">Time Unit<span style="color: red;">*</span>:</label>
+							<select asp-for="TimeUnit" id="Time-Unit" class="form-control" style="width:100% !important">
+								<option value="">Select Time Unit</option>
+								<option value="Day">Day</option>
+								<option value="Week">Week</option>
+							</select>
+							<span asp-validation-for="TimeUnit" id="Time-Unit-error" class="text-danger"></span>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="ServiceProposal-container">
+				<div class="header-form-title">
+					<h3>Disclaimers</h3>
+				</div>
+				<div class="ServiceProposal-from-contain">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-group">
+								<label asp-for="Disclaimer"> Disclaimer </label>
+								<textarea asp-for="Disclaimer" id="disclaimer" class="form-control" maxlength="240" placeholder="Enter Disclaimer"></textarea>
+								<span asp-validation-for="Disclaimer" id="disclaimer-error" class="text-danger"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="DocAttachAndPartLeadTime">
+				<div class="header-form-title">
+					<h3 id="DocumentAttachmentCoponentHeading">Document Attachment</h3>
+				</div>
+
+				<div class="DocAttachAndPartLeadTimeContain">
+					<div class="fileAttachmentClass mt-4">
+						<div class="upload-area">
+							<label asp-for="AttachmentFile">Upload Attachment: </label>
+
+							<div class="file-drop-area drag-over text-center" id="fileDropArea">
+								<div style="justify-self: center;">
+									<img src="https://img.icons8.com/?size=100&id=joVKpp2EUeU9&format=png&color=000000" height="80px"
+										 width="80px" alt="icon">
+								</div>
+
+								<p>Drag files here or browse to upload.</p>
+								<p>Allowed file types: .jpg, .jpeg, .png, .gif, .pdf, .doc, .docx, .xls, .xlsx, .csv. Max size: 10MB.</p>
+								<input asp-for="AttachmentFile" type="file" class="form-control d-none upload-file" id="fileInput" />
+								<div id="fileDisplay" style="display: none;">
+									<span id="fileName"></span>
+									<button type="button" id="removeFileButton" class="btn btn-link text-danger p-0">X</button>
+								</div>
+								<button type="button" id="uploadButton" class="btn btn-outline-primary mt-2">Upload Attachment</button>
+							</div>
+						</div>
+						<span asp-validation-for="AttachmentFile" id="fileInput-error" class="text-danger"></span>
+					</div>
+				</div>
+
+
+			</div>
+			<div style=" justify-self: end; margin-top:20px;">
+				@* <button type="button" title="Submit" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Submit</button> *@
+				@* <button type="submit" id="submitBtnId"  class="btn btn-outline-primary">Submit</button> *@
+				<button type="button" id="submitBtnId" class="btn btn-outline-primary">Submit</button>
+			</div>
+			<div>
+				@*<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                 <div class="modal-content">
                 <div class="modal-header">
@@ -506,204 +550,204 @@
                 </div>
                 </div>
                 </div>*@
-                @*Summary modal start*@
+				@*Summary modal start*@
 
-                <!-- Modal -->
-                <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-xl container">
-                        <div class="modal-content">
-                            <div class="modal-header justify-content-center">
-                                <div class="">
-                                    <h3 class="modal-title" id="extraLargeModalLabel">SMG Facilities Proposal Form Summary</h3>
-                                </div>
-                                <div class="">
-                                    <button type="button" id="btnModalClose" class=" modal-title-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="red" x="0px" y="0px" width="30" height="30" viewBox="0 0 128 128">
-                                            <path d="M 64 6 C 48.5 6 33.9 12 23 23 C 12 33.9 6 48.5 6 64 C 6 79.5 12 94.1 23 105 C 34 116 48.5 122 64 122 C 79.5 122 94.1 116 105 105 C 116 94 122 79.5 122 64 C 122 48.5 116 33.9 105 23 C 94.1 12 79.5 6 64 6 z M 64 12 C 77.9 12 90.900781 17.399219 100.80078 27.199219 C 110.70078 36.999219 116 50.1 116 64 C 116 77.9 110.60078 90.900781 100.80078 100.80078 C 90.900781 110.60078 77.9 116 64 116 C 50.1 116 37.099219 110.60078 27.199219 100.80078 C 17.299219 91.000781 12 77.9 12 64 C 12 50.1 17.399219 37.099219 27.199219 27.199219 C 36.999219 17.299219 50.1 12 64 12 z M 50.5625 47.5 C 49.8 47.5 49.05 47.800391 48.5 48.400391 C 47.3 49.600391 47.3 51.499609 48.5 52.599609 L 59.800781 64 L 48.400391 75.300781 C 47.200391 76.500781 47.200391 78.4 48.400391 79.5 C 49.000391 80.1 49.8 80.400391 50.5 80.400391 C 51.2 80.400391 51.999609 80.1 52.599609 79.5 L 64 68.199219 L 75.300781 79.5 C 75.900781 80.1 76.700391 80.400391 77.400391 80.400391 C 78.100391 80.400391 78.9 80.1 79.5 79.5 C 80.7 78.3 80.7 76.400781 79.5 75.300781 L 68.199219 64 L 79.5 52.699219 C 80.7 51.499219 80.699609 49.600391 79.599609 48.400391 C 78.399609 47.200391 76.500391 47.200391 75.400391 48.400391 L 64 59.800781 L 52.699219 48.400391 C 52.099219 47.800391 51.325 47.5 50.5625 47.5 z"></path>
-                                        </svg>
-                                    </button>
-                                </div>
+				<!-- Modal -->
+				<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-xl container">
+						<div class="modal-content">
+							<div class="modal-header justify-content-center">
+								<div class="">
+									<h3 class="modal-title" id="extraLargeModalLabel">SMG Facilities Proposal Form Summary</h3>
+								</div>
+								<div class="">
+									<button type="button" id="btnModalClose" class=" modal-title-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close">
+										<svg xmlns="http://www.w3.org/2000/svg" fill="red" x="0px" y="0px" width="30" height="30" viewBox="0 0 128 128">
+											<path d="M 64 6 C 48.5 6 33.9 12 23 23 C 12 33.9 6 48.5 6 64 C 6 79.5 12 94.1 23 105 C 34 116 48.5 122 64 122 C 79.5 122 94.1 116 105 105 C 116 94 122 79.5 122 64 C 122 48.5 116 33.9 105 23 C 94.1 12 79.5 6 64 6 z M 64 12 C 77.9 12 90.900781 17.399219 100.80078 27.199219 C 110.70078 36.999219 116 50.1 116 64 C 116 77.9 110.60078 90.900781 100.80078 100.80078 C 90.900781 110.60078 77.9 116 64 116 C 50.1 116 37.099219 110.60078 27.199219 100.80078 C 17.299219 91.000781 12 77.9 12 64 C 12 50.1 17.399219 37.099219 27.199219 27.199219 C 36.999219 17.299219 50.1 12 64 12 z M 50.5625 47.5 C 49.8 47.5 49.05 47.800391 48.5 48.400391 C 47.3 49.600391 47.3 51.499609 48.5 52.599609 L 59.800781 64 L 48.400391 75.300781 C 47.200391 76.500781 47.200391 78.4 48.400391 79.5 C 49.000391 80.1 49.8 80.400391 50.5 80.400391 C 51.2 80.400391 51.999609 80.1 52.599609 79.5 L 64 68.199219 L 75.300781 79.5 C 75.900781 80.1 76.700391 80.400391 77.400391 80.400391 C 78.100391 80.400391 78.9 80.1 79.5 79.5 C 80.7 78.3 80.7 76.400781 79.5 75.300781 L 68.199219 64 L 79.5 52.699219 C 80.7 51.499219 80.699609 49.600391 79.599609 48.400391 C 78.399609 47.200391 76.500391 47.200391 75.400391 48.400391 L 64 59.800781 L 52.699219 48.400391 C 52.099219 47.800391 51.325 47.5 50.5625 47.5 z"></path>
+										</svg>
+									</button>
+								</div>
 
 
-                            </div>
-                            <div class="modal-body">
-                                <div class="view-content">
-                                    <div class="modal-smg-facilities-proposal-form-details">
-                                        <!--SMG FACILITIES PROPOSAL FORM Details-->
-                                        <div>
-                                            <div class="header-form-title">
-                                                <h2>SMG FACILITIES PROPOSAL FORM</h2>
-                                            </div>
-                                        </div>
-                                        <div class="row pr-2 pl-2 mt-2">
-                                            <div class="form-group  col-md-6">
-                                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">SMG Vendor PO #:</h4></div>
-                                                <div>
-                                                    <span id="modal-SMGVendorPO"></span>
-                                                </div>
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Date:</h4></div>
-                                                <div>
-                                                    <span id="modal-Date"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row pl-2 pr-2 mt-2">
-                                            <div class="form-group col-md-6">
-                                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Store Name:</h4></div>
-                                                <div>
-                                                    <span id="modal-SMGClient"></span>
-                                                </div>
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Store #:</h4></div>
-                                                <div>
-                                                    <span id="modal-StoreNumber"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row pr-2 pl-2 mt-2">
-                                            <div class="form-group col-md-6">
-                                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Address:</h4></div>
-                                                <div>
-                                                    <span id="modal-Location"></span>
-                                                </div>
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Vendor:</h4></div>
-                                                <div>
-                                                    <span id="modal-Vendor"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row pl-2 pr-2 pb-3 mt-2">
-                                            <div class="form-group col-md-6">
-                                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Email:</h4></div>
-                                                <div>
-                                                    <span id="modal-Email"></span>
-                                                </div>
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Service Rep Name:</h4></div>
-                                                <div><span id="modal-ServiceRepName"></span></div>
-                                            </div>
-                                        </div>
-                                    </div>
+							</div>
+							<div class="modal-body">
+								<div class="view-content">
+									<div class="modal-smg-facilities-proposal-form-details">
+										<!--SMG FACILITIES PROPOSAL FORM Details-->
+										<div>
+											<div class="header-form-title">
+												<h2>SMG FACILITIES PROPOSAL FORM</h2>
+											</div>
+										</div>
+										<div class="row pr-2 pl-2 mt-2">
+											<div class="form-group  col-md-6">
+												<div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">SMG Vendor PO #:</h4></div>
+												<div>
+													<span id="modal-SMGVendorPO"></span>
+												</div>
+											</div>
+											<div class="form-group col-md-6">
+												<div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Date:</h4></div>
+												<div>
+													<span id="modal-Date"></span>
+												</div>
+											</div>
+										</div>
+										<div class="row pl-2 pr-2 mt-2">
+											<div class="form-group col-md-6">
+												<div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Store Name:</h4></div>
+												<div>
+													<span id="modal-SMGClient"></span>
+												</div>
+											</div>
+											<div class="form-group col-md-6">
+												<div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Store #:</h4></div>
+												<div>
+													<span id="modal-StoreNumber"></span>
+												</div>
+											</div>
+										</div>
+										<div class="row pr-2 pl-2 mt-2">
+											<div class="form-group col-md-6">
+												<div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Address:</h4></div>
+												<div>
+													<span id="modal-Location"></span>
+												</div>
+											</div>
+											<div class="form-group col-md-6">
+												<div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Vendor:</h4></div>
+												<div>
+													<span id="modal-Vendor"></span>
+												</div>
+											</div>
+										</div>
+										<div class="row pl-2 pr-2 pb-3 mt-2">
+											<div class="form-group col-md-6">
+												<div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Email:</h4></div>
+												<div>
+													<span id="modal-Email"></span>
+												</div>
+											</div>
+											<div class="form-group col-md-6">
+												<div><h4 class="text-base font-medium text-gray-700 dark:text-gray-300">Service Rep Name:</h4></div>
+												<div><span id="modal-ServiceRepName"></span></div>
+											</div>
+										</div>
+									</div>
 
-                                    <div class="mt-5">
-                                        <div class="modal-smg-facilities-proposal-form-details">
-                                            <div class="summary-section header-form-title">
-                                                <h4>SUMMARY OF INITIAL CALL</h4>
-                                            </div>
-                                            <div class="modal-service-date">
-                                                <span class="service-date-label">Service Date: <span id="modal-service-Date"></span></span>
-                                            </div>
-                                            <div class="initial-call-breakout mb-2">
-                                                <div>
-                                                    <h4 id="incurredSection" style="text-align: center;">Initial Call B reakout</h4>
-                                                </div>
-                                                <div class="p-2">
-                                                    <div><label class="text-base font-medium text-gray-700 dark:text-gray-300">Issue(s) discovered while on-site & Description of Work Performed*</label></div>
-                                                    <div class="mt-2"><span id="incurredIssueDescription"></span></div>
-                                                </div>
-                                                <div class="table-responsive p-2">
-                                                    <table class="initial-call-table table" id="modalInitialTable">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Cost Type</th>
-                                                                <th>Description</th>
-                                                                <th>#Techs</th>
-                                                                <th>Quantity</th>
-                                                                <th>Rate</th>
-                                                                <th>Initial Call Sub Total</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="incurredBreakouts">
-                                                            @* Dynamically load the data *@
-                                                        </tbody>
+									<div class="mt-5">
+										<div class="modal-smg-facilities-proposal-form-details">
+											<div class="summary-section header-form-title">
+												<h4>SUMMARY OF INITIAL CALL</h4>
+											</div>
+											<div class="modal-service-date">
+												<span class="service-date-label">Service Date: <span id="modal-service-Date"></span></span>
+											</div>
+											<div class="initial-call-breakout mb-2">
+												<div>
+													<h4 id="incurredSection" style="text-align: center;">Initial Call Breakout</h4>
+												</div>
+												<div class="p-2">
+													<div><label class="text-base font-medium text-gray-700 dark:text-gray-300">Issue(s) discovered while on-site & Description of Work Performed*</label></div>
+													<div class="mt-2"><span id="incurredIssueDescription"></span></div>
+												</div>
+												<div class="table-responsive p-2">
+													<table class="initial-call-table table" id="modalInitialTable">
+														<thead>
+															<tr>
+																<th>Cost Type</th>
+																<th>Description</th>
+																<th>#Techs</th>
+																<th>Quantity</th>
+																<th>Rate</th>
+																<th>Initial Call Sub Total</th>
+															</tr>
+														</thead>
+														<tbody id="incurredBreakouts">
+															@* Dynamically load the data *@
+														</tbody>
 
-                                                    </table>
-                                                    <div>
-                                                        <div class="tfoot">
-                                                            <div class="row justify-content-end ">
-                                                                <div class="col-md-2"><b>Sub Total</b></div>
-                                                                <div class="col-md-2" colspan="5">
-                                                                    <div><span class="initial-subtotal-final" id="initial-subtotal"></span></div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row justify-content-end">
-                                                                <div class="col-md-2"><b>Tax</b></div>
-                                                                <div class="col-md-2" colspan="5">
-                                                                    <div><span class="initial-tax-input" id="initial-tax"></span></div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row justify-content-end">
-                                                                <div class="col-md-2"><b>INITIAL CALL TOTAL</b></div>
-                                                                <div class="col-md-2" colspan="5">
-                                                                    <div><span class="initial-total-input" id="initial-total"></span></div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <h4 id="ProposedBreakoutTableText">Summary Of Proposed Quoted Work</h4>
-                                            <div class="proposed-quote-summary table-responsive">
-                                                <div class="p-2">
-                                                    <div><label class="text-base font-medium text-gray-700 dark:text-gray-300">Detailed description of proposed work to address unresolved issues</label></div>
-                                                    <div class="mt-2"><span id="proposedIssueDescription"></span></div>
-                                                </div>
-                                                <div class="p-2">
-                                                    <table class="table proposed-quote-table" id="modalProposedTable">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Cost Type</th>
-                                                                <th>Description - M/M/S</th>
-                                                                <th>#Techs</th>
-                                                                <th>Quantity</th>
-                                                                <th>Cost</th>
-                                                                <th>Quote Sub Total</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="proposedBreakouts">
-                                                            @* Dynamically load the data *@
-                                                        </tbody>
+													</table>
+													<div>
+														<div class="tfoot">
+															<div class="row justify-content-end ">
+																<div class="col-md-2"><b>Sub Total</b></div>
+																<div class="col-md-2" colspan="5">
+																	<div><span class="initial-subtotal-final" id="initial-subtotal"></span></div>
+																</div>
+															</div>
+															<div class="row justify-content-end">
+																<div class="col-md-2"><b>Tax</b></div>
+																<div class="col-md-2" colspan="5">
+																	<div><span class="initial-tax-input" id="initial-tax"></span></div>
+																</div>
+															</div>
+															<div class="row justify-content-end">
+																<div class="col-md-2"><b>INITIAL CALL TOTAL</b></div>
+																<div class="col-md-2" colspan="5">
+																	<div><span class="initial-total-input" id="initial-total"></span></div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<h4 id="ProposedBreakoutTableText">Summary Of Proposed Quoted Work</h4>
+											<div class="proposed-quote-summary table-responsive">
+												<div class="p-2">
+													<div><label class="text-base font-medium text-gray-700 dark:text-gray-300">Detailed description of proposed work to address unresolved issues</label></div>
+													<div class="mt-2"><span id="proposedIssueDescription"></span></div>
+												</div>
+												<div class="p-2">
+													<table class="table proposed-quote-table" id="modalProposedTable">
+														<thead>
+															<tr>
+																<th>Cost Type</th>
+																<th>Description - M/M/S</th>
+																<th>#Techs</th>
+																<th>Quantity</th>
+																<th>Cost</th>
+																<th>Quote Sub Total</th>
+															</tr>
+														</thead>
+														<tbody id="proposedBreakouts">
+															@* Dynamically load the data *@
+														</tbody>
 
-                                                    </table>
-                                                    <div class="quote-summary p-2">
-                                                        <div class="quote-summary-row row">
-                                                            <div class="quote-label col-md-2"><b>Sub Total</b></div>
-                                                            <div class="quote-value col-md-2" colspan="5">
-                                                                <div><span class="quote-subtotal-final" id="quote-subtotal"></span></div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="quote-summary-row row">
-                                                            <div class="quote-label col-md-2"><b>Tax</b></div>
-                                                            <div class="quote-value col-md-2" colspan="5">
-                                                                <div><span class="quote-tax-input" id="quote-tax"></span></div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="quote-summary-row row">
-                                                            <div class="quote-label col-md-2"><b>PROPOSED QUOTE </b></div>
-                                                            <div class="quote-value col-md-2" colspan="5">
-                                                                <div><span class="quote-total-input" id="quote-total"></span></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+													</table>
+													<div class="quote-summary p-2">
+														<div class="quote-summary-row row">
+															<div class="quote-label col-md-2"><b>Sub Total</b></div>
+															<div class="quote-value col-md-2" colspan="5">
+																<div><span class="quote-subtotal-final" id="quote-subtotal"></span></div>
+															</div>
+														</div>
+														<div class="quote-summary-row row">
+															<div class="quote-label col-md-2"><b>Tax</b></div>
+															<div class="quote-value col-md-2" colspan="5">
+																<div><span class="quote-tax-input" id="quote-tax"></span></div>
+															</div>
+														</div>
+														<div class="quote-summary-row row">
+															<div class="quote-label col-md-2"><b>PROPOSED QUOTE </b></div>
+															<div class="quote-value col-md-2" colspan="5">
+																<div><span class="quote-total-input" id="quote-total"></span></div>
+															</div>
+														</div>
+													</div>
+												</div>
 
-                                            </div>
+											</div>
 
-                                        </div>
-                                    </div>
-                                    <div class="ServiceProposal-container">
-                                        <div class="header-form-title">
-                                            <h3>Disclaimers</h3>
-                                        </div>
-                                        <div class="ServiceProposal-from-contain">
-                                            <div class="mddl additional-details">
-                                                @* <div class="row">
+										</div>
+									</div>
+									<div class="ServiceProposal-container">
+										<div class="header-form-title">
+											<h3>Disclaimers</h3>
+										</div>
+										<div class="ServiceProposal-from-contain">
+											<div class="mddl additional-details">
+												@* <div class="row">
                                                 <div class="col-md-6">
                                                 <div>
                                                 <label for="message" class="message-label text-base font-medium text-gray-700 dark:text-gray-300">Message</label>
@@ -722,1222 +766,1228 @@
                                                 </div>
                                                 </div>
                                                 </div> *@
-                                                <div class="row">
-                                                    <div class="col-md-12 mt-3">
-                                                        <div>
-                                                            <label for="disclaimer" class="disclaimer-label text-base font-medium text-gray-700 dark:text-gray-300">Disclaimer</label>
-                                                        </div>
-                                                        <div>
-                                                            <div><span id="disclaimer-modal" class="disclaimer-input"></span></div>
-                                                        </div>
-                                                        @* <div>
+												<div class="row">
+													<div class="col-md-12 mt-3">
+														<div>
+															<label for="disclaimer" class="disclaimer-label text-base font-medium text-gray-700 dark:text-gray-300">Disclaimer</label>
+														</div>
+														<div>
+															<div><span id="disclaimer-modal" class="disclaimer-input"></span></div>
+														</div>
+														@* <div>
                                                         <label for="services" class="services-label text-base font-medium text-gray-700 dark:text-gray-300">Description of Services</label>
                                                         </div>
                                                         <div>
                                                         <div><span id="services-modal" class="services-input"></span></div>
                                                         </div> *@
-                                                    </div>
-                                                </div>
+													</div>
+												</div>
 
-                                            </div>
+											</div>
 
-                                        </div>
-                                    </div>
+										</div>
+									</div>
 
-                                    <div class="DocAttachAndPartLeadTime " id="modalPartsLeadSection">
-                                        <div class="header-form-title">
-                                            <h3>Parts Lead Time</h3>
-                                        </div>
+									<div class="DocAttachAndPartLeadTime " id="modalPartsLeadSection">
+										<div class="header-form-title">
+											<h3>Parts Lead Time</h3>
+										</div>
 
-                                        <div class="DocAttachAndPartLeadTimeContain">
-                                            <div>
-                                                <h4 id="ProposedBreakoutTableText">Parts Lead Time</h4>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-4">
-                                                    <div><label><b>Time Option</b></label></div>
-                                                    <div><span id="Modal-Time-Option"></span></div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div id="time" style="display:none">
-                                                        <div><label><b>Time Number</b></label></div>
-                                                        <div><span id="Modal-Time-Number"></span></div>
-                                                    </div>
-                                                    <div>
-                                                        <div class="row" style="display:none" id="modalPartsRange">
-                                                            <div class="col-md-6">
-                                                                <div><label><b>Time Range From</b></label></div>
-                                                                <div><span id="Modal-Time-Range-From"></span></div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div><label><b>Time Range To</b></label></div>
-                                                                <div><span id="Modal-Time-Range-To"></span></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div><label>Time Unit</label></div>
-                                                    <div><span id="Modal-Time-Unit"></span></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+										<div class="DocAttachAndPartLeadTimeContain">
+											<div>
+												<h4 id="ProposedBreakoutTableText">Parts Lead Time</h4>
+											</div>
+											<div class="row">
+												<div class="col-md-4">
+													<div><label><b>Time Option</b></label></div>
+													<div><span id="Modal-Time-Option"></span></div>
+												</div>
+												<div class="col-md-4">
+													<div id="time" style="display:none">
+														<div><label><b>Time Number</b></label></div>
+														<div><span id="Modal-Time-Number"></span></div>
+													</div>
+													<div>
+														<div class="row" style="display:none" id="modalPartsRange">
+															<div class="col-md-6">
+																<div><label><b>Time Range From</b></label></div>
+																<div><span id="Modal-Time-Range-From"></span></div>
+															</div>
+															<div class="col-md-6">
+																<div><label><b>Time Range To</b></label></div>
+																<div><span id="Modal-Time-Range-To"></span></div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="col-md-4">
+													<div><label>Time Unit</label></div>
+													<div><span id="Modal-Time-Unit"></span></div>
+												</div>
+											</div>
+										</div>
+									</div>
 
-                                </div>
-                                <div class="mt-5">
-                                    <label asp-for="SignatureName">Signature Name <span class="text-danger">*</span></label>
-                                    <input class="form-control" id="signatureNameInput" name="SignatureName" maxlength="40" placeholder="Enter your name" />
-                                    <span asp-validation-for="SignatureName" class="text-danger"></span>
-                                </div>
-                                <div class="mt-3">
-                                    <label>
-                                        <input type="checkbox" id="confirmationCheckbox" />
-                                        I have reviewed above proposal and confirm all information is accurate
-                                    </label>
-                                    <span id="checkboxError" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <input id="createdDate" asp-for="ClientCreatedDate" readonly style="display: none;" />
-                                <button type="button" id="btnModalClose2" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
-                                <button type="button" id="confirmSubmitBtn" class="btn btn-outline-primary">Confirm & Submit</button>
-                                <button type="submit" id="modalSubmit" class="d-none">Confirm & Submit</button>
-                            </div>
+								</div>
+								<div class="mt-5">
+									<label asp-for="SignatureName">Signature Name <span class="text-danger">*</span></label>
+									<input class="form-control" id="signatureNameInput" name="SignatureName" maxlength="40" placeholder="Enter your name" />
+									<span asp-validation-for="SignatureName" class="text-danger"></span>
+								</div>
+								<div class="mt-3">
+									<label>
+										<input type="checkbox" id="confirmationCheckbox" />
+										I have reviewed above proposal and confirm all information is accurate
+									</label>
+									<span id="checkboxError" class="text-danger"></span>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<input id="createdDate" asp-for="ClientCreatedDate" readonly style="display: none;" />
+								<button type="button" id="btnModalClose2" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
+								<button type="button" id="confirmSubmitBtn" class="btn btn-outline-primary">Confirm & Submit</button>
+								<button type="submit" id="modalSubmit" class="d-none">Confirm & Submit</button>
+							</div>
 
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
 </div>
 <script src="~/js/regex.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 <script>
-    $(document).ready(function () {
-        let isMaterialsSelected = false;
-
-        $('#timeOption').on('change', function () {
-            const selectedOption = $(this).val();
-            debugger
-
-            if (selectedOption === 'Number') {
-                $('#numberOptionFields').show();
-                $('#Time-Range-From').val('');
-                $('#Time-Range-To').val('');
-                $('#rangeOptionFields').hide();
-            } else if (selectedOption === 'Range') {
-                $('#Time-Number').val('');
-                $('#numberOptionFields').hide();
-                $('#rangeOptionFields').show();
-            } else {
-                $('#Time-Range-From').val('');
-                $('#Time-Range-To').val('');
-                $('#Time-Number').val('');
-                $('#numberOptionFields').hide();
-                $('#rangeOptionFields').hide();
-
-            }
-        });
-
-        $('#confirmSubmitBtn').on('click', function () {
-            let isValid = true;
-            debugger
-            // Validate Signature Name field
-            const signatureName = $('#signatureNameInput').val().trim();
-            if (!signatureName) {
-                isValid = false;
-                $('#signatureNameError').text('Signature Name is required.');
-            } else {
-                $('#signatureNameError').text('');
-            }
-
-            // Validate Checkbox
-            if (!$('#confirmationCheckbox').is(':checked')) {
-                isValid = false;
-                $('#checkboxError').text('You must confirm before submitting.');
-            } else {
-                $('#checkboxError').text('');
-            }
-
-            // if ($("#timeOption").val() == '' || $("#timeOption").val() == null) {
-            //     isValid = false;
-            //     $('#timeOption-error').text('Please select time option.');
-            // }
-            // else {
-            //     if ($("#timeOption").val() == "Number") {
-            //         if ($("#Time-Number").val() == '' || $("#Time-Number").val() == null) {
-            //             isValid = false;
-            //             $("#Time-Number-error").text("Please select Time Number");
-            //         }
-            //     }
-            //     else if ($("#timeOption").val() == "Range") {
-            //         if ($("#Time-Range-From").val() == '' || $("#Time-Range-From").val() == null) {
-            //             isValid = false;
-            //             $("#Time-Range-From-error").text("Please select Time Range From");
-            //         }
-            //         if ($("#Time-Range-To").val() == '' || $("#Time-Range-To").val() == null) {
-            //             isValid = false;
-            //             $("#Time-Range-To-error").text("Please select Time Number");
-            //         }
-            //     }
-            // }
-
-            // if ($("#Time-Unit").val() == '' || $("#Time-Unit").val() == null) {
-            //     isValid = false;
-            //     $("#Time-Unit-error").text("Time Unit is required.");
-            // }
-            if ($("#Time-Unit").val() == '' || $("#Time-Unit").val() == null) {
-                $("#Time-Unit").val('0')
-            }
-            // If valid, submit the form
-            if (isValid) {
-                // Hide the modal
-                $('#confirmationModal').modal('hide');
-
-                // Optionally append data to a hidden field before submitting
-                $('form').append(`<input type="hidden" name="SignatureName" value="${signatureName}" />`);
-                $('form').append(`<input type="hidden" name="IsChecked" value="true" />`);
-
-                debugger
-                // Submit the form
-                // $('form').submit();
-                $('#modalSubmit').click();
-            }
-        });
-
-        // Close Modal
-        $("#confirmationModal").on("hidden.bs.modal", function () {
-            $('.initial-call-table tbody tr').remove();
-            $('.proposed-quote-table tbody tr').remove();
-        });
-
- 
-
-        // Clear all data in the incurred breakout table
-        function clearIncurredBreakoutTableData() {
-            // Find all inputs and selects in the Incurred Breakout Table and clear values
-            $('#incurredBreakoutTable').find('input, select').val('');
-            $('#incurredBreakoutTableTotal').find('input').val('');
-
-            // Recalculate grand total to exclude incurred table data
-            calculateTotal('#proposedBreakoutTable',
-                'input[name="ProposedTotals.ProposedSubTotal"]',
-                'input[name="ProposedTotals.ProposedTax"]',
-                'input[name="ProposedTotals.ProposedInitialCallTotal"]');
-            calculateGrandTotal();
-        }
-
-        function toggleTechsField(tableSelector) {
-            // Delegate the change event to the table level
-            $(tableSelector).on('change', 'select[name*="CostType"]', function () {
-                const $thisRow = $(this).closest('tr'); // Get the current row
-                const techsField = $thisRow.find('input[name*="Techs"]'); // Target the corresponding Techs field
-                const isLabor = $(this).val() === 'Labor';
-
-                if (isLabor) {
-                    techsField.prop('readonly', false).css('visibility', 'visible'); // Make editable and visible
-                } else {
-                    techsField.prop('readonly', true).val('').css('visibility', 'hidden'); // Clear value and make invisible
-                    $thisRow.find('span.validation-msg').remove(); // Remove any validation messages for Techs
-                }
-            });
-        }
-
-
-
-        // Call the function initially for the table
-        toggleTechsField('#incurredBreakoutTable');
-        toggleTechsField('#proposedBreakoutTable');
-
-        function addNewRow(tableSelector, type) {
-            const tableBody = $(tableSelector + ' tbody');
-            const lastIndex = tableBody.find('tr').length;
-
-            // Check if the table has no rows
-            if (lastIndex === 0) {
-                // Create a new row from the provided HTML structure if no rows exist
-                const newRowHtml = `
-                <tr>
-                    <td>
-                        <div>
-                            <div>
-                                <div class="form-table-label">
-                                    <label>Cost Type</label>
-                                </div>
-                            </div>
-                            <div>
-                                <select class="form-control" name="${type}[0].CostType">
-                                    <option selected>--select--</option>
-                                    <option value="Labor">Labor</option>
-                                    <option value="Materials">Materials</option>
-                                    <option value="Travel">Travel</option>
-                                    <option value="Equipment">Equipment</option>
-                                    <option value="Disposal">Disposal</option>
-                                    <option value="Fees">Fees</option>
-                                    <option value="Permitting">Permitting</option>
-                                    <option value="Miscellaneous">Miscellaneous</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <div class="form-table-label"><label>Description</label></div>
-                            <div>
-                                <textarea class="form-control" maxlength="240" name="${type}[0].Description" placeholder="Description"></textarea>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <div class="form-table-label"><label>#Techs</label></div>
-                        </div>
-                        <div>
-                            <input type="number" class="form-control" name="${type}[0].Techs" placeholder="Techs" readonly />
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <div class="form-table-label"><label>Quantity</label></div>
-                            <div>
-                                <input type="number" class="form-control" name="${type}[0].Quantity" placeholder="Quantity" min="0">
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <div class="form-table-label"><label>Rate</label></div>
-                            <div>
-                                <input type="number" class="form-control" name="${type}[0].Rate" placeholder="Rate" min="0">
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <div class="form-table-label"><label>Initial Call Sub Total</label></div>
-                            <div>
-                                <input type="text" class="form-control" name="${type}[0].InitialCallSubTotal" readonly />
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-danger remove-btn">X</button>
-                    </td>
-                </tr>
-            `;
-
-                // Append the new row to the table body
-                tableBody.append(newRowHtml);
-
-                // Trigger change for the select dropdown
-                tableBody.find('select[name*="CostType"]').trigger('change');
-                    
-                return; // Exit since the row has been added
-            }
-
-            // If rows exist, clone the first row as usual
-            const newRow = tableBody.find('tr:first').clone(true);
-
-            // Clear values and change add button to remove
-            newRow.find('input, textarea').val('');
-            newRow.find('select').prop('selectedIndex', 0);
-            newRow.find('.remove-btn').removeClass('btn-success add-btn').addClass('btn-danger remove-btn').text('X');
-
-            // Update names with new index
-            newRow.find('select').attr('name', `${type}[${lastIndex}].CostType`);
-            newRow.find('textarea[name$=".Description"]').attr('name', `${type}[${lastIndex}].Description`);
-            newRow.find('input[name$=".Rate"]').attr('name', `${type}[${lastIndex}].Rate`);
-            newRow.find('input[name$=".Quantity"]').attr('name', `${type}[${lastIndex}].Quantity`);
-            newRow.find('input[name$=".Techs"]').attr('name', `${type}[${lastIndex}].Techs`);
-            newRow.find('input[name$=".InitialCallSubTotal"]').attr('name', `${type}[${lastIndex}].InitialCallSubTotal`);
-
-            // Append the new row to the table
-            tableBody.append(newRow);
-
-            // Trigger change for the select dropdown
-            newRow.find('select[name*="CostType"]').trigger('change');
-        }
-    
-
-        // Event listener for adding a new row
-        $('#addRowButton').on('click', function () {
-            addNewRow('#incurredBreakoutTable', 'IncurredBreakouts');
-        });
-        $('#addRowButton2').on('click', function () {
-            addNewRow('#proposedBreakoutTable', 'ProposedBreakouts');
-        });
-
-        // Remove row and recalculate totals
-        $('#incurredBreakoutTable').on('click', '.remove-btn', function () {
-            $(this).closest('tr').remove(); // Remove the row
-
-            var table = document.querySelector('#incurredBreakoutTable');
-            var tbody = table.querySelector('tbody');
-            var rows = tbody.getElementsByTagName('tr'); // Get all rows in tbody specifically
-
-            console.log("Row count before removal:", rows.length);
-
-            if (rows.length < 1) {
-                $("#Incurred-Issue-Description-error").text('');
-                $("#Incurred-Issue-Description").val('');
-                $('#Incurred-Sub-Total').val('');
-                $('#Incurred-Tax').val('');
-                $('#Incurred-Initial-Call-Total ').val('');
-            }else{
-                calculateTotal('#proposedBreakoutTable',
-                    'input[name="ProposedTotals.ProposedSubTotal"]',
-                    'input[name="ProposedTotals.ProposedTax"]',
-                    'input[name="ProposedTotals.ProposedInitialCallTotal"]');
-                calculateTotal('#incurredBreakoutTable',
-                    'input[name="IncurredTotals.IncurredSubTotal"]',
-                    'input[name="IncurredTotals.IncurredTax"]',
-                    'input[name="IncurredTotals.IncurredInitialCallTotal"]');
-                calculateGrandTotal();
-            }
-
-
-            
-        });
-        $('#proposedBreakoutTable').on('click', '.remove-btn', function () {
-            const tableId = $(this).closest('table').attr('id');
-            const tbody = $(this).closest('tbody');
-            const rowCount = tbody.find('tr').length;
-
-            console.log("Row count before removal:", rowCount);
-
-            if (rowCount > 1) {
-                const currentRow = $(this).closest('tr');
-                currentRow.remove(); // Remove the row
-
-                // Check if any row still has Cost Type = "Materials"
-                let isMaterialsSelected = false;
-                $('#proposedBreakoutTable select[name$=".CostType"]').each(function () {
-                    const costType = $(this).val();
-                    if (costType === "Materials") {
-                        isMaterialsSelected = true;
-                    }
-                });
-
-                // Show or hide the Parts Lead Time component based on remaining rows
-                if (isMaterialsSelected) {
-                    console.log("Keeping PartsLeadTimeCoponent visible");
-                    $('#PartsLeadTimeCoponentDesc').show();
-                } else {
-                    console.log("Hiding PartsLeadTimeCoponent and clearing data");
-
-                    // Hide the Parts Lead Time component
-                    $('#PartsLeadTimeCoponentDesc').hide();
-
-                    // Clear the data in the Parts Lead Time fields
-                    $('#timeOption').val(''); // Reset Time Option
-                    $('#Time-Number').val(''); // Clear Time Number
-                    $('#Time-Range-From').val(''); // Clear Time Range From
-                    $('#Time-Range-To').val(''); // Clear Time Range To
-                    $('#Time-Unit').val(''); // Clear Time Unit
-
-                    // Hide both Number and Range option fields
-                    $('#numberOptionFields').hide();
-                    $('#rangeOptionFields').hide();
-                }
-            } else {
-                toastr.error("At least one row must remain in the table.");
-            }
-
-            // Recalculate totals after removal
-            calculateTotal('#proposedBreakoutTable',
-                'input[name="ProposedTotals.ProposedSubTotal"]',
-                'input[name="ProposedTotals.ProposedTax"]',
-                'input[name="ProposedTotals.ProposedInitialCallTotal"]');
-            calculateTotal('#incurredBreakoutTable',
-                'input[name="IncurredTotals.IncurredSubTotal"]',
-                'input[name="IncurredTotals.IncurredTax"]',
-                'input[name="IncurredTotals.IncurredInitialCallTotal"]');
-            calculateGrandTotal();
-        });
-
-        function calculateSubTotal(row) {
-
-            const costType = row.find('select[name$=".CostType"]').val() || "";
-            const rate = parseFloat(row.find('input[name$=".Rate"]').val()) || 0;
-            const quantity = parseFloat(row.find('input[name$=".Quantity"]').val()) || 0;
-            const techs = parseFloat(row.find('input[name$=".Techs"]').val()) || 1;
-            let subtotal;
-
-            if (costType == "Labor") { // Use strict equality
-                subtotal = rate * quantity * techs;
-            } else {
-                subtotal = rate * quantity;
-            }
-
-            row.find('input[name$=".InitialCallSubTotal"]').val(subtotal.toFixed(2));
-        }
-
-        $('#incurredBreakoutTable, #proposedBreakoutTable').on('input', 'input[name$=".Rate"], input[name$=".Quantity"], input[name$=".Techs"], select[name$=".CostType"]', function () {
-            const row = $(this).closest('tr');
-            calculateSubTotal(row);
-        });
-
-        // Event for Hide/Show Parts Lead Time display
-        $('#proposedBreakoutTable').on('change', 'select[name$=".CostType"]', function () {
-            let isMaterialsSelected = false;
-
-            // Iterate through each dropdown
-            $('#proposedBreakoutTable select[name$=".CostType"]').each(function () {
-                const costType = $(this).val(); // Get the value of the current dropdown
-                if (costType === "Materials") {
-                    isMaterialsSelected = true;
-                }
-            });
-
-            // Show or hide the Parts Lead Time component
-            if (isMaterialsSelected) {
-                console.log("Showing PartsLeadTimeCoponent");
-                $('#PartsLeadTimeCoponentDesc').show();
-
-                // Change the content of the h3 element
-                isMaterialsSelected = true;
-            } else {
-                console.log("Hiding PartsLeadTimeCoponent");
-                $('#PartsLeadTimeCoponentDesc').hide();
-
-                isMaterialsSelected = false;
-            }
-        });
-
-
-        // Event "Initial Call Total" Calculation on tax input
-        $('input[name="ProposedTotals.ProposedTax"], input[name="IncurredTotals.IncurredTax"]').on('input', function () {
-            console.log('Input event triggered'); // Check if the event is being triggered
-
-            // Calculate totals for both proposed and incurred tables
-            calculateTotal('#proposedBreakoutTable',
-                'input[name="ProposedTotals.ProposedSubTotal"]',
-                'input[name="ProposedTotals.ProposedTax"]',
-                'input[name="ProposedTotals.ProposedInitialCallTotal"]');
-
-            calculateTotal('#incurredBreakoutTable',
-                'input[name="IncurredTotals.IncurredSubTotal"]',
-                'input[name="IncurredTotals.IncurredTax"]',
-                'input[name="IncurredTotals.IncurredInitialCallTotal"]');
-
-            // Update the grand total calculation
-            calculateGrandTotal();
-        });
-
-        function calculateTotal(tableSelector, subtotalSelector, taxSelector, initialCallTotalSelector) {
-            let total = 0;
-
-            // Loop through each row in the table to calculate total and tax
-            $(tableSelector + ' tbody tr').each(function () {
-                // Calculate subtotal for the current row
-                const subTotal = parseFloat($(this).find('input[name$=".InitialCallSubTotal"]').val()) || 0;
-                total += subTotal;
-            });
-
-            // Update subtotal field
-            const subtotalValue = total.toFixed(2);
-            $(subtotalSelector).val(subtotalValue);
-
-            // Get the manually inputted tax value
-            const taxTotal = parseFloat($(taxSelector).val()) || 0;
-
-            // Calculate initial call total (Subtotal + Tax)
-            const initialCallTotal = (total + taxTotal).toFixed(2);
-            $(initialCallTotalSelector).val(initialCallTotal);
-
-            // Update grand total whenever calculateTotal is called
-            calculateGrandTotal();
-        }
-
-
-        function calculateGrandTotal() {
-            const proposedTotal = parseFloat($('input[name="ProposedTotals.ProposedInitialCallTotal"]').val()) || 0;
-            const incurredTotal = parseFloat($('input[name="IncurredTotals.IncurredInitialCallTotal"]').val()) || 0;
-            const grandTotal = (proposedTotal + incurredTotal).toFixed(2);
-            $('input[name="QuoteGrandTotal"]').val(grandTotal);
-        }
-
-        $('#incurredBreakoutTable, #proposedBreakoutTable').on('input', 'input[name$=".Rate"], input[name$=".Quantity"], input[name$=".Techs"], select[name$=".CostType"]', function () {
-            calculateTotal('#proposedBreakoutTable',
-                'input[name="ProposedTotals.ProposedSubTotal"]',
-                'input[name="ProposedTotals.ProposedTax"]',
-                'input[name="ProposedTotals.ProposedInitialCallTotal"]');
-            calculateTotal('#incurredBreakoutTable',
-                'input[name="IncurredTotals.IncurredSubTotal"]',
-                'input[name="IncurredTotals.IncurredTax"]',
-                'input[name="IncurredTotals.IncurredInitialCallTotal"]');
-        });
-
-        let shouldSubmit = false;
-
-        $('#submit-quoteform').on('submit', function (e) {
-            if (!shouldSubmit) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (validateBreakoutTables()) {
-                    shouldSubmit = true;
-                    $(this).submit();
-                }
-            }
-        });
-
-         const fileDropArea = $('#fileDropArea');
-        const fileInput = $('#fileInput');
-
-        // Trigger file input click on button click
-        $('#uploadButton').on('click', function () {
-            fileInput.click();
-        });
-
-        // File selected via input
-        fileInput.on('change', function () {
-            handleFiles(this.files);
-        });
-
-        // Drag-and-drop events
-        fileDropArea.on('dragover', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            fileDropArea.addClass('drag-over'); // Add styling for visual feedback
-        });
-
-        fileDropArea.on('dragleave', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            fileDropArea.removeClass('drag-over'); // Remove styling
-        });
-
-        // Modify your existing drop event handler
-        fileDropArea.on('drop', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            fileDropArea.removeClass('drag-over');
-    
-            const droppedFiles = e.originalEvent.dataTransfer.files;
-    
-            // Create DataTransfer and assign the dropped file to input
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(droppedFiles[0]);
-            fileInput[0].files = dataTransfer.files;
-    
-            handleFiles(droppedFiles); // Your existing handle files function
-        });
-
-        // Handle file selection
-        function handleFiles(files) {
-            const file = files[0];
-            if (file) {
-                const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv'];
-                const fileExtension = file.name.split('.').pop().toLowerCase();
-
-                // Validate file type and size
-                if (!allowedExtensions.includes(fileExtension)) {
-                    $("#fileInput-error").text(`Allowed file types are: ${allowedExtensions.join(', ')}.`);
-                    return;
-                }
-                if (file.size > 10 * 1024 * 1024)
-                { // 10MB limit
-                    $("#fileInput-error").text('File size exceeds 10MB. Please upload a smaller file.');
-                    return;
-                }
-
-                $("#fileInput-error").text('');
-                $('#fileName').text(file.name);
-                $('#fileDisplay').show();
-                $('#uploadButton').hide();
-            }
-        }
-
-        // Remove file on button click
-        $('#removeFileButton').on('click', function () {
-            fileInput.val(''); // Clear the input
-            $('#fileDisplay').hide(); // Hide the file display area
-            $('#uploadButton').show(); // Show the upload button again
-        });
-    });
-
-
-    $("#submitBtnId").click(function () {
-
-        let isSubmited = true;
-
-        let checkBreakoutTableAndIncurredTable = validateBreakoutTables();
-        let isvalidateServiceProposal = validateServiceProposal();
-        let isvalidateSMGFacilitiesProposalForm = validateSMGFacilitiesProposalForm();
-        let isValidPartsLead = validatePartsLeadTime();
-
-        // Get current date and time
-        var now = new Date();
-
-        // Format as 'YYYY-MM-DD HH:mm:ss'
-        var year = now.getFullYear();
-        var month = String(now.getMonth() + 1).padStart(2, '0'); // Add leading zero
-        var day = String(now.getDate()).padStart(2, '0');
-        var hours = String(now.getHours()).padStart(2, '0');
-        var minutes = String(now.getMinutes()).padStart(2, '0');
-        var seconds = String(now.getSeconds()).padStart(2, '0');
-
-        // Combine into desired format
-        var currentDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
-
-        // Format the date and time as 'YYYY-MM-DDTHH:mm' for compatibility with HTML datetime-local input
-        $('#createdDate').val(currentDateTime);
-
-        debugger
-        if (isvalidateSMGFacilitiesProposalForm == false) {
-            isSubmited = false;
-            toastr.error("There is an error in the SMG Facilities Proposal form. ");
-        } else if (checkBreakoutTableAndIncurredTable == false) {
-            isSubmited = false;
-            toastr.error("An issue was detected in the table validation. Please check the Breakout and Incurred tables.");
-        } else if (isvalidateServiceProposal == false) {
-            isSubmited = false;
-            toastr.error("There is an error in the Service Proposal. Please correct it before submitting.");
-        } else if (isValidPartsLead == false) {
-            isSubmited = false;
-            toastr.error("Document Attachment Or Parts Lead Time  contains errors. Please fix the issue to proceed.");
-        }
-
-        if (isSubmited == true) {
-            toastr.success("The form is valid and ready for submission.");
-        }
-
-        debugger
-        if (isSubmited == true) {
-            $('#modal-SMGVendorPO').text($("#smg-vendor-po").val());
-            //$('#modal-Date').text($("#date-quote-form").val());
-            //$('#modal-Date').text(formattedDateQuoteForm);
-            $('#modal-SMGClient').text($("#smg-client").val());
-            $('#modal-StoreNumber').text($("#store-number").val());
-            $('#modal-Email').text($("#email").val());
-            $('#modal-Vendor').text($("#vendor").val());
-            $('#modal-Location').text($("#location").val());
-            $('#modal-ServiceRepName').text($("#service-rep-name").val());
-            let dateQuoteFormValue = $("#date-quote-form").val();
-            let serviceDateValue = $("#service-date").val();
-
-            if (!dateQuoteFormValue || !serviceDateValue) {
-                console.error("Date fields are empty or invalid.");
-                return; // Exit if dates are not valid
-            }
-
-            let dateQuoteFormObject = new Date(dateQuoteFormValue);
-            let serviceDateObject = new Date(serviceDateValue);
-
-            let formattedDateQuoteForm = (dateQuoteFormObject.getMonth() + 1).toString().padStart(2, '0') + '/' +
-                dateQuoteFormObject.getDate().toString().padStart(2, '0') + '/' +
-                dateQuoteFormObject.getFullYear();
-
-            let formattedServiceDate = (serviceDateObject.getMonth() + 1).toString().padStart(2, '0') + '/' +
-                serviceDateObject.getDate().toString().padStart(2, '0') + '/' +
-                serviceDateObject.getFullYear();
-
-            // Set formatted values to modal
-            $('#modal-Date').text(formattedDateQuoteForm);
-            $('#modal-service-Date').text(formattedServiceDate);
-
-            // Set the formatted date to the element
-            //$('#modal-service-Date').text(formattedServiceDate);
-            //$('#modal-service-Date').text($("#service-date").val());
-            $('#initial-subtotal').text($("#Incurred-Sub-Total").val());
-            $('#initial-tax').text($("#Incurred-Tax").val());
-            $('#initial-total').text($("#Incurred-Initial-Call-Total").val());
-            $('#quote-subtotal').text($("#Proposed-Sub-Total").val());
-            $('#quote-tax').text($("#Proposed-Tax").val());
-            $('#quote-total').text($("#Proposed-Initial-Call-Total").val());
-            $('#message-modal').text($("#message").val());
-            $('#disclaimer-modal').text($("#disclaimer").val());
-            $('#services-modal').text($("#description-of-services").val());
-            $('#incurredIssueDescription').text($("#Incurred-Issue-Description").val());
-            $('#proposedIssueDescription').text($("#Proposed-Issue-Description").val());
-
-            $('#Modal-Time-Option').text($("#timeOption").val());
-            if ($("#timeOptionn").val() == "Number") {
-                $('#Modal-Time-Number').text($("#numberOptionFields").val());
-            }
-            if ($("#timeOptionn").val() == "Range") {
-                $('#Modal-Time-Range-From').text($("#TimeRangeFrom").val());
-                $('#Modal-Time-Range-To').text($("#TimeRangeTo").val());
-            }
-            $('#Modal-Time-Unit').text($("#TimeUnit").val());
-
-            var table = document.querySelector('#incurredBreakoutTable');
-            var tbody = table.querySelector('tbody');
-            var rows = tbody.getElementsByTagName('tr'); // Get all rows in tbody specifically
-
-            if (rows.length <= 0) {
-                $(".initial-call-breakout").hide();
-            } else {
-                $(".initial-call-breakout").show();
-                $('.incurredBreakoutTableClass tbody tr').each(function () {
-                    const row = $(this);
-                    var row1 = $('<tr></tr>');
-
-                    // Create cells with values
-                    var costTypeCell = $('<td></td>').append(
-                        $('<p></p>').addClass('quote-cost-type').text(row.find('td:nth-child(1) select').val())
-                    );
-
-                    var descriptionCell = $('<td></td>').append(
-                        $('<p></p>')
-                            .addClass('quote-description')
-                            .text(row.find('td:nth-child(2) textarea').val())
-                    );
-
-                    var costCell = $('<td></td>').append(
-                        $('<p></p>')
-                            .addClass('quote-cost')
-                            .text(row.find('td:nth-child(3) input').val())
-                    );
-
-                    var quantityCell = $('<td></td>').append(
-                        $('<p></p>')
-                            .addClass('quote-quantity')
-                            .text(row.find('td:nth-child(4) input').val())
-                    );
-
-                    var techsCell = $('<td></td>').append(
-                        $('<p></p>')
-                            .addClass('quote-techs')
-                            .text(row.find('td:nth-child(5) input').val())
-                    );
-
-                    var subtotalCell = $('<td></td>').append(
-                        $('<p></p>')
-                            .addClass('quote-subtotal')
-                            .text(row.find('td:nth-child(6) input').val())
-                    );
-
-                    // Append all cells to the row
-                    row1.append(costTypeCell, descriptionCell, costCell, quantityCell, techsCell, subtotalCell);
-
-                    // Append the row to the table body1
-                    $('.initial-call-table tbody').append(row1);
-
-                });
-            }
-
-            debugger
-            const data = [];
-            $('.proposedBreakoutTableClass tbody tr').each(function () {
-                const row = $(this);
-
-                var row1 = $('<tr></tr>');
-
-                // Cost Type cell (select dropdown with selected value)
-                var costTypeCell = $('<td></td>').append(
-                    $('<p></p>').addClass('quote-cost-type-select').text(row.find('td:nth-child(1) select').val())
-                );
-
-                // Description cell (readonly input)
-                var descriptionCell = $('<td></td>').append(
-                    $('<p></p>')
-                        .addClass('quote-description-input')
-                        .text(row.find('td:nth-child(2) textarea').val())
-                );
-
-                // Cost cell (readonly p tag)
-                var costCell = $('<td></td>').append(
-                    $('<p></p>')
-                        .addClass('quote-cost-input')
-                        .text(row.find('td:nth-child(3) input').val())
-                );
-
-                // Quantity cell (readonly p tag)
-                var quantityCell = $('<td></td>').append(
-                    $('<p></p>')
-                        .addClass('quote-quantity-input')
-                        .text(row.find('td:nth-child(4) input').val())
-                );
-
-                // Techs cell (readonly p tag)
-                var techsCell = $('<td></td>').append(
-                    $('<p></p>')
-                        .addClass('quote-techs-input')
-                        .text(row.find('td:nth-child(5) input').val())
-                );
-
-                // Quote Sub Total cell (readonly p tag)
-                var subtotalCell = $('<td></td>').append(
-                    $('<p></p>')
-                        .addClass('quote-subtotal-input')
-                        .text(row.find('td:nth-child(6) input').val())
-                );
-
-                // Append all cells to the row
-                row1.append(costTypeCell, descriptionCell, costCell, quantityCell, techsCell, subtotalCell);
-
-                // Append the row to the table body1
-                $('.proposed-quote-table tbody').append(row1);
-
-            });
-
-            let isMaterialsSelected = false;
-            $('#proposedBreakoutTable select[name$=".CostType"]').each(function () {
-                const costType = $(this).val(); // Get the value of the current dropdown
-                if (costType === "Materials") {
-                    isMaterialsSelected = true;
-                }
-            });
-
-            debugger
-            if (!isMaterialsSelected) {
-                // Clear the content of the modal fields
-                $('#Modal-Time-Unit').text('');
-                $('#Modal-Time-Number').text('');
-                $('#Modal-Time-Option').text('');
-
-                // Hide the modal
-                $('#modalPartsLeadSection').hide();
-            } else {
-                // Set the values based on form inputs
-                $('#Modal-Time-Unit').text($('#Time-Unit').val());
-                $('#Modal-Time-Option').text($('#timeOption').val());
-
-                if ($("#timeOption").val() == "Number") {
-                    $('#time').css('display', 'inline');
-                    $('#modalPartsRange').css('display', 'none');
-
-                    $('#Modal-Time-Number').text($('#Time-Number').val());
-                }
-                else if ($("#timeOption").val() == "Range") {
-                    $('#time').css('display', 'none');
-                    $('#modalPartsRange').css('display', 'inline');
-                    $('#Modal-Time-Range-From').text($('#Time-Range-From').val());
-                    $('#Modal-Time-Range-To').text($('#Time-Range-To').val());
-                }
-                // Show the modal
-                $('#modalPartsLeadSection').show();
-            }
-            $("#confirmationModal").modal("show");
-        }
-
-    });
-
-    function showValidationMsg(ele) {
-        // Check if there's already a validation message; if not, append it
-        if ($(ele).parent().find('span.validation-msg').length === 0) {
-            $(ele).parent().append('<span class="validation-msg" style="color:red">This field is required!</span>');
-        }
-
-        // Add event listener to remove error message when the user starts typing
-        $(ele).on('change input', function () {
-            if ($(this).val() !== '' && $(this).val() !== '--select--') {
-                removeValidationMsg($(this));
-            }
-        });
-    }
-
-    function removeValidationMsg(ele) {
-        // Remove validation message when the field is filled
-        $(ele).parent().find('span.validation-msg').remove();
-    }
-
-    // function validateBreakoutTables() {
-    //     let tableSelector = '#proposedBreakoutTable';
-    //     const isIncurredTableShown = $('#toggleSwitch').attr('aria-checked') === 'true';
-    //     if (isIncurredTableShown) tableSelector += ', #incurredBreakoutTable';
-
-    //     const costTypesWhichRequiredDesc = ['Materials', 'Equipment', 'Fees', 'Miscellaneous', 'Other'];
-    //     let isValid = true;
-
-    //     $(tableSelector).find('tbody tr').each(function () {
-    //         const $thisRow = $(this);
-
-    //         // Validate CostType field
-    //         const costType = $thisRow.find(`[name$='CostType']`);
-    //         if (costType.val() === '--select--' || costType.val() === '') {
-    //             isValid = false;
-    //             showValidationMsg(costType);
-    //         }
-
-    //         // Validate other fields
-    //         $thisRow.find('select, input, textarea').not('[readonly]').each(function () {
-    //             const $this = $(this);
-    //             if ($this.attr('name').includes('.Description')) {
-    //                 if (costTypesWhichRequiredDesc.includes($thisRow.find(`[name$='CostType']`).val())) {
-    //                     isValid = isValid === false ? false : $this.val() !== '';
-    //                     if ($this.val() === '') {
-    //                         showValidationMsg($this);
-    //                     }
-    //                 }
-    //             } else if ($this.attr('name').includes('.Techs')) {
-    //                 if ($thisRow.find(`[name$='CostType']`).val() === 'Labor') {
-    //                     isValid = isValid === false ? false : $this.val() !== '';
-    //                     if ($this.val() === '') {
-    //                         showValidationMsg($this);
-    //                     }
-    //                 }
-    //             } else {
-    //                 isValid = isValid === false ? false : $this.val() !== '';
-    //                 if ($this.val() === '') {
-    //                     showValidationMsg($this);
-    //                 }
-    //             }
-    //         });
-    //     });
-
-    //     var isIncurredCostToggleVal = ($('input[name="IsIncurredCost"]:checked').val().toLowerCase() === 'true');
-    //     if (isIncurredCostToggleVal == true) {
-    //         if ($("#Incurred-Issue-Description").val() == null || $("#Incurred-Issue-Description").val() == '') {
-    //             isValid = false;
-    //             $("#Incurred-Issue-Description-error").text("Description is required.");
-    //         }
-    //         if ($("#Proposed-Issue-Description").val() == null || $("#Proposed-Issue-Description").val() == '') {
-    //             isValid = false;
-    //             $("#Proposed-Issue-Description-error").text("Description is required.");
-    //         }
-    //     } else {
-    //         if ($("#Proposed-Issue-Description").val() == null || $("#Proposed-Issue-Description").val() == '') {
-    //             isValid = false;
-    //             $("#Proposed-Issue-Description-error").text("Description is required.");
-    //         }
-    //     }
-
-    //     return isValid;
-    // }
-    function validateBreakoutTables() {
-        
-
-        let tableSelector = '#proposedBreakoutTable';
-        // Check if any rows are added
-        var table = document.querySelector('#incurredBreakoutTable');
-        var rows = table.getElementsByTagName('tr'); // Get all the rows in the table
-
-        if (rows.length > 0) tableSelector += ', #incurredBreakoutTable';
-
-        const costTypesWhichRequiredDesc = ['Materials', 'Equipment', 'Fees', 'Miscellaneous', 'Other'];
-        let isValid = true;
-
-        $(tableSelector).find('tbody tr').each(function () {
-            const $thisRow = $(this);
-
-            // Validate CostType field
-            const costType = $thisRow.find(`[name$='CostType']`);
-            if (costType.val() === '--select--' || costType.val() === '') {
-                isValid = false;
-                showValidationMsg(costType);
-            }
-
-            // Validate other fields
-            $thisRow.find('select, input, textarea').not('[readonly], :disabled').each(function () {
-                const $this = $(this);
-
-                // Description field validation
-                if ($this.attr('name').includes('.Description')) {
-                    if (costTypesWhichRequiredDesc.includes($thisRow.find(`[name$='CostType']`).val())) {
-                        isValid = isValid && $this.val() !== '';
-                        if ($this.val() === '') {
-                            showValidationMsg($this);
-                        }
-                    }
-                }
-
-                // Techs field validation
-                else if ($this.attr('name').includes('.Techs')) {
-                    if ($thisRow.find(`[name$='CostType']`).val() === 'Labor') {
-                        isValid = isValid && $this.val() !== '';
-                        if ($this.val() === '') {
-                            showValidationMsg($this);
-                        }
-                    }
-                }
-
-                // Other fields validation
-                else {
-                    isValid = isValid && $this.val() !== '';
-                    if ($this.val() === '') {
-                        showValidationMsg($this);
-                    }
-                }
-            });
-        });
-
-        var table = document.querySelector('#incurredBreakoutTable');
-        var rows = table.getElementsByTagName('tr'); // Get all the rows in the table
-        
-        if (rows.length > 1     ) {
-            if ($("#Incurred-Issue-Description").val() === '') {
-                isValid = false;
-                $("#Incurred-Issue-Description-error").text("Description is required.");
-            }
-            if ($("#Proposed-Issue-Description").val() === '') {
-                isValid = false;
-                $("#Proposed-Issue-Description-error").text("Description is required.");
-            }
-        } else {
-            if ($("#Proposed-Issue-Description").val() === '') {
-                isValid = false;
-                $("#Proposed-Issue-Description-error").text("Description is required.");
-               
-            }
-        }
-
-        const serviceDateInput = document.getElementById('service-date');
-        const errorMessage = document.getElementById('service-date-error');
-
-        if (!serviceDateInput.value) {
-            isValid = false;
-            errorMessage.textContent = 'Service date is required.';
-        } 
-
-        return isValid;
-    }
-
-    function validateServiceProposal() {
-        var isvalidateServiceProposal = true;
-        // if ($("#message").val() == '' || $("#message").val() == null) {
-        //     $("#message-error").text("Message is required");
-        //     isvalidateServiceProposal = false;
-        // }
-
-        // if ($("#disclaimer").val() == '' || $("#disclaimer").val() == null) {
-        //     $("#disclaimer-error").text("Disclaimer is required");
-        //     isvalidateServiceProposal = false;
-        // }
-
-        // if ($("#description-of-services").val() == '' || $("#description-of-services").val() == null) {
-        //     $("#description-of-services-error").text("Description of Services is required.");
-        //     isvalidateServiceProposal = false;
-        // }
-
-        return isvalidateServiceProposal;
-    }
-
-    function validateSMGFacilitiesProposalForm() {
-        let isValidSMGFacilitiesProposalForm = true;
-
-        let SMGVendorPOVal = $("#smg-vendor-po").val();
-        let SMGClientVal = $("#smg-client").val();
-        let LocationVal = $("#location").val();
-        let VendorVal = $("#vendor").val();
-        let EmailVal = $("#email").val();
-        let StoreNumberVal = $("#store-number").val();
-        let ServiceRepNameVal = $("#service-rep-name").val();
-        debugger
-        if (SMGVendorPOVal != null && SMGVendorPOVal != '') {
-            const regex = /^\d{6}$|^\d{6}-\d{2}$/;
-            if (regex.test(SMGVendorPOVal) == false) {
-                isValidSMGFacilitiesProposalForm = false;
-                $("#smg-vendor-po-error").text("SMG Vendor PO must be in this digit format ###### or ######-##.");
-            }
-
-        } else {
-            isValidSMGFacilitiesProposalForm = false;
-            $("#smg-vendor-po-error").text("Vendor PO is required. ")
-        }
-
-        if (SMGClientVal != null && SMGClientVal != '') {
-            const regex = /^[a-zA-Z\s]+$/;
-            if (regex.test(SMGClientVal) == false) {
-                isValidSMGFacilitiesProposalForm = false;
-                $("#smg-client-error").text("Store Name can only contain alphabetic characters and spaces.");
-            }
-        } else {
-            isValidSMGFacilitiesProposalForm = false;
-            $("#smg-client-error").text("Store Name is required.");
-        }
-
-        if (LocationVal == null || LocationVal.trim() === '') {
-            $("#location-error").text(''); // Clear error as it is optional
-        }
-
-        if (VendorVal == null || VendorVal == '') {
-            isValidSMGFacilitiesProposalForm = false;
-            $("#vendor-error").text("Vendor is required..");
-        }
-
-        if (EmailVal != null && EmailVal != '') {
-            if (emailRegex.test(EmailVal) == false) {
-                isValidSMGFacilitiesProposalForm = false;
-                $("#email-error").text("Invalid Email format.");
-            }
-        } else {
-            isValidSMGFacilitiesProposalForm = false;
-            $("#email-error").text("Email is required");
-        }
-
-        const serviceRepNamePattern = /^[a-zA-Z\s]+$/;
-        if (ServiceRepNameVal == null || ServiceRepNameVal.trim() == '') {
-            isValidSMGFacilitiesProposalForm = false;
-            $("#service-rep-name-error").text("Service Representative Name is required.");
-        }
-        else if (!serviceRepNamePattern.test(ServiceRepNameVal)) {
-            isValidSMGFacilitiesProposalForm = false;
-            $("#service-rep-name-error").text("Service Representative Name can only contain letters and spaces.");
-        }
-        else {
-            $("#service-rep-name-error").text('');
-        }
-
-        if (StoreNumberVal == null || StoreNumberVal.trim() === '') {
-            $("#store-number-error").text(''); // Clear error as it is optional
-        } else {
-            const digitOnlyPattern = /^\d+$/;
-            if (!digitOnlyPattern.test(StoreNumberVal)) {
-                isValidSMGFacilitiesProposalForm = false;
-                $("#store-number-error").text("Store number must be numeric.");
-            } else {
-                $("#store-number-error").text(''); // Clear error if validation passes
-            }
-        }
-
-        debugger
-
-        return isValidSMGFacilitiesProposalForm;
-    }
-
-    function validatePartsLeadTime() {
-        let isPartsLeadTime = true;
-        let isPartsLeadSelected = false;
-
-        $('#proposedBreakoutTable select[name$=".CostType"]').each(function () {
-            const costType = $(this).val(); // Get the value of the current dropdown
-            if (costType === "Materials") {
-                isPartsLeadSelected = true;
-            }
-        });
-
-        if (isPartsLeadSelected) {
-            if ($("#timeOption").val() == '' || $("#timeOption").val() == null) {
-                isPartsLeadTime = false;
-                $('#timeOption-error').text('Please select time option.');
-            }
-            else {
-                if ($("#timeOption").val() == "Number") {
-                    if ($("#Time-Number").val() == '' || $("#Time-Number").val() == null) {
-                        isPartsLeadTime = false;
-                        $("#Time-Number-error").text("Please select Time Number");
-                    }
-                }
-                else if ($("#timeOption").val() == "Range") {
-                    if ($("#Time-Range-From").val() == '' || $("#Time-Range-From").val() == null) {
-                        isPartsLeadTime = false;
-                        $("#Time-Range-From-error").text("Please select Time Range From");
-                    }
-                    if ($("#Time-Range-To").val() == '' || $("#Time-Range-To").val() == null) {
-                        isPartsLeadTime = false;
-                        $("#Time-Range-To-error").text("Please select Time Number");
-                    }
-                }
-            }
-
-            if ($("#Time-Unit").val() == '' || $("#Time-Unit").val() == null) {
-                isPartsLeadTime = false;
-                $("#Time-Unit-error").text("Please select Time Unit");
-            }
-
-        }
-
-
-        return isPartsLeadTime;
-    }
-
-    var myModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+	$(document).ready(function () {
+		let isMaterialsSelected = false;
+
+		$('#timeOption').on('change', function () {
+			const selectedOption = $(this).val();
+			debugger
+
+			if (selectedOption === 'Number') {
+				$('#numberOptionFields').show();
+				$('#Time-Range-From').val('');
+				$('#Time-Range-To').val('');
+				$('#rangeOptionFields').hide();
+			} else if (selectedOption === 'Range') {
+				$('#Time-Number').val('');
+				$('#numberOptionFields').hide();
+				$('#rangeOptionFields').show();
+			} else {
+				$('#Time-Range-From').val('');
+				$('#Time-Range-To').val('');
+				$('#Time-Number').val('');
+				$('#numberOptionFields').hide();
+				$('#rangeOptionFields').hide();
+
+			}
+		});
+
+		$('#confirmSubmitBtn').on('click', function () {
+			let isValid = true;
+
+			// Show loader before validation
+			$('#loader').show();
+
+			// Validate Signature Name field
+			const signatureName = $('#signatureNameInput').val().trim();
+			if (!signatureName) {
+				isValid = false;
+				$('#signatureNameError').text('Signature Name is required.');
+			} else {
+				$('#signatureNameError').text('');
+			}
+
+			// Validate Checkbox
+			if (!$('#confirmationCheckbox').is(':checked')) {
+				isValid = false;
+				$('#checkboxError').text('You must confirm before submitting.');
+			} else {
+				$('#checkboxError').text('');
+			}
+
+			if ($("#Time-Unit").val() == '' || $("#Time-Unit").val() == null) {
+				$("#Time-Unit").val('0')
+			}
+
+			// If valid, submit the form
+			if (isValid) {
+				// Hide the modal
+				// $('#confirmationModal').modal('hide');
+
+				// Optionally append data to a hidden field before submitting
+				$('form').append(`<input type="hidden" name="SignatureName" value="${signatureName}" />`);
+				$('form').append(`<input type="hidden" name="IsChecked" value="true" />`);
+
+				// Submit the form
+				$('#modalSubmit').click();
+			} else {
+				// Hide loader if validation fails
+				$('#loader').hide();
+			}
+		});
+
+		// Add this to handle form submission completion
+		$('#submit-quoteform').on('submit', function() {
+			// Show loader when form starts submitting
+			$('#loader').show();
+		});
+
+		// Close Modal
+		$("#confirmationModal").on("hidden.bs.modal", function () {
+			$('.initial-call-table tbody tr').remove();
+			$('.proposed-quote-table tbody tr').remove();
+		});
+
+
+
+		// Clear all data in the incurred breakout table
+		function clearIncurredBreakoutTableData() {
+			// Find all inputs and selects in the Incurred Breakout Table and clear values
+			$('#incurredBreakoutTable').find('input, select').val('');
+			$('#incurredBreakoutTableTotal').find('input').val('');
+
+			// Recalculate grand total to exclude incurred table data
+			calculateTotal('#proposedBreakoutTable',
+				'input[name="ProposedTotals.ProposedSubTotal"]',
+				'input[name="ProposedTotals.ProposedTax"]',
+				'input[name="ProposedTotals.ProposedInitialCallTotal"]');
+			calculateGrandTotal();
+		}
+
+		function toggleTechsField(tableSelector) {
+			// Delegate the change event to the table level
+			$(tableSelector).on('change', 'select[name*="CostType"]', function () {
+				const $thisRow = $(this).closest('tr'); // Get the current row
+				const techsField = $thisRow.find('input[name*="Techs"]'); // Target the corresponding Techs field
+				const isLabor = $(this).val() === 'Labor';
+
+				if (isLabor) {
+					techsField.prop('readonly', false).css('visibility', 'visible'); // Make editable and visible
+				} else {
+					techsField.prop('readonly', true).val('').css('visibility', 'hidden'); // Clear value and make invisible
+					$thisRow.find('span.validation-msg').remove(); // Remove any validation messages for Techs
+				}
+			});
+		}
+
+
+
+		// Call the function initially for the table
+		toggleTechsField('#incurredBreakoutTable');
+		toggleTechsField('#proposedBreakoutTable');
+
+		function addNewRow(tableSelector, type) {
+			const tableBody = $(tableSelector + ' tbody');
+			const lastIndex = tableBody.find('tr').length;
+
+			// Check if the table has no rows
+			if (lastIndex === 0) {
+				// Create a new row from the provided HTML structure if no rows exist
+				const newRowHtml = `
+				<tr>
+					<td>
+						<div>
+							<div>
+								<div class="form-table-label">
+									<label>Cost Type</label>
+								</div>
+							</div>
+							<div>
+								<select class="form-control" name="${type}[0].CostType">
+									<option selected>--select--</option>
+									<option value="Labor">Labor</option>
+									<option value="Materials">Materials</option>
+									<option value="Travel">Travel</option>
+									<option value="Equipment">Equipment</option>
+									<option value="Disposal">Disposal</option>
+									<option value="Fees">Fees</option>
+									<option value="Permitting">Permitting</option>
+									<option value="Miscellaneous">Miscellaneous</option>
+									<option value="Other">Other</option>
+								</select>
+							</div>
+						</div>
+					</td>
+					<td>
+						<div>
+							<div class="form-table-label"><label>Description</label></div>
+							<div>
+								<textarea class="form-control" maxlength="240" name="${type}[0].Description" placeholder="Description"></textarea>
+							</div>
+						</div>
+					</td>
+					<td>
+						<div>
+							<div class="form-table-label"><label>#Techs</label></div>
+						</div>
+						<div>
+							<input type="number" class="form-control" name="${type}[0].Techs" placeholder="Techs" readonly />
+						</div>
+					</td>
+					<td>
+						<div>
+							<div class="form-table-label"><label>Quantity</label></div>
+							<div>
+								<input type="number" class="form-control" name="${type}[0].Quantity" placeholder="Quantity" min="0">
+							</div>
+						</div>
+					</td>
+					<td>
+						<div>
+							<div class="form-table-label"><label>Rate</label></div>
+							<div>
+								<input type="number" class="form-control" name="${type}[0].Rate" placeholder="Rate" min="0">
+							</div>
+						</div>
+					</td>
+					<td>
+						<div>
+							<div class="form-table-label"><label>Initial Call Sub Total</label></div>
+							<div>
+								<input type="text" class="form-control" name="${type}[0].InitialCallSubTotal" readonly />
+							</div>
+						</div>
+					</td>
+					<td>
+						<button type="button" class="btn btn-danger remove-btn">X</button>
+					</td>
+				</tr>
+			`;
+
+				// Append the new row to the table body
+				tableBody.append(newRowHtml);
+
+				// Trigger change for the select dropdown
+				tableBody.find('select[name*="CostType"]').trigger('change');
+
+				return; // Exit since the row has been added
+			}
+
+			// If rows exist, clone the first row as usual
+			const newRow = tableBody.find('tr:first').clone(true);
+
+			// Clear values and change add button to remove
+			newRow.find('input, textarea').val('');
+			newRow.find('select').prop('selectedIndex', 0);
+			newRow.find('.remove-btn').removeClass('btn-success add-btn').addClass('btn-danger remove-btn').text('X');
+
+			// Update names with new index
+			newRow.find('select').attr('name', `${type}[${lastIndex}].CostType`);
+			newRow.find('textarea[name$=".Description"]').attr('name', `${type}[${lastIndex}].Description`);
+			newRow.find('input[name$=".Rate"]').attr('name', `${type}[${lastIndex}].Rate`);
+			newRow.find('input[name$=".Quantity"]').attr('name', `${type}[${lastIndex}].Quantity`);
+			newRow.find('input[name$=".Techs"]').attr('name', `${type}[${lastIndex}].Techs`);
+			newRow.find('input[name$=".InitialCallSubTotal"]').attr('name', `${type}[${lastIndex}].InitialCallSubTotal`);
+
+			// Append the new row to the table
+			tableBody.append(newRow);
+
+			// Trigger change for the select dropdown
+			newRow.find('select[name*="CostType"]').trigger('change');
+		}
+
+
+		// Event listener for adding a new row
+		$('#addRowButton').on('click', function () {
+			addNewRow('#incurredBreakoutTable', 'IncurredBreakouts');
+		});
+		$('#addRowButton2').on('click', function () {
+			addNewRow('#proposedBreakoutTable', 'ProposedBreakouts');
+		});
+
+		// Remove row and recalculate totals
+		$('#incurredBreakoutTable').on('click', '.remove-btn', function () {
+			$(this).closest('tr').remove(); // Remove the row
+
+			var table = document.querySelector('#incurredBreakoutTable');
+			var tbody = table.querySelector('tbody');
+			var rows = tbody.getElementsByTagName('tr'); // Get all rows in tbody specifically
+
+			console.log("Row count before removal:", rows.length);
+
+			if (rows.length < 1) {
+				$("#Incurred-Issue-Description-error").text('');
+				$("#Incurred-Issue-Description").val('');
+				$('#Incurred-Sub-Total').val('');
+				$('#Incurred-Tax').val('');
+				$('#Incurred-Initial-Call-Total ').val('');
+			}else{
+				calculateTotal('#proposedBreakoutTable',
+					'input[name="ProposedTotals.ProposedSubTotal"]',
+					'input[name="ProposedTotals.ProposedTax"]',
+					'input[name="ProposedTotals.ProposedInitialCallTotal"]');
+				calculateTotal('#incurredBreakoutTable',
+					'input[name="IncurredTotals.IncurredSubTotal"]',
+					'input[name="IncurredTotals.IncurredTax"]',
+					'input[name="IncurredTotals.IncurredInitialCallTotal"]');
+				calculateGrandTotal();
+			}
+
+
+
+		});
+		$('#proposedBreakoutTable').on('click', '.remove-btn', function () {
+			const tableId = $(this).closest('table').attr('id');
+			const tbody = $(this).closest('tbody');
+			const rowCount = tbody.find('tr').length;
+
+			console.log("Row count before removal:", rowCount);
+
+			if (rowCount > 1) {
+				const currentRow = $(this).closest('tr');
+				currentRow.remove(); // Remove the row
+
+				// Check if any row still has Cost Type = "Materials"
+				let isMaterialsSelected = false;
+				$('#proposedBreakoutTable select[name$=".CostType"]').each(function () {
+					const costType = $(this).val();
+					if (costType === "Materials") {
+						isMaterialsSelected = true;
+					}
+				});
+
+				// Show or hide the Parts Lead Time component based on remaining rows
+				if (isMaterialsSelected) {
+					console.log("Keeping PartsLeadTimeCoponent visible");
+					$('#PartsLeadTimeCoponentDesc').show();
+				} else {
+					console.log("Hiding PartsLeadTimeCoponent and clearing data");
+
+					// Hide the Parts Lead Time component
+					$('#PartsLeadTimeCoponentDesc').hide();
+
+					// Clear the data in the Parts Lead Time fields
+					$('#timeOption').val(''); // Reset Time Option
+					$('#Time-Number').val(''); // Clear Time Number
+					$('#Time-Range-From').val(''); // Clear Time Range From
+					$('#Time-Range-To').val(''); // Clear Time Range To
+					$('#Time-Unit').val(''); // Clear Time Unit
+
+					// Hide both Number and Range option fields
+					$('#numberOptionFields').hide();
+					$('#rangeOptionFields').hide();
+				}
+			} else {
+				toastr.error("At least one row must remain in the table.");
+			}
+
+			// Recalculate totals after removal
+			calculateTotal('#proposedBreakoutTable',
+				'input[name="ProposedTotals.ProposedSubTotal"]',
+				'input[name="ProposedTotals.ProposedTax"]',
+				'input[name="ProposedTotals.ProposedInitialCallTotal"]');
+			calculateTotal('#incurredBreakoutTable',
+				'input[name="IncurredTotals.IncurredSubTotal"]',
+				'input[name="IncurredTotals.IncurredTax"]',
+				'input[name="IncurredTotals.IncurredInitialCallTotal"]');
+			calculateGrandTotal();
+		});
+
+		function calculateSubTotal(row) {
+
+			const costType = row.find('select[name$=".CostType"]').val() || "";
+			const rate = parseFloat(row.find('input[name$=".Rate"]').val()) || 0;
+			const quantity = parseFloat(row.find('input[name$=".Quantity"]').val()) || 0;
+			const techs = parseFloat(row.find('input[name$=".Techs"]').val()) || 1;
+			let subtotal;
+
+			if (costType == "Labor") { // Use strict equality
+				subtotal = rate * quantity * techs;
+			} else {
+				subtotal = rate * quantity;
+			}
+
+			row.find('input[name$=".InitialCallSubTotal"]').val(subtotal.toFixed(2));
+		}
+
+		$('#incurredBreakoutTable, #proposedBreakoutTable').on('input', 'input[name$=".Rate"], input[name$=".Quantity"], input[name$=".Techs"], select[name$=".CostType"]', function () {
+			const row = $(this).closest('tr');
+			calculateSubTotal(row);
+		});
+
+		// Event for Hide/Show Parts Lead Time display
+		$('#proposedBreakoutTable').on('change', 'select[name$=".CostType"]', function () {
+			let isMaterialsSelected = false;
+
+			// Iterate through each dropdown
+			$('#proposedBreakoutTable select[name$=".CostType"]').each(function () {
+				const costType = $(this).val(); // Get the value of the current dropdown
+				if (costType === "Materials") {
+					isMaterialsSelected = true;
+				}
+			});
+
+			// Show or hide the Parts Lead Time component
+			if (isMaterialsSelected) {
+				console.log("Showing PartsLeadTimeCoponent");
+				$('#PartsLeadTimeCoponentDesc').show();
+
+				// Change the content of the h3 element
+				isMaterialsSelected = true;
+			} else {
+				console.log("Hiding PartsLeadTimeCoponent");
+				$('#PartsLeadTimeCoponentDesc').hide();
+
+				isMaterialsSelected = false;
+			}
+				debugger
+
+			// Update placeholder for input[name$=".Description"]
+			$('#proposedBreakoutTable textarea[name$=".Description"]').each(function () {
+				const costType = $(this).closest('tr').find('select[name$=".CostType"]').val(); // Get the CostType for the current row
+				if (["Materials", "Equipment", "Fees", "Miscellaneous", "Other"].includes(costType)) {
+					$(this).attr('placeholder', 'Description is required');
+				} else {
+					$(this).attr('placeholder', 'Description'); // Clear placeholder for other CostType values
+				}
+			});
+		});
+
+		$('#incurredBreakoutTable').on('change', 'select[name$=".CostType"]', function () {
+			$('#incurredBreakoutTable textarea[name$=".Description"]').each(function () {
+				const costType = $(this).closest('tr').find('select[name$=".CostType"]').val(); // Get the CostType for the current row
+				if (["Materials", "Equipment", "Fees", "Miscellaneous", "Other"].includes(costType)) {
+					$(this).attr('placeholder', 'Description is required');
+				} else {
+					$(this).attr('placeholder', 'Description'); // Clear placeholder for other CostType values
+				}
+			});
+		});
+
+
+		// Event "Initial Call Total" Calculation on tax input
+		$('input[name="ProposedTotals.ProposedTax"], input[name="IncurredTotals.IncurredTax"]').on('input', function () {
+			console.log('Input event triggered'); // Check if the event is being triggered
+
+			// Calculate totals for both proposed and incurred tables
+			calculateTotal('#proposedBreakoutTable',
+				'input[name="ProposedTotals.ProposedSubTotal"]',
+				'input[name="ProposedTotals.ProposedTax"]',
+				'input[name="ProposedTotals.ProposedInitialCallTotal"]');
+
+			calculateTotal('#incurredBreakoutTable',
+				'input[name="IncurredTotals.IncurredSubTotal"]',
+				'input[name="IncurredTotals.IncurredTax"]',
+				'input[name="IncurredTotals.IncurredInitialCallTotal"]');
+
+			// Update the grand total calculation
+			calculateGrandTotal();
+		});
+
+		function calculateTotal(tableSelector, subtotalSelector, taxSelector, initialCallTotalSelector) {
+			let total = 0;
+
+			// Loop through each row in the table to calculate total and tax
+			$(tableSelector + ' tbody tr').each(function () {
+				// Calculate subtotal for the current row
+				const subTotal = parseFloat($(this).find('input[name$=".InitialCallSubTotal"]').val()) || 0;
+				total += subTotal;
+			});
+
+			// Update subtotal field
+			const subtotalValue = total.toFixed(2);
+			$(subtotalSelector).val(subtotalValue);
+
+			// Get the manually inputted tax value
+			const taxTotal = parseFloat($(taxSelector).val()) || 0;
+
+			// Calculate initial call total (Subtotal + Tax)
+			const initialCallTotal = (total + taxTotal).toFixed(2);
+			$(initialCallTotalSelector).val(initialCallTotal);
+
+			// Update grand total whenever calculateTotal is called
+			calculateGrandTotal();
+		}
+
+
+		function calculateGrandTotal() {
+			const proposedTotal = parseFloat($('input[name="ProposedTotals.ProposedInitialCallTotal"]').val()) || 0;
+			const incurredTotal = parseFloat($('input[name="IncurredTotals.IncurredInitialCallTotal"]').val()) || 0;
+			const grandTotal = (proposedTotal + incurredTotal).toFixed(2);
+			$('input[name="QuoteGrandTotal"]').val(grandTotal);
+		}
+
+		$('#incurredBreakoutTable, #proposedBreakoutTable').on('input', 'input[name$=".Rate"], input[name$=".Quantity"], input[name$=".Techs"], select[name$=".CostType"]', function () {
+			calculateTotal('#proposedBreakoutTable',
+				'input[name="ProposedTotals.ProposedSubTotal"]',
+				'input[name="ProposedTotals.ProposedTax"]',
+				'input[name="ProposedTotals.ProposedInitialCallTotal"]');
+			calculateTotal('#incurredBreakoutTable',
+				'input[name="IncurredTotals.IncurredSubTotal"]',
+				'input[name="IncurredTotals.IncurredTax"]',
+				'input[name="IncurredTotals.IncurredInitialCallTotal"]');
+		});
+
+		let shouldSubmit = false;
+
+		$('#submit-quoteform').on('submit', function (e) {
+			if (!shouldSubmit) {
+				e.preventDefault();
+				e.stopPropagation();
+				if (validateBreakoutTables()) {
+					shouldSubmit = true;
+					$(this).submit();
+				}
+			}
+		});
+
+		 const fileDropArea = $('#fileDropArea');
+		const fileInput = $('#fileInput');
+
+		// Trigger file input click on button click
+		$('#uploadButton').on('click', function () {
+			fileInput.click();
+		});
+
+		// File selected via input
+		fileInput.on('change', function () {
+			handleFiles(this.files);
+		});
+
+		// Drag-and-drop events
+		fileDropArea.on('dragover', function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+			fileDropArea.addClass('drag-over'); // Add styling for visual feedback
+		});
+
+		fileDropArea.on('dragleave', function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+			fileDropArea.removeClass('drag-over'); // Remove styling
+		});
+
+		// Modify your existing drop event handler
+		fileDropArea.on('drop', function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+			fileDropArea.removeClass('drag-over');
+
+			const droppedFiles = e.originalEvent.dataTransfer.files;
+
+			// Create DataTransfer and assign the dropped file to input
+			const dataTransfer = new DataTransfer();
+			dataTransfer.items.add(droppedFiles[0]);
+			fileInput[0].files = dataTransfer.files;
+
+			handleFiles(droppedFiles); // Your existing handle files function
+		});
+
+		// Handle file selection
+		function handleFiles(files) {
+			const file = files[0];
+			if (file) {
+				const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv'];
+				const fileExtension = file.name.split('.').pop().toLowerCase();
+
+				// Validate file type and size
+				if (!allowedExtensions.includes(fileExtension)) {
+					$("#fileInput-error").text(`Allowed file types are: ${allowedExtensions.join(', ')}.`);
+					return;
+				}
+				if (file.size > 10 * 1024 * 1024)
+				{ // 10MB limit
+					$("#fileInput-error").text('File size exceeds 10MB. Please upload a smaller file.');
+					return;
+				}
+
+				$("#fileInput-error").text('');
+				$('#fileName').text(file.name);
+				$('#fileDisplay').show();
+				$('#uploadButton').hide();
+			}
+		}
+
+		// Remove file on button click
+		$('#removeFileButton').on('click', function () {
+			fileInput.val(''); // Clear the input
+			$('#fileDisplay').hide(); // Hide the file display area
+			$('#uploadButton').show(); // Show the upload button again
+		});
+	});
+
+
+	$("#submitBtnId").click(function () {
+
+		let isSubmited = true;
+
+		let checkBreakoutTableAndIncurredTable = validateBreakoutTables();
+		let isvalidateServiceProposal = validateServiceProposal();
+		let isvalidateSMGFacilitiesProposalForm = validateSMGFacilitiesProposalForm();
+		let isValidPartsLead = validatePartsLeadTime();
+
+		// Get current date and time
+		var now = new Date();
+
+		// Format as 'YYYY-MM-DD HH:mm:ss'
+		var year = now.getFullYear();
+		var month = String(now.getMonth() + 1).padStart(2, '0'); // Add leading zero
+		var day = String(now.getDate()).padStart(2, '0');
+		var hours = String(now.getHours()).padStart(2, '0');
+		var minutes = String(now.getMinutes()).padStart(2, '0');
+		var seconds = String(now.getSeconds()).padStart(2, '0');
+
+		// Combine into desired format
+		var currentDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+
+		// Format the date and time as 'YYYY-MM-DDTHH:mm' for compatibility with HTML datetime-local input
+		$('#createdDate').val(currentDateTime);
+
+		debugger
+		if (isvalidateSMGFacilitiesProposalForm == false) {
+			isSubmited = false;
+			toastr.error("There is an error in the SMG Facilities Proposal form.");
+		} else if (checkBreakoutTableAndIncurredTable == false) {
+			isSubmited = false;
+			toastr.error("An issue was detected in the table validation. Please check the Breakout and Incurred tables.");
+		} else if (isvalidateServiceProposal == false) {
+			isSubmited = false;
+			toastr.error("There is an error in the Service Proposal. Please correct it before submitting.");
+		} else if (isValidPartsLead == false) {
+			isSubmited = false;
+			toastr.error("Document Attachment Or Parts Lead Time  contains errors. Please fix the issue to proceed.");
+		}
+
+		if (isSubmited == true) {
+			toastr.success("The form is valid and ready for submission.");
+		}
+
+		debugger
+		if (isSubmited == true) {
+			$('#modal-SMGVendorPO').text($("#smg-vendor-po").val());
+			//$('#modal-Date').text($("#date-quote-form").val());
+			//$('#modal-Date').text(formattedDateQuoteForm);
+			$('#modal-SMGClient').text($("#smg-client").val());
+			$('#modal-StoreNumber').text($("#store-number").val());
+			$('#modal-Email').text($("#email").val());
+			$('#modal-Vendor').text($("#vendor").val());
+			$('#modal-Location').text($("#location").val());
+			$('#modal-ServiceRepName').text($("#service-rep-name").val());
+			let dateQuoteFormValue = $("#date-quote-form").val();
+			let serviceDateValue = $("#service-date").val();
+
+			if (!dateQuoteFormValue || !serviceDateValue) {
+				console.error("Date fields are empty or invalid.");
+				return; // Exit if dates are not valid
+			}
+
+			let dateQuoteFormObject = new Date(dateQuoteFormValue);
+			let serviceDateObject = new Date(serviceDateValue);
+
+			let formattedDateQuoteForm = (dateQuoteFormObject.getMonth() + 1).toString().padStart(2, '0') + '/' +
+				dateQuoteFormObject.getDate().toString().padStart(2, '0') + '/' +
+				dateQuoteFormObject.getFullYear();
+
+			let formattedServiceDate = (serviceDateObject.getMonth() + 1).toString().padStart(2, '0') + '/' +
+				serviceDateObject.getDate().toString().padStart(2, '0') + '/' +
+				serviceDateObject.getFullYear();
+
+			// Set formatted values to modal
+			$('#modal-Date').text(formattedDateQuoteForm);
+			$('#modal-service-Date').text(formattedServiceDate);
+
+			// Set the formatted date to the element
+			//$('#modal-service-Date').text(formattedServiceDate);
+			//$('#modal-service-Date').text($("#service-date").val());
+			$('#initial-subtotal').text($("#Incurred-Sub-Total").val());
+			$('#initial-tax').text($("#Incurred-Tax").val());
+			$('#initial-total').text($("#Incurred-Initial-Call-Total").val());
+			$('#quote-subtotal').text($("#Proposed-Sub-Total").val());
+			$('#quote-tax').text($("#Proposed-Tax").val());
+			$('#quote-total').text($("#Proposed-Initial-Call-Total").val());
+			$('#message-modal').text($("#message").val());
+			$('#disclaimer-modal').text($("#disclaimer").val());
+			$('#services-modal').text($("#description-of-services").val());
+			$('#incurredIssueDescription').text($("#Incurred-Issue-Description").val());
+			$('#proposedIssueDescription').text($("#Proposed-Issue-Description").val());
+
+			$('#Modal-Time-Option').text($("#timeOption").val());
+			if ($("#timeOptionn").val() == "Number") {
+				$('#Modal-Time-Number').text($("#numberOptionFields").val());
+			}
+			if ($("#timeOptionn").val() == "Range") {
+				$('#Modal-Time-Range-From').text($("#TimeRangeFrom").val());
+				$('#Modal-Time-Range-To').text($("#TimeRangeTo").val());
+			}
+			$('#Modal-Time-Unit').text($("#TimeUnit").val());
+
+			var table = document.querySelector('#incurredBreakoutTable');
+			var tbody = table.querySelector('tbody');
+			var rows = tbody.getElementsByTagName('tr'); // Get all rows in tbody specifically
+
+			if (rows.length <= 0) {
+				$(".initial-call-breakout").hide();
+			} else {
+				$(".initial-call-breakout").show();
+				$('.incurredBreakoutTableClass tbody tr').each(function () {
+					const row = $(this);
+					var row1 = $('<tr></tr>');
+
+					// Create cells with values
+					var costTypeCell = $('<td></td>').append(
+						$('<p></p>').addClass('quote-cost-type').text(row.find('td:nth-child(1) select').val())
+					);
+
+					var descriptionCell = $('<td></td>').append(
+						$('<p></p>')
+							.addClass('quote-description')
+							.text(row.find('td:nth-child(2) textarea').val())
+					);
+
+					var costCell = $('<td></td>').append(
+						$('<p></p>')
+							.addClass('quote-cost')
+							.text(row.find('td:nth-child(3) input').val())
+					);
+
+					var quantityCell = $('<td></td>').append(
+						$('<p></p>')
+							.addClass('quote-quantity')
+							.text(row.find('td:nth-child(4) input').val())
+					);
+
+					var techsCell = $('<td></td>').append(
+						$('<p></p>')
+							.addClass('quote-techs')
+							.text(row.find('td:nth-child(5) input').val())
+					);
+
+					var subtotalCell = $('<td></td>').append(
+						$('<p></p>')
+							.addClass('quote-subtotal')
+							.text(row.find('td:nth-child(6) input').val())
+					);
+
+					// Append all cells to the row
+					row1.append(costTypeCell, descriptionCell, costCell, quantityCell, techsCell, subtotalCell);
+
+					// Append the row to the table body1
+					$('.initial-call-table tbody').append(row1);
+
+				});
+			}
+
+			debugger
+			const data = [];
+			$('.proposedBreakoutTableClass tbody tr').each(function () {
+				const row = $(this);
+
+				var row1 = $('<tr></tr>');
+
+				// Cost Type cell (select dropdown with selected value)
+				var costTypeCell = $('<td></td>').append(
+					$('<p></p>').addClass('quote-cost-type-select').text(row.find('td:nth-child(1) select').val())
+				);
+
+				// Description cell (readonly input)
+				var descriptionCell = $('<td></td>').append(
+					$('<p></p>')
+						.addClass('quote-description-input')
+						.text(row.find('td:nth-child(2) textarea').val())
+				);
+
+				// Cost cell (readonly p tag)
+				var costCell = $('<td></td>').append(
+					$('<p></p>')
+						.addClass('quote-cost-input')
+						.text(row.find('td:nth-child(3) input').val())
+				);
+
+				// Quantity cell (readonly p tag)
+				var quantityCell = $('<td></td>').append(
+					$('<p></p>')
+						.addClass('quote-quantity-input')
+						.text(row.find('td:nth-child(4) input').val())
+				);
+
+				// Techs cell (readonly p tag)
+				var techsCell = $('<td></td>').append(
+					$('<p></p>')
+						.addClass('quote-techs-input')
+						.text(row.find('td:nth-child(5) input').val())
+				);
+
+				// Quote Sub Total cell (readonly p tag)
+				var subtotalCell = $('<td></td>').append(
+					$('<p></p>')
+						.addClass('quote-subtotal-input')
+						.text(row.find('td:nth-child(6) input').val())
+				);
+
+				// Append all cells to the row
+				row1.append(costTypeCell, descriptionCell, costCell, quantityCell, techsCell, subtotalCell);
+
+				// Append the row to the table body1
+				$('.proposed-quote-table tbody').append(row1);
+
+			});
+
+			let isMaterialsSelected = false;
+			$('#proposedBreakoutTable select[name$=".CostType"]').each(function () {
+				const costType = $(this).val(); // Get the value of the current dropdown
+				if (costType === "Materials") {
+					isMaterialsSelected = true;
+				}
+			});
+
+			debugger
+			if (!isMaterialsSelected) {
+				// Clear the content of the modal fields
+				$('#Modal-Time-Unit').text('');
+				$('#Modal-Time-Number').text('');
+				$('#Modal-Time-Option').text('');
+
+				// Hide the modal
+				$('#modalPartsLeadSection').hide();
+			} else {
+				// Set the values based on form inputs
+				$('#Modal-Time-Unit').text($('#Time-Unit').val());
+				$('#Modal-Time-Option').text($('#timeOption').val());
+
+				if ($("#timeOption").val() == "Number") {
+					$('#time').css('display', 'inline');
+					$('#modalPartsRange').css('display', 'none');
+
+					$('#Modal-Time-Number').text($('#Time-Number').val());
+				}
+				else if ($("#timeOption").val() == "Range") {
+					$('#time').css('display', 'none');
+					$('#modalPartsRange').css('display', 'inline');
+					$('#Modal-Time-Range-From').text($('#Time-Range-From').val());
+					$('#Modal-Time-Range-To').text($('#Time-Range-To').val());
+				}
+				// Show the modal
+				$('#modalPartsLeadSection').show();
+			}
+			$("#confirmationModal").modal("show");
+		}
+
+	});
+
+	function showValidationMsg(ele) {
+		// Check if there's already a validation message; if not, append it
+		if ($(ele).parent().find('span.validation-msg').length === 0) {
+			$(ele).parent().append('<span class="validation-msg" style="color:red">This field is required!</span>');
+		}
+
+		// Add event listener to remove error message when the user starts typing
+		$(ele).on('change input', function () {
+			if ($(this).val() !== '' && $(this).val() !== '--select--') {
+				removeValidationMsg($(this));
+			}
+		});
+	}
+
+	function removeValidationMsg(ele) {
+		// Remove validation message when the field is filled
+		$(ele).parent().find('span.validation-msg').remove();
+	}
+
+	// function validateBreakoutTables() {
+	//     let tableSelector = '#proposedBreakoutTable';
+	//     const isIncurredTableShown = $('#toggleSwitch').attr('aria-checked') === 'true';
+	//     if (isIncurredTableShown) tableSelector += ', #incurredBreakoutTable';
+
+	//     const costTypesWhichRequiredDesc = ['Materials', 'Equipment', 'Fees', 'Miscellaneous', 'Other'];
+	//     let isValid = true;
+
+	//     $(tableSelector).find('tbody tr').each(function () {
+	//         const $thisRow = $(this);
+
+	//         // Validate CostType field
+	//         const costType = $thisRow.find(`[name$='CostType']`);
+	//         if (costType.val() === '--select--' || costType.val() === '') {
+	//             isValid = false;
+	//             showValidationMsg(costType);
+	//         }
+
+	//         // Validate other fields
+	//         $thisRow.find('select, input, textarea').not('[readonly]').each(function () {
+	//             const $this = $(this);
+	//             if ($this.attr('name').includes('.Description')) {
+	//                 if (costTypesWhichRequiredDesc.includes($thisRow.find(`[name$='CostType']`).val())) {
+	//                     isValid = isValid === false ? false : $this.val() !== '';
+	//                     if ($this.val() === '') {
+	//                         showValidationMsg($this);
+	//                     }
+	//                 }
+	//             } else if ($this.attr('name').includes('.Techs')) {
+	//                 if ($thisRow.find(`[name$='CostType']`).val() === 'Labor') {
+	//                     isValid = isValid === false ? false : $this.val() !== '';
+	//                     if ($this.val() === '') {
+	//                         showValidationMsg($this);
+	//                     }
+	//                 }
+	//             } else {
+	//                 isValid = isValid === false ? false : $this.val() !== '';
+	//                 if ($this.val() === '') {
+	//                     showValidationMsg($this);
+	//                 }
+	//             }
+	//         });
+	//     });
+
+	//     var isIncurredCostToggleVal = ($('input[name="IsIncurredCost"]:checked').val().toLowerCase() === 'true');
+	//     if (isIncurredCostToggleVal == true) {
+	//         if ($("#Incurred-Issue-Description").val() == null || $("#Incurred-Issue-Description").val() == '') {
+	//             isValid = false;
+	//             $("#Incurred-Issue-Description-error").text("Description is required.");
+	//         }
+	//         if ($("#Proposed-Issue-Description").val() == null || $("#Proposed-Issue-Description").val() == '') {
+	//             isValid = false;
+	//             $("#Proposed-Issue-Description-error").text("Description is required.");
+	//         }
+	//     } else {
+	//         if ($("#Proposed-Issue-Description").val() == null || $("#Proposed-Issue-Description").val() == '') {
+	//             isValid = false;
+	//             $("#Proposed-Issue-Description-error").text("Description is required.");
+	//         }
+	//     }
+
+	//     return isValid;
+	// }
+	function validateBreakoutTables() {
+
+
+		let tableSelector = '#proposedBreakoutTable';
+		// Check if any rows are added
+		var table = document.querySelector('#incurredBreakoutTable');
+		var rows = table.getElementsByTagName('tr'); // Get all the rows in the table
+
+		if (rows.length > 0) tableSelector += ', #incurredBreakoutTable';
+
+		const costTypesWhichRequiredDesc = ['Materials', 'Equipment', 'Fees', 'Miscellaneous', 'Other'];
+		let isValid = true;
+
+		$(tableSelector).find('tbody tr').each(function () {
+			const $thisRow = $(this);
+
+			// Validate CostType field
+			const costType = $thisRow.find(`[name$='CostType']`);
+			if (costType.val() === '--select--' || costType.val() === '') {
+				isValid = false;
+				showValidationMsg(costType);
+			}
+
+			// Validate other fields
+			$thisRow.find('select, input, textarea').not('[readonly], :disabled').each(function () {
+				const $this = $(this);
+
+				// Description field validation
+				if ($this.attr('name').includes('.Description')) {
+					if (costTypesWhichRequiredDesc.includes($thisRow.find(`[name$='CostType']`).val())) {
+						isValid = isValid && $this.val() !== '';
+						if ($this.val() === '') {
+							showValidationMsg($this);
+						}
+					}
+				}
+
+				// Techs field validation
+				else if ($this.attr('name').includes('.Techs')) {
+					if ($thisRow.find(`[name$='CostType']`).val() === 'Labor') {
+						isValid = isValid && $this.val() !== '';
+						if ($this.val() === '') {
+							showValidationMsg($this);
+						}
+					}
+				}
+
+				// Other fields validation
+				else {
+					isValid = isValid && $this.val() !== '';
+					if ($this.val() === '') {
+						showValidationMsg($this);
+					}
+				}
+			});
+		});
+
+		var table = document.querySelector('#incurredBreakoutTable');
+		var rows = table.getElementsByTagName('tr'); // Get all the rows in the table
+
+		if (rows.length > 1     ) {
+			if ($("#Incurred-Issue-Description").val() === '') {
+				isValid = false;
+				$("#Incurred-Issue-Description-error").text("Description is required.");
+			}
+			if ($("#Proposed-Issue-Description").val() === '') {
+				isValid = false;
+				$("#Proposed-Issue-Description-error").text("Description is required.");
+			}
+		} else {
+			if ($("#Proposed-Issue-Description").val() === '') {
+				isValid = false;
+				$("#Proposed-Issue-Description-error").text("Description is required.");
+
+			}
+		}
+
+		const serviceDateInput = document.getElementById('service-date');
+		const errorMessage = document.getElementById('service-date-error');
+
+		if (!serviceDateInput.value) {
+			isValid = false;
+			errorMessage.textContent = 'Service date is required.';
+		}
+
+		return isValid;
+	}
+
+	function validateServiceProposal() {
+		var isvalidateServiceProposal = true;
+		// if ($("#message").val() == '' || $("#message").val() == null) {
+		//     $("#message-error").text("Message is required");
+		//     isvalidateServiceProposal = false;
+		// }
+
+		// if ($("#disclaimer").val() == '' || $("#disclaimer").val() == null) {
+		//     $("#disclaimer-error").text("Disclaimer is required");
+		//     isvalidateServiceProposal = false;
+		// }
+
+		// if ($("#description-of-services").val() == '' || $("#description-of-services").val() == null) {
+		//     $("#description-of-services-error").text("Description of Services is required.");
+		//     isvalidateServiceProposal = false;
+		// }
+
+		return isvalidateServiceProposal;
+	}
+
+	function validateSMGFacilitiesProposalForm() {
+		let isValidSMGFacilitiesProposalForm = true;
+
+		// Clear all previous error messages first
+		$("#smg-vendor-po-error").text("");
+		$("#smg-client-error").text("");
+		$("#location-error").text("");
+		$("#vendor-error").text("");
+		$("#email-error").text("");
+		$("#store-number-error").text("");
+		$("#service-rep-name-error").text("");
+
+		let SMGVendorPOVal = $("#smg-vendor-po").val();
+		let SMGClientVal = $("#smg-client").val();
+		let LocationVal = $("#location").val();
+		let VendorVal = $("#vendor").val();
+		let EmailVal = $("#email").val();
+		let StoreNumberVal = $("#store-number").val();
+		let ServiceRepNameVal = $("#service-rep-name").val();
+
+		// SMG Vendor PO Validation
+		if (!SMGVendorPOVal) {
+			isValidSMGFacilitiesProposalForm = false;
+			$("#smg-vendor-po-error").text("Vendor PO is required.");
+		} else {
+			const regex = /^\d{6}$|^\d{6}-\d{2}$/;
+			if (!regex.test(SMGVendorPOVal)) {
+				isValidSMGFacilitiesProposalForm = false;
+				$("#smg-vendor-po-error").text("SMG Vendor PO must be in this digit format ###### or ######-##.");
+			}
+		}
+
+		// Store Name Validation
+		if (!SMGClientVal) {
+			isValidSMGFacilitiesProposalForm = false;
+			$("#smg-client-error").text("Store Name is required.");
+		} else {
+			const regex = /^[a-zA-Z\s]+$/;
+			if (!regex.test(SMGClientVal)) {
+				isValidSMGFacilitiesProposalForm = false;
+				$("#smg-client-error").text("Store Name can only contain alphabetic characters and spaces.");
+			}
+		}
+
+		// Vendor Validation
+		if (!VendorVal) {
+			isValidSMGFacilitiesProposalForm = false;
+			$("#vendor-error").text("Vendor is required.");
+		}
+
+		// Email Validation
+		if (!EmailVal) {
+			isValidSMGFacilitiesProposalForm = false;
+			$("#email-error").text("Email is required.");
+		} else if (!emailRegex.test(EmailVal)) {
+			isValidSMGFacilitiesProposalForm = false;
+			$("#email-error").text("Invalid Email format.");
+		}
+
+		// Service Rep Name Validation
+		const serviceRepNamePattern = /^[a-zA-Z\s]+$/;
+		if (!ServiceRepNameVal || ServiceRepNameVal.trim() === '') {
+			isValidSMGFacilitiesProposalForm = false;
+			$("#service-rep-name-error").text("Service Representative Name is required.");
+		} else if (!serviceRepNamePattern.test(ServiceRepNameVal)) {
+			isValidSMGFacilitiesProposalForm = false;
+			$("#service-rep-name-error").text("Service Representative Name can only contain letters and spaces.");
+		}
+
+		// Store Number Validation (optional field)
+		if (StoreNumberVal && StoreNumberVal.trim() !== '') {
+			const digitOnlyPattern = /^\d+$/;
+			if (!digitOnlyPattern.test(StoreNumberVal)) {
+				isValidSMGFacilitiesProposalForm = false;
+				$("#store-number-error").text("Store number must be numeric.");
+			}
+		}
+
+		debugger
+
+		return isValidSMGFacilitiesProposalForm;
+	}
+
+	function validatePartsLeadTime() {
+		let isPartsLeadTime = true;
+		let isPartsLeadSelected = false;
+
+		$('#proposedBreakoutTable select[name$=".CostType"]').each(function () {
+			const costType = $(this).val(); // Get the value of the current dropdown
+			if (costType === "Materials") {
+				isPartsLeadSelected = true;
+			}
+		});
+
+		if (isPartsLeadSelected) {
+			if ($("#timeOption").val() == '' || $("#timeOption").val() == null) {
+				isPartsLeadTime = false;
+				$('#timeOption-error').text('Please select time option.');
+			}
+			else {
+				if ($("#timeOption").val() == "Number") {
+					if ($("#Time-Number").val() == '' || $("#Time-Number").val() == null) {
+						isPartsLeadTime = false;
+						$("#Time-Number-error").text("Please select Time Number");
+					}
+				}
+				else if ($("#timeOption").val() == "Range") {
+					if ($("#Time-Range-From").val() == '' || $("#Time-Range-From").val() == null) {
+						isPartsLeadTime = false;
+						$("#Time-Range-From-error").text("Please select Time Range From");
+					}
+					if ($("#Time-Range-To").val() == '' || $("#Time-Range-To").val() == null) {
+						isPartsLeadTime = false;
+						$("#Time-Range-To-error").text("Please select Time Number");
+					}
+				}
+			}
+
+			if ($("#Time-Unit").val() == '' || $("#Time-Unit").val() == null) {
+				isPartsLeadTime = false;
+				$("#Time-Unit-error").text("Please select Time Unit");
+			}
+
+		}
+
+
+		return isPartsLeadTime;
+	}
+
+	var myModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
 </script>
