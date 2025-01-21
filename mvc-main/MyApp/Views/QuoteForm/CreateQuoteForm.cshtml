@@ -931,12 +931,6 @@
 			}
 		});
 
-		// Add this to handle form submission completion
-		$('#submit-quoteform').on('submit', function() {
-			// Show loader when form starts submitting
-			$('#loader').show();
-		});
-
 		// Close Modal
 		$("#confirmationModal").on("hidden.bs.modal", function () {
 			$('.initial-call-table tbody tr').remove();
@@ -1103,20 +1097,21 @@
 		// Remove row and recalculate totals
 		$('#incurredBreakoutTable').on('click', '.remove-btn', function () {
 			$(this).closest('tr').remove(); // Remove the row
-
+			
 			var table = document.querySelector('#incurredBreakoutTable');
 			var tbody = table.querySelector('tbody');
-			var rows = tbody.getElementsByTagName('tr'); // Get all rows in tbody specifically
+			var rows = tbody.getElementsByTagName('tr');
 
-			console.log("Row count before removal:", rows.length);
+			// Reindex remaining rows
+			reindexTableRows('#incurredBreakoutTable', 'IncurredBreakouts');
 
 			if (rows.length < 1) {
 				$("#Incurred-Issue-Description-error").text('');
 				$("#Incurred-Issue-Description").val('');
 				$('#Incurred-Sub-Total').val('');
 				$('#Incurred-Tax').val('');
-				$('#Incurred-Initial-Call-Total ').val('');
-			}else{
+				$('#Incurred-Initial-Call-Total').val('');
+			} else {
 				calculateTotal('#proposedBreakoutTable',
 					'input[name="ProposedTotals.ProposedSubTotal"]',
 					'input[name="ProposedTotals.ProposedTax"]',
@@ -1127,65 +1122,54 @@
 					'input[name="IncurredTotals.IncurredInitialCallTotal"]');
 				calculateGrandTotal();
 			}
-
-
-
 		});
+
 		$('#proposedBreakoutTable').on('click', '.remove-btn', function () {
-			const tableId = $(this).closest('table').attr('id');
 			const tbody = $(this).closest('tbody');
 			const rowCount = tbody.find('tr').length;
-
-			console.log("Row count before removal:", rowCount);
 
 			if (rowCount > 1) {
 				const currentRow = $(this).closest('tr');
 				currentRow.remove(); // Remove the row
 
+				// Reindex remaining rows
+				reindexTableRows('#proposedBreakoutTable', 'ProposedBreakouts');
+
 				// Check if any row still has Cost Type = "Materials"
 				let isMaterialsSelected = false;
 				$('#proposedBreakoutTable select[name$=".CostType"]').each(function () {
-					const costType = $(this).val();
-					if (costType === "Materials") {
+					if ($(this).val() === "Materials") {
 						isMaterialsSelected = true;
 					}
 				});
 
-				// Show or hide the Parts Lead Time component based on remaining rows
+				// Update Parts Lead Time visibility
 				if (isMaterialsSelected) {
-					console.log("Keeping PartsLeadTimeCoponent visible");
 					$('#PartsLeadTimeCoponentDesc').show();
 				} else {
-					console.log("Hiding PartsLeadTimeCoponent and clearing data");
-
-					// Hide the Parts Lead Time component
 					$('#PartsLeadTimeCoponentDesc').hide();
-
-					// Clear the data in the Parts Lead Time fields
-					$('#timeOption').val(''); // Reset Time Option
-					$('#Time-Number').val(''); // Clear Time Number
-					$('#Time-Range-From').val(''); // Clear Time Range From
-					$('#Time-Range-To').val(''); // Clear Time Range To
-					$('#Time-Unit').val(''); // Clear Time Unit
-
-					// Hide both Number and Range option fields
+					$('#timeOption').val('');
+					$('#Time-Number').val('');
+					$('#Time-Range-From').val('');
+					$('#Time-Range-To').val('');
+					$('#Time-Unit').val('');
 					$('#numberOptionFields').hide();
 					$('#rangeOptionFields').hide();
 				}
+
+				// Recalculate totals
+				calculateTotal('#proposedBreakoutTable',
+					'input[name="ProposedTotals.ProposedSubTotal"]',
+					'input[name="ProposedTotals.ProposedTax"]',
+					'input[name="ProposedTotals.ProposedInitialCallTotal"]');
+				calculateTotal('#incurredBreakoutTable',
+					'input[name="IncurredTotals.IncurredSubTotal"]',
+					'input[name="IncurredTotals.IncurredTax"]',
+					'input[name="IncurredTotals.IncurredInitialCallTotal"]');
+				calculateGrandTotal();
 			} else {
 				toastr.error("At least one row must remain in the table.");
 			}
-
-			// Recalculate totals after removal
-			calculateTotal('#proposedBreakoutTable',
-				'input[name="ProposedTotals.ProposedSubTotal"]',
-				'input[name="ProposedTotals.ProposedTax"]',
-				'input[name="ProposedTotals.ProposedInitialCallTotal"]');
-			calculateTotal('#incurredBreakoutTable',
-				'input[name="IncurredTotals.IncurredSubTotal"]',
-				'input[name="IncurredTotals.IncurredTax"]',
-				'input[name="IncurredTotals.IncurredInitialCallTotal"]');
-			calculateGrandTotal();
 		});
 
 		function calculateSubTotal(row) {
@@ -1235,7 +1219,6 @@
 
 				isMaterialsSelected = false;
 			}
-				debugger
 
 			// Update placeholder for input[name$=".Description"]
 			$('#proposedBreakoutTable textarea[name$=".Description"]').each(function () {
@@ -1915,7 +1898,7 @@
 			isValidSMGFacilitiesProposalForm = false;
 			$("#email-error").text("Email is required.");
 		} else if (!emailRegex.test(EmailVal)) {
-			isValidSMGFacilitiesProposalForm = false;
+				isValidSMGFacilitiesProposalForm = false;
 			$("#email-error").text("Invalid Email format.");
 		}
 
@@ -1925,7 +1908,7 @@
 			isValidSMGFacilitiesProposalForm = false;
 			$("#service-rep-name-error").text("Service Representative Name is required.");
 		} else if (!serviceRepNamePattern.test(ServiceRepNameVal)) {
-			isValidSMGFacilitiesProposalForm = false;
+				isValidSMGFacilitiesProposalForm = false;
 			$("#service-rep-name-error").text("Service Representative Name can only contain letters and spaces.");
 		}
 
@@ -1989,5 +1972,29 @@
 		return isPartsLeadTime;
 	}
 
-	var myModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+	// var myModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+
+	// Add this new function to handle reindexing
+	function reindexTableRows(tableSelector, arrayName) {
+		$(tableSelector + ' tbody tr').each(function(index) {
+			// Update CostType select
+			$(this).find(`select[name^="${arrayName}"]`).attr('name', `${arrayName}[${index}].CostType`);
+			
+			// Update Description textarea
+			$(this).find(`textarea[name^="${arrayName}"]`).attr('name', `${arrayName}[${index}].Description`);
+			
+			// Update Techs input
+			$(this).find(`input[name^="${arrayName}"][name$=".Techs"]`).attr('name', `${arrayName}[${index}].Techs`);
+			
+			// Update Quantity input
+			$(this).find(`input[name^="${arrayName}"][name$=".Quantity"]`).attr('name', `${arrayName}[${index}].Quantity`);
+			
+			// Update Rate input
+			$(this).find(`input[name^="${arrayName}"][name$=".Rate"]`).attr('name', `${arrayName}[${index}].Rate`);
+			
+			// Update InitialCallSubTotal input
+			$(this).find(`input[name^="${arrayName}"][name$=".InitialCallSubTotal"]`)
+				.attr('name', `${arrayName}[${index}].InitialCallSubTotal`);
+		});
+	}
 </script>

@@ -116,6 +116,7 @@ namespace MyApp.Controllers
                         long fileSizeInMegabytes = fileSizeInKilobytes / 1024; // Size in MB
                         if (fileSizeInMegabytes > 10)
                         {
+                            logMessageBuilder.AppendLine($"Uploaded signature file is too large: [{model.AttachmentFile.FileName}]");
                             ModelState.AddModelError("AttachmentFile", "Please upload file less than 10MB.");
                             return View("CreateQuoteForm", model);
                         }
@@ -139,10 +140,15 @@ namespace MyApp.Controllers
                         _context.ProposedBreakouts.Add(proposed);
                     }
                 }
+                else
+                {
+                    logMessageBuilder.AppendLine("ProposedBreakouts is null");
+                }
 
                 // Store IncurredBreakouts and IncurredTotals based on IsIncurredCost
                 if (model.IncurredBreakouts == null)
                 {
+                    logMessageBuilder.AppendLine($"IncurredBreakouts is null");
                     model.IsIncurredCost = false;
                     //model.IncurredTotals = null;
                 }
@@ -150,8 +156,6 @@ namespace MyApp.Controllers
                 {
                     if (model.IncurredBreakouts != null)
                     {
-
-
                         foreach (var incurred in model.IncurredBreakouts)
                         {
                             if (!string.IsNullOrEmpty(incurred.Description))
@@ -161,6 +165,7 @@ namespace MyApp.Controllers
                                 _context.IncurredBreakouts.Add(incurred);
                             }
                         }
+                       
                     }
                 }
                 var grandTotal = model.QuoteGrandTotal;
