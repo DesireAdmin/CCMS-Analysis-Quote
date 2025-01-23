@@ -134,6 +134,7 @@
 						</div>
 						<div>
 							<input asp-for="StoreNumber" id="store-number" class="form-control" maxlength="30" placeholder="Enter Store Number" />
+							<span asp-validation-for="StoreNumber" id="store-number-error" class="text-danger"></span>
 							@* Validation message removed as Store Number is optional *@
 						</div>
 					</div>
@@ -1964,6 +1965,8 @@
 			if ($("#Time-Unit").val() == '' || $("#Time-Unit").val() == null) {
 				isPartsLeadTime = false;
 				$("#Time-Unit-error").text("Please select Time Unit");
+			}else{
+				$("#Time-Unit-error").text("");
 			}
 
 		}

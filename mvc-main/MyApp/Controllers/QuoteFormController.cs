@@ -191,12 +191,12 @@ namespace MyApp.Controllers
                 emailbody = emailbody.Replace("{{Location}}", model.Location);
                 if (model.AttachmentFile != null && model.AttachmentFile.Length > 0)
                 {
-                    await _bradEmail.SendEmailAsync(model.Email, "Brad email", emailbody, pdfdata, model.AttachmentFile);
+                    await _bradEmail.SendEmailAsync(model.Email, $"Proposal submitted for {model.SMG_CLIENT} - {model.SMG_Vendor_PO} - {model.Vendor}", emailbody, pdfdata, model.AttachmentFile);
                 }
                 else
                 {
                     // No file attachment, pass null for the file
-                    await _bradEmail.SendEmailAsync(model.Email, "Brad email", emailbody, pdfdata, null);
+                    await _bradEmail.SendEmailAsync(model.Email, $"Proposal submitted for {model.SMG_CLIENT} - {model.SMG_Vendor_PO} - {model.Vendor}", emailbody, pdfdata, null);
                 }
 
                 logMessageBuilder.AppendLine($"Email sent to [{model.Email}]");

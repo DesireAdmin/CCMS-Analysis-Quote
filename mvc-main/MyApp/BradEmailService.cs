@@ -27,8 +27,8 @@ namespace MyApp
             using (MailMessage mail = new MailMessage())
             {
                 mail.From = new MailAddress(_config["SmtpConfig:Username"]);
-                mail.To.Add(email);
-                mail.CC.Add("desireinfoweb@smgholdingsllc.com");
+                mail.To.Add("proposals@smgholdingsllc.com");
+                mail.CC.Add(email);
                 mail.Subject = subject;
                 mail.Body = message;
                 mail.IsBodyHtml = true;
